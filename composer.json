@@ -1,5 +1,5 @@
 {
-  "name"       : "matthewbaggett/active_record",
+  "name"       : "thru.io/active_record",
   "description": "An active-record like implementation",
   "authors"    : [
     {
@@ -12,7 +12,7 @@
   },
   "autoload"   : {
     "psr-0": {
-      "FourOneOne\\ActiveRecord\\": ""
+      "Thru\\ActiveRecord\\": ""
     }
   }
 }
