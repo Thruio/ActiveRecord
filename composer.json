@@ -1,5 +1,5 @@
 {
-  "name"       : "fouroneone/ActiveRecord",
+  "name"       : "matthewbaggett/active_record",
   "description": "An active-record like implementation",
   "authors"    : [
     {
