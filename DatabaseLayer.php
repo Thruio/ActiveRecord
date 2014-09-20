@@ -1,7 +1,7 @@
 <?php
-namespace FourOneOne\ActiveRecord;
+namespace Thru\ActiveRecord;
 
-use FourOneOne\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\Exception;
 
 class DatabaseLayer
 {

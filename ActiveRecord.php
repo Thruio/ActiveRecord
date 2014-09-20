@@ -1,8 +1,8 @@
 <?php
 
-namespace FourOneOne\ActiveRecord;
+namespace Thru\ActiveRecord;
 
-use FourOneOne\ActiveRecord\DatabaseLayer\Insert;
+use Thru\ActiveRecord\DatabaseLayer\Insert;
 
 class ActiveRecord
 {

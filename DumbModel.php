@@ -1,6 +1,6 @@
 <?php
 
-namespace FourOneOne\ActiveRecord;
+namespace Thru\ActiveRecord;
 
 class DumbModel
 {

@@ -1,18 +1,18 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer\Sql;
+namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
-use FourOneOne\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\Exception;
 
 class Sqlite extends Base
 {
 
     /**
      * Turn a VirtualQuery into a SQL statement
-     * @param \FourOneOne\ActiveRecord\DatabaseLayer\VirtualQuery $thing
+     * @param \Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing
      * @return array of results
      * @throws Exception
      */
-    public function process(\FourOneOne\ActiveRecord\DatabaseLayer\VirtualQuery $thing)
+    public function process(\Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing)
     {
         $fields = array();
         $tables = array();
@@ -21,7 +21,7 @@ class Sqlite extends Base
 
         // SELECTORS
         foreach ($thing->getTables() as $table) {
-            /* @var $table \FourOneOne\ActiveRecord\DatabaseLayer\Table */
+            /* @var $table \Thru\ActiveRecord\DatabaseLayer\Table */
             $tables[] = $table->getName() . " " . $table->getAlias();
             foreach ($table->getFields() as $field) {
                 $fields[] = $table->getAlias() . "." . $field;
@@ -33,7 +33,7 @@ class Sqlite extends Base
         // CONDITIONS
         if(count($thing->getConditions()) > 0){
             foreach($thing->getConditions() as $condition){
-                /* @var $condition \FourOneOne\ActiveRecord\DatabaseLayer\Condition */
+                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
                 if($condition->getOperation() == "IN"){
                     $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
                 }else{
@@ -58,7 +58,7 @@ class Sqlite extends Base
         // Handle ORDERs
         if(count($thing->getOrders()) > 0){
             foreach($thing->getOrders() as $order){
-                /* @var $order \FourOneOne\ActiveRecord\DatabaseLayer\Order */
+                /* @var $order \Thru\ActiveRecord\DatabaseLayer\Order */
                 $column = $order->getColumn();
                 switch(strtolower($order->getDirection())){
                     case 'asc':

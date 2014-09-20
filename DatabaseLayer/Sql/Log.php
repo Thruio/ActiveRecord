@@ -1,5 +1,5 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer\Sql;
+namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 class Log
 {

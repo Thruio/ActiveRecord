@@ -1,5 +1,5 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer;
+namespace Thru\ActiveRecord\DatabaseLayer;
 
 class Condition
 {

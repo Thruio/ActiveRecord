@@ -1,5 +1,5 @@
 <?php
-namespace FourOneOne\ActiveRecord;
+namespace Thru\ActiveRecord;
 
 class UUID {
   public static function v3($namespace, $name) {

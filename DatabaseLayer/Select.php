@@ -1,7 +1,7 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer;
+namespace Thru\ActiveRecord\DatabaseLayer;
 
-use FourOneOne\ActiveRecord\Exception;
+use Thru\ActiveRecord\Exception;
 
 class Select extends VirtualQuery
 {
@@ -15,7 +15,7 @@ class Select extends VirtualQuery
      * @param $alias
      * @param string $fields
      * @return $this
-     * @throws \FourOneOne\ActiveRecord\Exception
+     * @throws \Thru\ActiveRecord\Exception
      */
     public function fields($alias, $fields = '*')
     {

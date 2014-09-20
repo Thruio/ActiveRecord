@@ -1,7 +1,7 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer;
+namespace Thru\ActiveRecord\DatabaseLayer;
 
-use FourOneOne\ActiveRecord\Exception;
+use Thru\ActiveRecord\Exception;
 
 class Delete extends VirtualQuery
 {

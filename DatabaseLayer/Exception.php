@@ -1,7 +1,7 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer;
+namespace Thru\ActiveRecord\DatabaseLayer;
 
-class Exception extends \FourOneOne\ActiveRecord\Exception
+class Exception extends \Thru\ActiveRecord\Exception
 {
 
 }

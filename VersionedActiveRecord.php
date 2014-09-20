@@ -2,7 +2,7 @@
 
 namespace ActiveRecord;
 
-use FourOneOne\ActiveRecord\ActiveRecord;
+use Thru\ActiveRecord\ActiveRecord;
 
 class VersionedActiveRecord extends ActiveRecord
 {

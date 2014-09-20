@@ -1,7 +1,7 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer;
+namespace Thru\ActiveRecord\DatabaseLayer;
 
-use FourOneOne\ActiveRecord\Exception;
+use Thru\ActiveRecord\Exception;
 
 class VirtualQuery
 {
@@ -49,10 +49,10 @@ class VirtualQuery
     }
 
     /**
-     * @return \FourOneOne\ActiveRecord\DatabaseLayer\Sql\Base
+     * @return \Thru\ActiveRecord\DatabaseLayer\Sql\Base
      */
     protected function getInterpreter(){
-        $sql_interpreter_name = "\\FourOneOne\\ActiveRecord\\DatabaseLayer\\Sql\\" . \FourOneOne\ActiveRecord\DatabaseLayer::get_instance()->get_option('db_type');
+        $sql_interpreter_name = "\\Thru\\ActiveRecord\\DatabaseLayer\\Sql\\" . \Thru\ActiveRecord\DatabaseLayer::get_instance()->get_option('db_type');
         $sql_interpreter = $sql_interpreter_name::factory();
         return $sql_interpreter;
     }

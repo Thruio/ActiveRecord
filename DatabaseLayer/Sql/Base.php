@@ -1,9 +1,9 @@
 <?php
-namespace FourOneOne\ActiveRecord\DatabaseLayer\Sql;
+namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
-use FourOneOne\ActiveRecord\DatabaseLayer;
-use FourOneOne\ActiveRecord\DatabaseLayer\Exception;
-use FourOneOne\ActiveRecord\DatabaseLayer\VirtualQuery;
+use Thru\ActiveRecord\DatabaseLayer;
+use Thru\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 
 class Base extends \PDO
 {
