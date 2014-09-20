@@ -4,7 +4,7 @@
   "authors"    : [
     {
       "name" : "Matthew Baggett",
-      "email": "matthew@Thru.us"
+      "email": "matthew@baggett.me"
     }
   ],
   "require"    : {
@@ -12,7 +12,7 @@
   },
   "autoload"   : {
     "psr-0": {
-      "Thru\\ActiveRecord\\": ""
+      "Thru\\ActiveRecord\\": "src/"
     }
   }
 }

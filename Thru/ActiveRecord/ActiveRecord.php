@@ -2,8 +2,6 @@
 
 namespace Thru\ActiveRecord;
 
-use Thru\ActiveRecord\DatabaseLayer\Insert;
-
 class ActiveRecord
 {
     static protected $MYSQL_FORMAT = "Y-m-d H:i:s";
@@ -49,6 +47,7 @@ class ActiveRecord
      */
     static public function getAll($limit = null, $order = null, $order_direction = "ASC")
     {
+        //TODO: Old drupaly leftover needs cleanup.
         watchdog("ActiveRecord", "ActiveRecord::getAll() is deprecated, please use get_all()");
         return self::get_all($limit, $order, $order_direction);
     }
