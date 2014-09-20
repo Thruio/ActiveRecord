@@ -6,7 +6,7 @@ use Thru\ActiveRecord\DatabaseLayer\Exception;
 class DatabaseLayer
 {
 
-    const DSN_REGEX = '/^(?P<user>\*)(:(?P<password>\w+))?@(?P<host>[.\w]+)(:(?P<port>\d+))?\\\\(?P<database>\w+)$/im';
+    const DSN_REGEX = '/^(?P<user>\w+)(:(?P<password>\w+))?@(?P<host>[.\w]+)(:(?P<port>\d+))?\\\\(?P<database>\w+)$/im';
 
     static $instance;
     private $options;
