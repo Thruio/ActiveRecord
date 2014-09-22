@@ -45,7 +45,6 @@ class Base extends \PDO
       switch($error[0]){
         case '42S02':
           $instance = new $model();
-          \Kint::dump($instance, $model);
           if($instance instanceof ActiveRecord) {
             $table_builder = new TableBuilder();
             $table_builder->build($instance);
