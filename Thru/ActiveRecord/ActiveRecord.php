@@ -238,7 +238,7 @@ class ActiveRecord
     /**
      * Work out which columns should be saved down.
      */
-    protected function _calculate_save_down_rows()
+    public function _calculate_save_down_rows()
     {
         if (!$this->_columns_to_save_down) {
             foreach (get_object_vars($this) as $potential_column => $discard) {

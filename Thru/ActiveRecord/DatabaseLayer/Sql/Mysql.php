@@ -2,6 +2,7 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Thru\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\ActiveRecord;
 
 class Mysql extends Base
 {
@@ -314,5 +315,27 @@ class Mysql extends Base
         }
         $this->known_indexes[$table] = $results;
         return $results;
+    }
+
+    public function buildTable(ActiveRecord $model){
+        $params = array();
+        foreach($model->_calculate_save_down_rows() as $p => $parameter){
+            $type = "varchar(200)";
+            if($p == 0){
+                // First param always primary key
+                $type = "int(10)";
+                $primary_key_parameter = $parameter;
+            }
+            $nullability = "NOT NULL";
+            $params[] = "  `{$parameter}` {$type} {$nullability}";
+        }
+        $params[] = "  PRIMARY KEY (`$primary_key_parameter`)";
+
+        $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
+        $query.= "(\n";
+        $query.= implode(",\n", $params)."\n";
+        $query.= ")\n";
+        $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
+        die("<pre>" . $query);
     }
 }

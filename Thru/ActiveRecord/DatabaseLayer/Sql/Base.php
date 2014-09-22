@@ -1,9 +1,11 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
+use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer;
-use Thru\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\Exception as Exception;
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
+use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 
 class Base extends \PDO
 {
@@ -40,7 +42,21 @@ class Base extends \PDO
 
     $error = parent::errorInfo();
     if($error[0] !== '00000'){
-      throw new \Exception($error[2]);
+      switch($error[0]){
+        case '42S02':
+          $instance = new $model();
+          \Kint::dump($instance, $model);
+          if($instance instanceof ActiveRecord) {
+            $table_builder = new TableBuilder();
+            $table_builder->build($instance);
+            $this->query($query); // Re-run the query
+          }else{
+            throw new Exception($error[0] . ": " . $error[2] . "... and is not an ActiveRecord object, so we can't create it anyway!");
+          }
+          break;
+        default:
+          throw new Exception($error[0] . ": " . $error[2]);
+      }
     }
 
     $exec_time_end = microtime(true);
