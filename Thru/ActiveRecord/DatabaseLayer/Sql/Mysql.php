@@ -318,16 +318,45 @@ class Mysql extends Base
     }
 
     public function buildTable(ActiveRecord $model){
+
+        $schema = $this->parseClassDefinition($model);
         $params = array();
         foreach($model->_calculate_save_down_rows() as $p => $parameter){
+            $auto_increment = false;
             $type = "varchar(200)";
+            if(isset($schema[$parameter])){
+              $psuedo_type = $schema[$parameter]['type'];
+              switch($psuedo_type){
+                case 'int':
+                case 'integer':
+                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
+                  $type = "INT({$length})";
+                  break;
+                case 'string':
+                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
+                  $type = "VARCHAR({$length})";
+                  break;
+                case 'datetime':
+                  $type = 'DATETIME';
+                  break;
+                case 'enum':
+                  $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
+                  break;
+              }
+            }
+
             if($p == 0){
                 // First param always primary key
-                $type = "int(10)";
                 $primary_key_parameter = $parameter;
+                $auto_increment = true;
+            }
+            if($auto_increment){
+              $auto_increment_sql = 'AUTO_INCREMENT';
+            }else{
+              $auto_increment_sql = '';
             }
             $nullability = "NOT NULL";
-            $params[] = "  `{$parameter}` {$type} {$nullability}";
+            $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
         $params[] = "  PRIMARY KEY (`$primary_key_parameter`)";
 
@@ -336,6 +365,51 @@ class Mysql extends Base
         $query.= implode(",\n", $params)."\n";
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
-        die("<pre>" . $query);
+
+        #die("<pre>" . $query);
+        $this->query($query);
+    }
+
+    private function parseClassDefinition(ActiveRecord $model){
+        $rc = new \ReflectionClass($model);
+        $rows = explode("\n", $rc->getDocComment());
+        $variables = [];
+        foreach($rows as &$row){
+            $row = str_replace("*", "", $row);
+            $row = trim($row);
+            if(substr($row,0,4) == '@var'){
+                $property = $this->parseClassDefinitionProperty($model, $row);
+                $variables[$property['name']] = $property;
+            }
+        }
+        return $variables;
+    }
+
+    private function parseClassDefinitionProperty(ActiveRecord $model, $row){
+      $bits = explode(" ", $row,3);
+      $name = trim($bits[1],"$");
+      $type = $bits[2];
+      $type_bits = explode("(", $type, 2);
+      $type = $type_bits[0];
+      if($type == 'enum'){
+        $options = explode(",", $type_bits[1]);
+        foreach($options as &$option){
+          $option = trim($option);
+          $option = trim($option, "'\")");
+        }
+      }else{
+        $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
+      }
+
+      $definition = array();
+      $definition['name'] = $name;
+      $definition['type'] = $type;
+      if(isset($length)) {
+        $definition['length'] = $length;
+      }
+      if(isset($options)){
+        $definition['options'] = $options;
+      }
+      return $definition;
     }
 }
