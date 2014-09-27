@@ -2,6 +2,8 @@
 
 namespace Thru\ActiveRecord;
 
+use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
+
 class ActiveRecord
 {
     static protected $MYSQL_FORMAT = "Y-m-d H:i:s";
@@ -77,7 +79,8 @@ class ActiveRecord
      */
     public function __construct()
     {
-
+      $tableBuilder = new TableBuilder();
+      $tableBuilder->build($this);
     }
 
     /**
