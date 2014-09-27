@@ -345,6 +345,12 @@ class Mysql extends Base
                 case 'enum':
                   $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
                   break;
+                case 'text':
+                  $type = "TEXT";
+                  break;
+                case 'blob':
+                  $type = 'BLOB';
+                  break;
               }
             }
 
