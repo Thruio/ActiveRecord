@@ -3,7 +3,6 @@ namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer;
-use Thru\ActiveRecord\DatabaseLayer\Exception as Exception;
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 
@@ -44,17 +43,20 @@ class Base extends \PDO
     if($error[0] !== '00000'){
       switch($error[0]){
         case '42S02':
-          $instance = new $model();
-          if($instance instanceof ActiveRecord) {
-            $table_builder = new TableBuilder();
-            $table_builder->build($instance);
-            $this->query($query); // Re-run the query
-          }else{
-            throw new Exception($error[0] . ": " . $error[2] . "... and is not an ActiveRecord object, so we can't create it anyway!");
+          if($model != 'StdClass'){
+            $instance = new $model();
+            if($instance instanceof ActiveRecord) {
+              $table_builder = new TableBuilder();
+              $table_builder->build($instance);
+              $this->query($query); // Re-run the query
+            }else{
+              throw new DatabaseLayer\Exception($error[0] . ": " . $error[2] . "... and is not an ActiveRecord object, so we can't create it anyway! We were trying to run '{$query}'");
+            }
+            throw new DatabaseLayer\TableDoesntExistException($error[0] . ": " . $error[2]);
           }
           break;
         default:
-          throw new Exception($error[0] . ": " . $error[2]);
+          throw new DatabaseLayer\Exception($error[0] . ": " . $error[2]);
       }
     }
 

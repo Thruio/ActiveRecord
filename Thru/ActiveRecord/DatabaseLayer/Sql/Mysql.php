@@ -3,6 +3,8 @@ namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
+use Thru\ActiveRecord\DatabaseLayer\IndexException;
+use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
 
 class Mysql extends Base
 {
@@ -304,7 +306,9 @@ class Mysql extends Base
 
         $results = array();
         if(!$indexes instanceof \PDOStatement){
-          throw new \Exception("Error running query: {$query}");
+          $indexException = new IndexException("Error running query: {$query}");
+          $indexException->remedy = 'table_missing';
+          throw $indexException;
         }
         if($indexes->rowCount() > 0){
             foreach($indexes as $index){
@@ -318,7 +322,6 @@ class Mysql extends Base
     }
 
     public function buildTable(ActiveRecord $model){
-
         $schema = $this->parseClassDefinition($model);
         $params = array();
         foreach($model->_calculate_save_down_rows() as $p => $parameter){
@@ -366,8 +369,11 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
-        #die("<pre>" . $query);
-        $this->query($query);
+        try {
+          $this->query($query);
+        }Catch(Exception $e){
+          throw new TableBuildFailureException($e->getMessage());
+        }
     }
 
     private function parseClassDefinition(ActiveRecord $model){
@@ -386,11 +392,15 @@ class Mysql extends Base
     }
 
     private function parseClassDefinitionProperty(ActiveRecord $model, $row){
-      $bits = explode(" ", $row,3);
+      $bits = explode(" ", $row);
       $name = trim($bits[1],"$");
       $type = $bits[2];
       $type_bits = explode("(", $type, 2);
       $type = $type_bits[0];
+
+      $controls = array_slice($bits,3);
+      // TODO: Parse controls for relationships and so on.
+
       if($type == 'enum'){
         $options = explode(",", $type_bits[1]);
         foreach($options as &$option){
