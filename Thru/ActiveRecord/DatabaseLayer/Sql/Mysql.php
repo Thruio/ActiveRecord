@@ -329,27 +329,36 @@ class Mysql extends Base
             $type = "varchar(200)";
             if(isset($schema[$parameter])){
               $psuedo_type = $schema[$parameter]['type'];
-              switch($psuedo_type){
+              switch(strtolower($psuedo_type)){
                 case 'int':
                 case 'integer':
                   $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
                   $type = "INT({$length})";
                   break;
+
                 case 'string':
                   $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
                   $type = "VARCHAR({$length})";
                   break;
+
                 case 'datetime':
                   $type = 'DATETIME';
                   break;
+
                 case 'enum':
                   $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
                   break;
+
                 case 'text':
                   $type = "TEXT";
                   break;
+
                 case 'blob':
                   $type = 'BLOB';
+                  break;
+
+                case "decimal":
+                  $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
                   break;
               }
             }
