@@ -411,12 +411,12 @@ class Mysql extends Base
       $name = trim($bits[1],"$");
       $type = $bits[2];
       $type_bits = explode("(", $type, 2);
-      $type = $type_bits[0];
+      $type = strtolower($type_bits[0]);
 
       $controls = array_slice($bits,3);
       // TODO: Parse controls for relationships and so on.
 
-      if($type == 'enum'){
+      if($type == 'enum' || $type == 'decimal'){
         $options = explode(",", $type_bits[1]);
         foreach($options as &$option){
           $option = trim($option);
