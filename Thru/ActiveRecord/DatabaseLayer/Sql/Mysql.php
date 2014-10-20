@@ -360,6 +360,10 @@ class Mysql extends Base
                 case "decimal":
                   $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
                   break;
+
+                case "uuid":
+                  $type = "VARCHAR(36)";
+                  break;
               }
             }
 
