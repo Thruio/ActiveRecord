@@ -364,6 +364,14 @@ class Mysql extends Base
                 case "uuid":
                   $type = "VARCHAR(36)";
                   break;
+
+                case "md5":
+                  $type = "VARCHAR(" . strlen(md5("test")) . ")";
+                  break;
+
+                case "sha1":
+                  $type = "VARCHAR(" . strlen(sha1("test")) . ")";
+                  break;
               }
             }
 
