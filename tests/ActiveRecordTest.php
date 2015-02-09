@@ -8,7 +8,8 @@
 
 use \Thru\ActiveRecord\ActiveRecord;
 use \Thru\ActiveRecord\Test\TestModel;
-use Thru\ActiveRecord\Test\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
+
 class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
   public function testSetup(){
