@@ -2,8 +2,12 @@
          colors="true"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="conversions">
-            <file>Thru/ActiveRecord/tests/PrettyPrinterTest.php</file>
+        <testsuite name="main">
+            <file>tests/PrettyPrinterTest.php</file>
+            <file>tests/UUIDTest.php</file>
+        </testsuite>
+        <testsuite name="dblayer">
+
         </testsuite>
     </testsuites>
 </phpunit>
