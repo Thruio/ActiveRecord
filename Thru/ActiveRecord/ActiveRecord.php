@@ -355,6 +355,10 @@ class ActiveRecord
       $delete = $db->delete($this->get_table_name(), $this->get_table_alias());
       $delete->condition($this->get_table_primary_key(), $this->get_id());
       $delete->execute();
+
+      // Invalidate cache.
+      SearchIndex::get_instance()->expire($this->get_table_name(),$this->get_id());
+
       return true;
     }
 
