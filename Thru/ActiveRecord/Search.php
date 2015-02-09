@@ -65,7 +65,7 @@ class Search
           $select->fields($this->model->get_table_alias());
 
           // Add WHERE Conditions
-          foreach ((array) $this->conditions as $condition) {
+          foreach ((array)$this->conditions as $condition) {
             $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
           }
 
@@ -84,40 +84,7 @@ class Search
           $class = get_class($this->model);
           $select->setModel($class);
           $response = $select->execute();
-          $results = array();
-          foreach ($response as $result) {
-            if ($result->get_primary_key_index()) {
-              $results[$result->get_primary_key_index()] = $result;
-            } else {
-              $results[] = $result;
-            }
-          }
-
-          // Check for ActiveRecord_class and recast as needed
-          foreach ($results as $key => $result) {
-            $results[$key] = $result->__recast();
-          }
-
-          // Call __post_construct on each of the newly constructed objects.
-          foreach ($results as &$result) {
-            /* @var $result ActiveRecord */
-            $result->__post_construct();
-            if ($result->__requires_recast()) {
-              $result = $result->__recast();
-            }
-          }
-
-          // Just return the array as-it-comes from MySQL.
-          $output = $results;
-
-          if ($primary_key_search) {
-            $active_record_to_store = end($output);
-            if ($active_record_to_store instanceof ActiveRecord) {
-              SearchIndex::get_instance()
-                ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
-            }
-          }
-          return $output;
+          return $this->execProcessResponse($response, $primary_key_search);
         }catch(IndexException $e){
           if($e->remedy == 'table_missing'){
             $tableBuilder = new TableBuilder();
@@ -128,6 +95,42 @@ class Search
           throw $e;
         }
     }
+
+    private function execProcessResponse($response, $primary_key_search){
+      $results = array();
+
+      foreach ($response as $result) {
+        if ($result->get_primary_key_index()) {
+          $results[$result->get_primary_key_index()] = $result;
+        } else {
+          $results[] = $result;
+        }
+      }
+
+      // Check for ActiveRecord_class and recast as needed
+      foreach ($results as $key => $result) {
+        $results[$key] = $result->__recast();
+      }
+
+      // Call __post_construct on each of the newly constructed objects.
+      foreach ($results as &$result) {
+        /* @var $result ActiveRecord */
+        $result->__post_construct();
+        if ($result->__requires_recast()) {
+          $result = $result->__recast();
+        }
+      }
+
+      if ($primary_key_search) {
+        $active_record_to_store = end($results);
+        if ($active_record_to_store instanceof ActiveRecord) {
+          SearchIndex::get_instance()
+            ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
+        }
+      }
+      return $results;cco
+    }
+
 
     public function execOne()
     {
