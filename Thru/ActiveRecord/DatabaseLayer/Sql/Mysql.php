@@ -179,23 +179,8 @@ class Mysql extends Base
 
         $selector = "DELETE FROM {$table->getName()} ";
 
-        // CONDITIONS
-        if(count($thing->getConditions()) > 0){
-            foreach($thing->getConditions() as $condition){
-                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
-                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
-                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
-                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }else{
-                    $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
-                }
-            }
-            $conditions = "WHERE " . implode("\n  AND ", $conditions);
-        }else{
-            $conditions = null;
-        }
-
+        $conditions = $this->processConditions($thing);
+      
         $query = "{$selector}\n{$conditions}";
 
         $result = $this->query($query);
@@ -238,6 +223,26 @@ class Mysql extends Base
         return $insertId;
     }
 
+    private function processConditions($thing){
+        // CONDITIONS
+        if(count($thing->getConditions()) > 0){
+            foreach($thing->getConditions() as $condition){
+                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
+                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
+                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
+                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
+                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
+                }else{
+                    $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
+                }
+            }
+            $conditions = "WHERE " . implode("\n  AND ", $conditions);
+        }else{
+            $conditions = null;
+        }
+        return $conditions;
+    }
+
     public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
         $conditions = array();
 
@@ -264,22 +269,7 @@ class Mysql extends Base
         $selector = "UPDATE {$table->getName()} ";
         $data = "SET " . implode(", ", $updates);
 
-        // CONDITIONS
-        if(count($thing->getConditions()) > 0){
-            foreach($thing->getConditions() as $condition){
-                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
-                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
-                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
-                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }else{
-                    $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
-                }
-            }
-            $conditions = "WHERE " . implode("\n  AND ", $conditions);
-        }else{
-            $conditions = null;
-        }
+        $conditions = $this->processConditions($thing);
 
         $query = "{$selector}\n$data\n{$conditions}";
         //header("Content-type: text/plain"); echo $query; exit;
