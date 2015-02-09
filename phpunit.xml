@@ -16,7 +16,7 @@
             <file>tests/SearchRecordsTest.php</file>
         </testsuite>
         <testsuite name="dblayer">
-
+            <file>tests/DatabaseLayerSelectTest.php</file>
         </testsuite>
     </testsuites>
     <logging>
@@ -26,6 +26,8 @@
     <filter>
         <blacklist>
             <directory>vendor</directory>
+            <directory>tests</directory>
+            <directory>Thru/ActiveRecord/Test</directory>
         </blacklist>
     </filter>
 </phpunit>
