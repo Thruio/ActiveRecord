@@ -1,0 +1,8 @@
+{
+	"foo": "bar",
+	"string": "String Here",
+	"int": 6293,
+	"object": {
+		"inner": "inner"
+	}
+}

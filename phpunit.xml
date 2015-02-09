@@ -1,0 +1,9 @@
+<phpunit bootstrap="bootstrap.php"
+         colors="true"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="conversions">
+            <file>Thru/ActiveRecord/tests/PrettyPrinterTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -10,6 +10,9 @@
   "require"    : {
 
   },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
   "autoload"   : {
     "psr-0": {
       "Thru\\ActiveRecord\\": ""
