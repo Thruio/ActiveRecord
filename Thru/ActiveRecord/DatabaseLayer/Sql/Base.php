@@ -5,6 +5,7 @@ use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
+use Thru\ActiveRecord\Exception;
 
 class Base extends \PDO
 {
