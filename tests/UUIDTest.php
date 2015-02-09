@@ -51,10 +51,10 @@ class UUIDTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testGeneratedUUIDsUnique(){
-    $this->assertNotEquals(UUID::v4(), UUID::v4(), sprintf('Same UUID was not generated twice.'));
+    $this->assertNotEquals(UUID::v4(), UUID::v4(), 'Same UUID was not generated twice.');
   }
 
   public function testGenerateUUIDs(){
-    $this->assertTrue(Uuid::is_valid(UUID::v4()), sprintf('UUID generation works.'));
+    $this->assertTrue(UUID::is_valid(UUID::v4()), 'UUID generation works.');
   }
 }
