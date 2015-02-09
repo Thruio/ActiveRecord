@@ -3,6 +3,7 @@ namespace Thru\ActiveRecord;
 
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
+use ActiveRecord\VersionedActiveRecord;
 
 class Search
 {

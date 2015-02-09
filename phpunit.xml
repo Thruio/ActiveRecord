@@ -4,8 +4,13 @@
          stopOnFailure="false">
     <testsuites>
         <testsuite name="main">
+            <file>tests/ExceptionTest.php</file>
             <file>tests/PrettyPrinterTest.php</file>
+            <file>tests/UtilTest.php</file>
             <file>tests/UUIDTest.php</file>
+        </testsuite>
+        <testsuite name="objects">
+            <file>tests/ActiveRecordTest.php</file>
         </testsuite>
         <testsuite name="dblayer">
 

@@ -15,9 +15,9 @@ class TestModel extends ActiveRecord{
 
   protected $_table = "test_models";
 
-  protected $test_model_id;
-  protected $integer_field;
-  protected $text_field;
-  protected $date_field;
+  public $test_model_id;
+  public $integer_field;
+  public $text_field;
+  public $date_field;
 
 }
