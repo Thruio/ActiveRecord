@@ -23,4 +23,9 @@
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
+    <filter>
+        <blacklist>
+            <directory>vendor</directory>
+        </blacklist>
+    </filter>
 </phpunit>
