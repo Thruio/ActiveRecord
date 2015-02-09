@@ -179,13 +179,13 @@ class Mysql extends Base
         $table = end($tables);
 
         $updates = array();
-        foreach($thing->getData() as $k => $v){
-            $k = trim($k,"`");
-            $v_slashed = addslashes($v);
-            if($v === null){
-              $updates[] = "`$k` = NULL";
+        foreach($thing->getData() as $key => $value){
+            $key = trim($key,"`");
+            $value_slashed = addslashes($value);
+            if($value === null){
+              $updates[] = "`$key` = NULL";
             }else{
-              $updates[] = "`$k` = \"$v_slashed\"";
+              $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
         $selector = "INSERT INTO {$table->getName()} ";
@@ -365,8 +365,8 @@ class Mysql extends Base
     }
 
     private function parseClassDefinition(ActiveRecord $model){
-        $rc = new \ReflectionClass($model);
-        $rows = explode("\n", $rc->getDocComment());
+        $reflection_class = new \ReflectionClass($model);
+        $rows = explode("\n", $reflection_class->getDocComment());
         $variables = array();
         foreach($rows as &$row){
             $row = str_replace("*", "", $row);
