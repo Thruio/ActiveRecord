@@ -82,28 +82,9 @@ class Mysql extends Base
         $selector = "SELECT " . implode(" ", $fields);
         $from = "FROM " . implode(" ", $tables);
 
-        // CONDITIONS
-        if(count($thing->getConditions()) > 0){
-            foreach($thing->getConditions() as $condition){
-                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
-                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
-                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
-                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }else{
-                    if($condition->getValue() === null){
-                        $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} NULL";
-                    }else{
-                        $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
-                    }
-                }
-            }
-            $conditions = "WHERE " . implode("\n  AND ", $conditions);
-        }else{
-            $conditions = null;
-        }
+      $conditions = $this->processConditions($thing);
 
-        // Handle LIMIT & OFFSET
+      // Handle LIMIT & OFFSET
         $limit = '';
         $offset = '';
         if($thing->getLimit()){
@@ -221,26 +202,6 @@ class Mysql extends Base
         $insertId = $this->lastInsertId();
 
         return $insertId;
-    }
-
-    private function processConditions($thing){
-        // CONDITIONS
-        if(count($thing->getConditions()) > 0){
-            foreach($thing->getConditions() as $condition){
-                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
-                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
-                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
-                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }else{
-                    $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
-                }
-            }
-            $conditions = "WHERE " . implode("\n  AND ", $conditions);
-        }else{
-            $conditions = null;
-        }
-        return $conditions;
     }
 
     public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
@@ -448,5 +409,25 @@ class Mysql extends Base
         $definition['options'] = $options;
       }
       return $definition;
+    }
+
+    private function processConditions($thing){
+        // CONDITIONS
+        if(count($thing->getConditions()) > 0){
+            foreach($thing->getConditions() as $condition){
+                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
+                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
+                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
+                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
+                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
+                }else{
+                    $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
+                }
+            }
+            $conditions = "WHERE " . implode("\n  AND ", $conditions);
+        }else{
+            $conditions = null;
+        }
+        return $conditions;
     }
 }
