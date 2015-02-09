@@ -3,7 +3,6 @@ namespace Thru\ActiveRecord;
 
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
-use ActiveRecord\VersionedActiveRecord;
 
 class Search
 {
@@ -70,21 +69,9 @@ class Search
             $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
           }
 
-          // If we are NOT ordered, and we ARE weighted, order by Weight ASC
-          if (count($this->order) == 0 && $this->model instanceof VersionedActiveRecord && $this->model->use_weighting()) {
-            $this->order[] = array('column' => 'weight', 'direction' => 'ASC');
-          }
-
-          // Build ORDER SQL if relevent
-          if ($this->model instanceof VersionedActiveRecord) {
-            // If this is a versioned object, we'll sort it in PHP, and use MySQL to do the heavy lifting on the version instead.
-            $select->orderBy('version', 'ASC');
-          }
-          else {
-            if ($this->order) {
-              foreach ($this->order as $order) {
-                $select->orderBy($order['column'], $order['direction']);
-              }
+          if ($this->order) {
+            foreach ($this->order as $order) {
+              $select->orderBy($order['column'], $order['direction']);
             }
           }
 
@@ -99,24 +86,10 @@ class Search
           $response = $select->execute();
           $results = array();
           foreach ($response as $result) {
-            // If the item is versioned, we need to check if it uses logical deletion, and discard deleted rows.
-            if ($this->model instanceof VersionedActiveRecord && $this->model->use_logical_deletion()) {
-              if ($result->deleted == 'No') {
-                // Not deleted, add it.
-                $results[$result->get_id()] = $result;
-              }
-              else {
-                // Unset any older loaded-in version
-                unset($results[$result->get_id()]);
-              }
-            }
-            else {
-              if ($result->get_primary_key_index()) {
-                $results[$result->get_primary_key_index()] = $result;
-              }
-              else {
-                $results[] = $result;
-              }
+            if ($result->get_primary_key_index()) {
+              $results[$result->get_primary_key_index()] = $result;
+            } else {
+              $results[] = $result;
             }
           }
 
@@ -134,31 +107,8 @@ class Search
             }
           }
 
-          // If this is a versioned object, its time do do the heavy lifting on the result.
-          if ($this->model instanceof VersionedActiveRecord && count($this->order) > 0) {
-            // An array to put our computed results in.
-            $sorted_results = array();
-            // Get the first order from the $this->order array
-            $order = reset($this->order);
-            // Cycle through the results
-            foreach ($results as $result) {
-              // Generate the key we're gonna order against. Add the ID to the end, to prevent key collision
-              $key = $result->$order['column'] . "-" . $result->get_id();
-              $sorted_results[$key] = $result;
-            }
-            // Sort by the key
-            ksort($sorted_results);
-            // If we're sorting DESCending, flip the array now.
-            if (strtoupper($order['direction']) == 'DESC') {
-              $sorted_results = array_reverse($sorted_results);
-            }
-            // Return sorted array
-            $output = $sorted_results;
-          }
-          else {
-            // Just return the array as-it-comes from MySQL.
-            $output = $results;
-          }
+          // Just return the array as-it-comes from MySQL.
+          $output = $results;
 
           if ($primary_key_search) {
             $active_record_to_store = end($output);
@@ -181,11 +131,6 @@ class Search
 
     public function execOne()
     {
-        // If this isn't a versioned active record, limit to 1.
-        if (!$this->model instanceof VersionedActiveRecord) {
-            $this->limit(1);
-        }
-
         // Get all the corresponding items
         $results = $this->exec();
 
