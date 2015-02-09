@@ -11,7 +11,8 @@
 
   },
   "require-dev": {
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "*",
+    "codeclimate/php-test-reporter": "dev-master"
   },
   "autoload"   : {
     "psr-0": {
