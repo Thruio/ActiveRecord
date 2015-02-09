@@ -9,6 +9,7 @@
 use \Thru\ActiveRecord\ActiveRecord;
 use \Thru\ActiveRecord\Test\TestModel;
 use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
+use \Thru\ActiveRecord\SearchIndex;
 
 class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
@@ -110,7 +111,6 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
    * @depends testUpdate
    */
   public function testDelete(TestModel $deletable){
-    echo "Deleting object #{$deletable->test_model_id}\n";
     $this->assertTrue($deletable->delete(), "Delete function returned true");
 
     return $deletable->test_model_id;
@@ -121,7 +121,33 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
    */
   public function testDeleteVerify($test_model_id){
     $reload = TestModel::search()->where('test_model_id', $test_model_id)->execOne();
-    var_dump($reload);
     $this->assertFalse($reload , "Delete verified");
+  }
+
+  public function testSearchIndexSuccess(){
+    $dummy_object = new TestModel();
+    $dummy_object->test_model_id = 90;
+    $dummy_object->text_field = "Bloo bee blah";
+    $dummy_object->date_field = "1990-06-01 04:00:00";
+    $insertion = SearchIndex::get_instance()->put('nontable','nonkey', $dummy_object);
+    $this->assertEquals("Thru\\ActiveRecord\\SearchIndex", get_class($insertion));
+    $this->assertTrue(SearchIndex::get_instance()->exists('nontable','nonkey'));
+
+    $fetch = SearchIndex::get_instance()->get('nontable','nonkey');
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($fetch));
+    $this->assertEquals($dummy_object->test_model_id, $fetch->test_model_id);
+    $this->assertEquals($dummy_object->text_field, $fetch->text_field);
+    $this->assertEquals($dummy_object->date_field, $fetch->date_field);
+  }
+
+  public function testSearchIndexFailure(){
+    $this->assertFalse(SearchIndex::get_instance()->exists('nontable','doesntexist'));
+    $this->assertFalse(SearchIndex::get_instance()->get('nontable','doesntexist'));
+  }
+
+  public function testSearchIndexDelete(){
+    $this->assertTrue(SearchIndex::get_instance()->exists('nontable','nonkey'));
+    SearchIndex::get_instance()->expire('nontable','nonkey');
+    $this->assertFalse(SearchIndex::get_instance()->exists('nontable','nonkey'));
   }
 }
