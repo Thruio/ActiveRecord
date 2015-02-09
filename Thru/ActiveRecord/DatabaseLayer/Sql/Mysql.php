@@ -406,7 +406,7 @@ class Mysql extends Base
     private function parseClassDefinition(ActiveRecord $model){
         $rc = new \ReflectionClass($model);
         $rows = explode("\n", $rc->getDocComment());
-        $variables = [];
+        $variables = array();
         foreach($rows as &$row){
             $row = str_replace("*", "", $row);
             $row = trim($row);
