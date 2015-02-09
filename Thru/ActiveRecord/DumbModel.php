@@ -6,8 +6,8 @@ class DumbModel
 {
     static public function query($query, $type = 'StdClass', $key_by = null)
     {
-        $db = DatabaseLayer::get_instance();
-        $passthru = $db->passthru($query);
+        $database = DatabaseLayer::get_instance();
+        $passthru = $database->passthru($query);
         return $passthru->execute($type);
     }
 

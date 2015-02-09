@@ -60,9 +60,9 @@ class Search
             unset($model);
           }
 
-          $db = DatabaseLayer::get_instance();
+          $database = DatabaseLayer::get_instance();
 
-          $select = $db->select($this->model->get_table_name(), $this->model->get_table_alias());
+          $select = $database->select($this->model->get_table_name(), $this->model->get_table_alias());
           $select->fields($this->model->get_table_alias());
 
           // Add WHERE Conditions

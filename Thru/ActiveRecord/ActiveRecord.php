@@ -66,8 +66,8 @@ class ActiveRecord
      */
     public function get_by_id($id)
     {
-        $db = DatabaseLayer::get_instance();
-        $select = $db->select($this->get_table_name(), $this->get_table_alias());
+        $database = DatabaseLayer::get_instance();
+        $select = $database->select($this->get_table_name(), $this->get_table_alias());
         $select->fields($this->get_table_alias());
         $select->condition($this->get_table_primary_key(), $id);
         $results = $select->execute(get_called_class());
@@ -111,8 +111,8 @@ class ActiveRecord
      */
     public function get_table_primary_key()
     {
-        $db = DatabaseLayer::get_instance();
-        $keys = $db->get_table_indexes($this->_table);
+        $database = DatabaseLayer::get_instance();
+        $keys = $database->get_table_indexes($this->_table);
         if(!isset($keys[0])){
           return false;
         }
@@ -127,9 +127,9 @@ class ActiveRecord
      */
     public function get_primary_key_index()
     {
-        $db = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::get_instance();
 
-        $keys = $db->get_table_indexes($this->_table);
+        $keys = $database->get_table_indexes($this->_table);
         $columns = array();
         foreach ($keys as $key) {
             $columns[$key->Column_name] = $key->Column_name;
@@ -244,11 +244,11 @@ class ActiveRecord
         }
 
         // If we already have an ID, this is an update.
-        $db = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::get_instance();
         if ($this->get_id()) {
-            $operation = $db->update($this->get_table_name(), $this->get_table_alias());
+            $operation = $database->update($this->get_table_name(), $this->get_table_alias());
         } else { // Else, we're an insert.
-            $operation = $db->insert($this->get_table_name(), $this->get_table_alias());
+            $operation = $database->insert($this->get_table_name(), $this->get_table_alias());
         }
 
         $operation->setData($data);
@@ -291,8 +291,8 @@ class ActiveRecord
      */
     public function delete()
     {
-      $db = DatabaseLayer::get_instance();
-      $delete = $db->delete($this->get_table_name(), $this->get_table_alias());
+      $database = DatabaseLayer::get_instance();
+      $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
       $delete->condition($this->get_table_primary_key(), $this->get_id());
       $delete->execute();
 
