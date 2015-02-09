@@ -75,9 +75,6 @@ class VirtualQuery
             $this->setModel($model);
         }
         $result = $this->getInterpreter()->process($this);
-        global $active_record_log;
-        $active_record_log['QueryCount'] = isset($active_record_log['QueryCount']) ? $active_record_log['QueryCount'] + 1 : 1;
-        $active_record_log['QueryLog'][] = $this;
         return $result;
     }
 

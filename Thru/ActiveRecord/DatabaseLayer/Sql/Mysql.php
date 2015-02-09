@@ -144,9 +144,6 @@ class Mysql extends Base
             }
         }
 
-        global $active_record_log;
-        $active_record_log['QueryLogSQL'][] = array('query' => $query, 'result_count' => count($results), 'delay' => $delay);
-
         return $results;
     }
 

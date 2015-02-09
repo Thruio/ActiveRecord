@@ -23,20 +23,6 @@ class DatabaseLayer
     }
 
     /**
-     * @param array|null $options
-     */
-    public function __construct($options = null)
-    {
-        global $active_record_log;
-        $active_record_log['ConnectionCount'] = isset($active_record_log['ConnectionCount']) ? $active_record_log['ConnectionCount'] + 1 : 1;
-        $this->options = $options;
-        if(!isset($this->options['db_dsn'])){
-          $this->options['db_dsn'] = $this->_getDsn();
-        }
-        self::$instance = $this;
-    }
-
-    /**
      * @param $table_name
      * @param null $table_alias
      * @return DatabaseLayer\Select
