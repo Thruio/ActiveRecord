@@ -1,6 +1,6 @@
 <?php
 
-namespace ActiveRecord;
+namespace Thru\ActiveRecord;
 
 use Thru\ActiveRecord\ActiveRecord;
 
