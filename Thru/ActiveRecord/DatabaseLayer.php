@@ -23,6 +23,18 @@ class DatabaseLayer
     }
 
     /**
+     * @param array|null $options
+     */
+    public function __construct($options = null)
+    {
+        $this->options = $options;
+        if(!isset($this->options['db_dsn'])){
+          $this->options['db_dsn'] = $this->_getDsn();
+        }
+        self::$instance = $this;
+    }
+
+    /**
      * @param $table_name
      * @param null $table_alias
      * @return DatabaseLayer\Select
