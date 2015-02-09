@@ -11,50 +11,6 @@ class ActiveRecord
     protected $_columns_to_save_down;
 
     /**
-     * get_all - Get all items.
-     *
-     * @param integer $limit Limit number of results
-     * @param string $order Column to sort by
-     * @param string $order_direction Order to sort by
-     *
-     * @throws exception
-     * @return Array of items
-     */
-    static public function get_all($limit = null, $order = null, $order_direction = "ASC")
-    {
-        $name = get_called_class();
-        $query = $name::search();
-        if ($query instanceof Search) {
-            if ($limit) {
-                $query->limit($limit);
-            }
-            if ($order) {
-                $query->order($order, $order_direction);
-            }
-            $result = $query->exec();
-            return $result;
-        } else {
-            throw new exception("Failed to instantiate an object of type ActiveRecord with name {$name}");
-        }
-    }
-
-    /**
-     * GetAll - Get all items.
-     * Legacy Support - Deprecated
-     *
-     * @param integer $limit Limit number of results
-     * @param string $order Column to sort by
-     * @param string $order_direction Order to sort by
-     * @return Array of items
-     */
-    static public function getAll($limit = null, $order = null, $order_direction = "ASC")
-    {
-        //TODO: Old drupaly leftover needs cleanup.
-        watchdog("ActiveRecord", "ActiveRecord::getAll() is deprecated, please use get_all()");
-        return self::get_all($limit, $order, $order_direction);
-    }
-
-    /**
      * Start a Search on this type of active record
      * @return Search
      */
@@ -117,22 +73,6 @@ class ActiveRecord
         $results = $select->execute(get_called_class());
         $result = end($results);
         return $result;
-    }
-
-    /**
-     * STATICALLY find an item by the Primary Key ID. This does not use the search() functionality
-     * @param $id
-     * @return ActiveRecord
-     * @throws exception
-     */
-    static public function getById($id){
-        $class = get_called_class();
-        $o_active_record = new $class();
-        if($o_active_record instanceof ActiveRecord){
-            return $o_active_record->get_by_id($id);
-        }else{
-            throw new exception ("{$class} does not extend ActiveRecord!");
-        }
     }
 
     /**
@@ -612,16 +552,6 @@ class ActiveRecord
     public function get_table_headings()
     {
         return $this->_calculate_save_down_rows();
-    }
-
-    public function get_table_rows($anticipated_rows = null)
-    {
-        $rows = array();
-        foreach (self::get_all() as $item) {
-            /* @var $item ActiveRecord */
-            $rows[] = $item->__toArray($anticipated_rows);
-        }
-        return $rows;
     }
 
     public function __toArray($anticipated_rows = null)
