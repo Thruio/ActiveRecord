@@ -154,17 +154,17 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertArrayHasKey("text_field", $model_array);
     $this->assertArrayHasKey("date_field", $model_array);
     $this->assertArrayHasKey("_label_column", $model_array);
-    $this->assertArrayHasKey("_columns_to_save_down", $model_array);
+    $this->assertArrayHasKey("_columns", $model_array);
     $this->assertEquals("test_models", $model_array['_table']);
     $this->assertEquals(null, $model_array['test_model_id']);
     $this->assertEquals($test_model->integer_field, $model_array['integer_field']);
     $this->assertEquals($test_model->text_field, $model_array['text_field']);
     $this->assertEquals($test_model->date_field, $model_array['date_field']);
     $this->assertEquals("name", $model_array['_label_column']);
-    $this->assertEquals("test_model_id", $model_array['_columns_to_save_down'][0]);
-    $this->assertEquals("integer_field", $model_array['_columns_to_save_down'][1]);
-    $this->assertEquals("text_field", $model_array['_columns_to_save_down'][2]);
-    $this->assertEquals("date_field", $model_array['_columns_to_save_down'][3]);
+    $this->assertEquals("test_model_id", $model_array['_columns'][0]);
+    $this->assertEquals("integer_field", $model_array['_columns'][1]);
+    $this->assertEquals("text_field", $model_array['_columns'][2]);
+    $this->assertEquals("date_field", $model_array['_columns'][3]);
 
     $model_array_save_down_applied = $test_model->__toArray($test_model->_calculate_save_down_rows());
 
@@ -174,7 +174,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertArrayHasKey("text_field", $model_array_save_down_applied);
     $this->assertArrayHasKey("date_field", $model_array_save_down_applied);
     $this->assertArrayNotHasKey("_label_column", $model_array_save_down_applied);
-    $this->assertArrayNotHasKey("_columns_to_save_down", $model_array_save_down_applied);
+    $this->assertArrayNotHasKey("_columns", $model_array_save_down_applied);
     $this->assertEquals(4, count($model_array_save_down_applied));
   }
 
@@ -197,7 +197,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(property_exists($decoded, "text_field"));
     $this->assertTrue(property_exists($decoded, "date_field"));
     $this->assertTrue(property_exists($decoded, "_label_column"));
-    $this->assertTrue(property_exists($decoded, "_columns_to_save_down"));
+    $this->assertTrue(property_exists($decoded, "_columns"));
 
     $this->assertEquals("test_models", $decoded->_table);
     $this->assertEquals(null, $decoded->test_model_id);
@@ -205,10 +205,10 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($test_model->text_field, $decoded->text_field);
     $this->assertEquals($test_model->date_field, $decoded->date_field);
     $this->assertEquals("name", $decoded->_label_column);
-    $this->assertEquals("test_model_id", $decoded->_columns_to_save_down[0]);
-    $this->assertEquals("integer_field", $decoded->_columns_to_save_down[1]);
-    $this->assertEquals("text_field", $decoded->_columns_to_save_down[2]);
-    $this->assertEquals("date_field", $decoded->_columns_to_save_down[3]);
+    $this->assertEquals("test_model_id", $decoded->_columns[0]);
+    $this->assertEquals("integer_field", $decoded->_columns[1]);
+    $this->assertEquals("text_field", $decoded->_columns[2]);
+    $this->assertEquals("date_field", $decoded->_columns[3]);
   }
 
   public function testSearchOrder(){

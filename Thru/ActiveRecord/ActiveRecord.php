@@ -8,7 +8,7 @@ class ActiveRecord
 {
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
     protected $_label_column = 'name';
-    protected $_columns_to_save_down;
+    protected $_columns;
 
     /**
      * Start a Search on this type of active record
@@ -183,7 +183,7 @@ class ActiveRecord
      */
     public function _calculate_save_down_rows()
     {
-        if (!$this->_columns_to_save_down) {
+        if (!$this->_columns) {
             foreach (get_object_vars($this) as $potential_column => $discard) {
                 switch ($potential_column) {
                     case 'table':
@@ -191,12 +191,12 @@ class ActiveRecord
                         // Not a valid column
                         break;
                     default:
-                        $this->_columns_to_save_down[] = $potential_column;
+                        $this->_columns[] = $potential_column;
                         break;
                 }
             }
         }
-        return $this->_columns_to_save_down;
+        return $this->_columns;
     }
 
     /**
@@ -236,7 +236,7 @@ class ActiveRecord
 
         // Make an array out of the objects columns.
         $data = array();
-        foreach ($this->_columns_to_save_down as $column) {
+        foreach ($this->_columns as $column) {
             // Never update the primary key. Bad bad bad.
             if ($column != $primary_key_column) {
                 $data["`{$column}`"] = $this->$column;

@@ -116,7 +116,7 @@ class VersionedActiveRecord extends ActiveRecord
 
         // Make an array out of the objects columns.
         $data = array();
-        foreach ($this->_columns_to_save_down as $column) {
+        foreach ($this->_columns as $column) {
             $data["`{$column}`"] = $this->$column;
         }
 
