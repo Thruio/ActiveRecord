@@ -338,7 +338,7 @@ class Mysql extends Base
 
             if($p == 0){
                 // First param always primary key
-                $primary_key_parameter = $parameter;
+                $primary_key = $parameter;
                 $auto_increment = true;
             }
             if($auto_increment){
@@ -349,7 +349,7 @@ class Mysql extends Base
             $nullability = "NOT NULL";
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
-        $params[] = "  PRIMARY KEY (`$primary_key_parameter`)";
+        $params[] = "  PRIMARY KEY (`$primary_key`)";
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
         $query.= "(\n";
