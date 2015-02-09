@@ -87,8 +87,8 @@ class Search
           return $this->execProcessResponse($response, $primary_key_search);
         }catch(IndexException $e){
           if($e->remedy == 'table_missing'){
-            $tableBuilder = new TableBuilder();
-            $tableBuilder->build($this->model);
+            $tableBuilder = new TableBuilder($this->model);
+            $tableBuilder->build();
             return $this->exec();
           }
         }catch(Exception $e){

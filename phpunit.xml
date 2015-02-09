@@ -11,12 +11,14 @@
         </testsuite>
         <testsuite name="objects">
             <file>tests/ActiveRecordTest.php</file>
+            <file>tests/ActiveRecordExtendedTypesTest.php</file>
             <file>tests/ActiveRecordExportTest.php</file>
             <file>tests/SearchIndexTest.php</file>
             <file>tests/SearchRecordsTest.php</file>
         </testsuite>
         <testsuite name="dblayer">
             <file>tests/DatabaseLayerSelectTest.php</file>
+            <file>tests/SqlLayerTest.php</file>
         </testsuite>
     </testsuites>
     <logging>

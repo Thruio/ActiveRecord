@@ -35,7 +35,7 @@ class ActiveRecord
      */
     public function __construct()
     {
-      $tableBuilder = new TableBuilder();
+      $tableBuilder = $this->get_table_builder();
       $tableBuilder->build($this);
     }
 
@@ -379,7 +379,7 @@ class ActiveRecord
         }
     }
 
-    public function get_schema(){
-
+    public function get_table_builder(){
+        return new TableBuilder($this);
     }
 }

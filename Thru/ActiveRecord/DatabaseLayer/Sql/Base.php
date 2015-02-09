@@ -47,8 +47,8 @@ class Base extends \PDO
           if($model != 'StdClass'){
             $instance = new $model();
             if($instance instanceof ActiveRecord) {
-              $table_builder = new TableBuilder();
-              $table_builder->build($instance);
+              $table_builder = new TableBuilder($instance);
+              $table_builder->build();
               $this->query($query); // Re-run the query
             }else{
               throw new DatabaseLayer\Exception($error[0] . ": " . $error[2] . "... and is not an ActiveRecord object, so we can't create it anyway! We were trying to run '{$query}'");

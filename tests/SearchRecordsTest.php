@@ -10,6 +10,44 @@ use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\TestModelSortable;
 
 class SearchRecordsTest extends PHPUnit_Framework_TestCase {
+
+  /* @var $one TestModelSortable */
+  private $one;
+  /* @var $two TestModelSortable */
+  private $two;
+  /* @var $three TestModelSortable */
+  private $three;
+
+  public function setUp(){
+    $this->one = new TestModelSortable();
+    $this->two = new TestModelSortable();
+    $this->three = new TestModelSortable();
+
+    $this->one->integer_field = 3;
+    $this->two->integer_field = 2;
+    $this->three->integer_field = 1;
+
+    $this->one->text_field = "Dog";
+    $this->two->text_field = "Parakeet";
+    $this->three->text_field = "Cat";
+
+    $this->one->date_field = "1990-06-01 04:00:00";
+    $this->two->date_field = "1983-01-08 00:00:00";
+    $this->three->date_field = date("Y-m-d H:i:s", strtotime("tomorrow"));
+
+    $this->one->save();
+    $this->two->save();
+    $this->three->save();
+  }
+
+  public function tearDown(){
+    $this->one->delete();
+    $this->two->delete();
+    $this->three->delete();
+
+    $this->three->get_table_builder()->destroy();
+  }
+
   public function testSearchBySlug(){
     $slug_original = new TestModelWithNameLabel();
     $slug_original->name = "Example";
@@ -25,26 +63,6 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testSearchOrder(){
-    $one = new TestModelSortable();
-    $two = new TestModelSortable();
-    $three = new TestModelSortable();
-
-    $one->integer_field = 3;
-    $two->integer_field = 2;
-    $three->integer_field = 1;
-
-    $one->text_field = "Dog";
-    $two->text_field = "Parakeet";
-    $three->text_field = "Cat";
-
-    $one->date_field = "1990-06-01 04:00:00";
-    $two->date_field = "1983-01-08 00:00:00";
-    $three->date_field = date("Y-m-d H:i:s", strtotime("tomorrow"));
-
-    $one->save();
-    $two->save();
-    $three->save();
-
     $sort_by_num_desc = TestModelSortable::search()->order("integer_field", "DESC")->exec();
     $sort_by_num_asc = TestModelSortable::search()->order("integer_field", "ASC")->exec();
 
@@ -54,9 +72,9 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $sort_by_date_desc = TestModelSortable::search()->order("date_field", "DESC")->exec();
     $sort_by_date_asc = TestModelSortable::search()->order("date_field", "ASC")->exec();
 
-    $this->assertEquals(1, $one->test_model_id);
-    $this->assertEquals(2, $two->test_model_id);
-    $this->assertEquals(3, $three->test_model_id);
+    $this->assertEquals(1, $this->one->test_model_id);
+    $this->assertEquals(2, $this->two->test_model_id);
+    $this->assertEquals(3, $this->three->test_model_id);
 
     $this->assertEquals(array(1,2,3), array_keys($sort_by_num_desc));
     $this->assertEquals(array(3,2,1), array_keys($sort_by_num_asc));
@@ -64,6 +82,21 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(array(3,1,2), array_keys($sort_by_text_asc));
     $this->assertEquals(array(3,1,2), array_keys($sort_by_date_desc));
     $this->assertEquals(array(2,1,3), array_keys($sort_by_date_asc));
-
   }
+
+  public function testSearchIn(){
+    $in_result = TestModelSortable::search()->where('test_model_id', array(1,3), "IN")->exec();
+    $this->assertEquals(2, count($in_result));
+    $this->assertEquals("1", reset($in_result)->test_model_id);
+    $this->assertEquals("3", end($in_result)->test_model_id);
+  }
+
+  public function testSearchRand(){
+    $random_result = TestModelSortable::search()
+      ->order("test_model_id", "rand")
+      ->limit(1,0)  //Not strictly neccisary but helps coverage
+      ->execOne();
+    $this->assertTrue($random_result instanceof TestModelSortable);
+  }
+
 }

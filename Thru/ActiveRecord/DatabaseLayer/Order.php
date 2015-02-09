@@ -8,8 +8,8 @@ class Order
 
     public function __construct($column, $direction)
     {
-        $this->column = $column;
-        $this->direction = $direction;
+        $this->setColumn($column);
+        $this->setDirection($direction);
     }
 
     public function getColumn(){

@@ -5,6 +5,7 @@ use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
+use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
 
 class Mysql extends Base
 {
@@ -31,7 +32,7 @@ class Mysql extends Base
             case 'Passthru': //Delete
                 return $this->processPassthru($thing);
             default:
-                throw new Exception("Operation {$thing->getOperation} not supported");
+                throw new Exception("Operation {$thing->getOperation()} not supported");
         }
     }
 
@@ -55,7 +56,6 @@ class Mysql extends Base
           $results[] = $result_item;
         }
       }
-
 
       return $results;
     }
@@ -321,6 +321,15 @@ class Mysql extends Base
         return $results;
     }
 
+    public function destroyTable(ActiveRecord $model){
+      $query = "DROP TABLE {$model->get_table_name()};";
+      try {
+        $this->query($query);
+      }Catch(Exception $e){
+        throw new TableDestroyFailureException($e->getMessage());
+      }
+    }
+
     public function buildTable(ActiveRecord $model){
         $schema = $this->parseClassDefinition($model);
         $params = array();
@@ -341,6 +350,7 @@ class Mysql extends Base
                   $type = "VARCHAR({$length})";
                   break;
 
+                case 'date':
                 case 'datetime':
                   $type = 'DATETIME';
                   break;
@@ -399,7 +409,7 @@ class Mysql extends Base
         try {
           $this->query($query);
         }Catch(Exception $e){
-          throw new TableBuildFailureException($e->getMessage());
+          throw new TableBuildFailureException($e->getMessage() . "\n" . $query);
         }
     }
 

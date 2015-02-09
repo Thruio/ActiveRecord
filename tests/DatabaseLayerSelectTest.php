@@ -10,14 +10,6 @@ use \Thru\ActiveRecord\DatabaseLayer\Select;
 
 class DatabaseLayerSelectTest extends PHPUnit_Framework_TestCase {
 
-  public function setUp(){
-
-  }
-
-  public function tearDown(){
-
-  }
-
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage  No table matching alias 'doesntexist' selectable
