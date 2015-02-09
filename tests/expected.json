@@ -4,5 +4,7 @@
 	"int": 6293,
 	"object": {
 		"inner": "inner"
-	}
+	},
+	"string_with_newline": "Newline\r\nYo.",
+	"string_with_umlaut": "Uml\u00e4ut."
 }

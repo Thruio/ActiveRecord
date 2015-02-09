@@ -50,11 +50,34 @@ class UUIDTest extends PHPUnit_Framework_TestCase {
     );
   }
 
-  public function testGeneratedUUIDsUnique(){
+  public function testGeneratedUUIDv3NotUnique(){
+    $namespace = UUID::v4();
+    $name = "test";
+    $this->assertEquals(UUID::v3($namespace, $name), UUID::v3($namespace, $name), 'Same UUID v5 was generated twice.');
+  }
+
+  public function testGeneratedUUIDv4Unique(){
     $this->assertNotEquals(UUID::v4(), UUID::v4(), 'Same UUID was not generated twice.');
   }
 
+  public function testGeneratedUUIDv5NotUnique(){
+    $namespace = UUID::v4();
+    $name = "test";
+    $this->assertEquals(UUID::v5($namespace, $name), UUID::v5($namespace, $name), 'Same UUID v5 was generated twice.');
+  }
+
   public function testGenerateUUIDs(){
-    $this->assertTrue(UUID::is_valid(UUID::v4()), 'UUID generation works.');
+    $namespace = UUID::v4();
+    $name = "test";
+    $this->assertTrue(UUID::is_valid(UUID::v3($namespace, $name)), 'UUID v3 generation works.');
+    $this->assertTrue(UUID::is_valid(UUID::v4()), 'UUID v4 generation works.');
+    $this->assertTrue(UUID::is_valid(UUID::v5($namespace, $name)), 'UUID v5 generation works.');
+  }
+
+  public function testGeneratedUUIDNamespaces(){
+    $this->assertFalse(UUID::v3("garbage", "test"));
+    $this->assertFalse(UUID::v5("garbage", "test"));
+    $this->assertNotFalse(UUID::v3("00000000-0000-0000-0000-000000000000", "test"));
+    $this->assertNotFalse(UUID::v5("00000000-0000-0000-0000-000000000000", "test"));
   }
 }
