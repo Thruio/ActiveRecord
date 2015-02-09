@@ -215,16 +215,16 @@ class Mysql extends Base
         $table = end($tables);
 
         $updates = array();
-        foreach($thing->getData() as $k => $v){
-            $k = trim($k,"`");
-            if(is_object($v) || is_array($v)){
-                $v = json_encode($v);
+        foreach($thing->getData() as $key => $value){
+            $key = trim($key,"`");
+            if(is_object($value) || is_array($value)){
+                $value = json_encode($value);
             }
-            $v_slashed = addslashes($v);
-            if($v === null){
-              $updates[] = "`$k` = NULL";
+            $value_slashed = addslashes($value);
+            if($value === null){
+              $updates[] = "`$key` = NULL";
             }else{
-              $updates[] = "`$k` = \"$v_slashed\"";
+              $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
         $selector = "UPDATE {$table->getName()} ";
