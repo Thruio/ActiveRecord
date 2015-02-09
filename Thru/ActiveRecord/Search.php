@@ -128,7 +128,7 @@ class Search
             ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
         }
       }
-      return $results;cco
+      return $results;
     }
 
 
