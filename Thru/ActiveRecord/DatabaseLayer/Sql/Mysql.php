@@ -180,7 +180,7 @@ class Mysql extends Base
         $selector = "DELETE FROM {$table->getName()} ";
 
         $conditions = $this->processConditions($thing);
-      
+
         $query = "{$selector}\n{$conditions}";
 
         $result = $this->query($query);
