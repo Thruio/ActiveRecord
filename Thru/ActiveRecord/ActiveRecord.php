@@ -202,7 +202,7 @@ class ActiveRecord
     /**
      * Load an object from data fed to us as an array (or similar.)
      *
-     * @param ActiveRecord $row
+     * @param Array $row
      *
      * @return ActiveRecord
      */

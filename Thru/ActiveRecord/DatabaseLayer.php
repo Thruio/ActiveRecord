@@ -98,6 +98,10 @@ class DatabaseLayer
         return false;
     }
 
+    /**
+     * @return string|false
+     * @throws Exception
+     */
     private function _getDsn(){
         switch($this->options['db_type']){
             case 'Sqlite':
