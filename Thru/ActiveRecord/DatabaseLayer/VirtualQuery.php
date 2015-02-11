@@ -1,8 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-use Thru\ActiveRecord\Exception;
-
 class VirtualQuery
 {
     protected $tables;      // SELECT/UPDATE/DELETE

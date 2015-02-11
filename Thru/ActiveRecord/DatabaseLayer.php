@@ -45,8 +45,8 @@ class DatabaseLayer
     }
 
     /**
-     * @param $table_name
-     * @param null $table_alias
+     * @param string $table_name
+     * @param string $table_alias
      * @return DatabaseLayer\Update
      */
     public function update($table_name, $table_alias = null)
@@ -54,9 +54,9 @@ class DatabaseLayer
         return new DatabaseLayer\Update($table_name, $table_alias);
     }
     /**
-     * @param $table_name
-     * @param null $table_alias
-     * @return DatabaseLayer\Update
+     * @param string $table_name
+     * @param string $table_alias
+     * @return DatabaseLayer\Delete
      */
     public function delete($table_name, $table_alias = null)
     {
@@ -64,8 +64,8 @@ class DatabaseLayer
     }
 
     /**
-     * @param $table_name
-     * @param null $table_alias
+     * @param string $table_name
+     * @param string $table_alias
      * @return DatabaseLayer\Insert
      */
     public function insert($table_name, $table_alias = null)
@@ -74,7 +74,6 @@ class DatabaseLayer
     }
     /**
      * @param $table_name
-     * @param null $table_alias
      * @return DatabaseLayer\Passthru
      */
     public function passthru($sql = null)
@@ -87,6 +86,11 @@ class DatabaseLayer
         return $util->getIndexes($table_name);
     }
 
+    /**
+     * @param string $name
+     *
+     * @return string|null
+     */
     public function get_option($name){
         if(isset($this->options[$name])){
             return $this->options[$name];

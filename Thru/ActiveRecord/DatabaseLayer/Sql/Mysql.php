@@ -376,6 +376,9 @@ class Mysql extends Base
         return $variables;
     }
 
+    /**
+     * @param string $row
+     */
     private function parseClassDefinitionProperty(ActiveRecord $model, $row){
       $bits = explode(" ", $row);
       $name = trim($bits[1],"$");
