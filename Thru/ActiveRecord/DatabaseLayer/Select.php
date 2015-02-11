@@ -30,6 +30,9 @@ class Select extends VirtualQuery
         return $this;
     }
 
+    /**
+     * @param integer $offset
+     */
     public function range($offset, $limit)
     {
         $this->offset = $offset;
@@ -37,6 +40,9 @@ class Select extends VirtualQuery
         return $this;
     }
 
+    /**
+     * @param string $direction
+     */
     public function orderBy($column, $direction){
         $this->addOrder(new Order($column, $direction));
         return $this;

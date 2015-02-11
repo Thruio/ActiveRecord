@@ -1,8 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-use Thru\ActiveRecord\Exception;
-
 class Passthru extends VirtualQuery
 {
   private $sql_to_passthru;
