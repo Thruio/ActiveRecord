@@ -31,6 +31,9 @@ class Base extends \PDO
     if(DatabaseLayer::get_instance()->get_option('db_password')){
       $password = DatabaseLayer::get_instance()->get_option('db_password');
     }
+    $username = !empty($username)?$username:null;
+    $password = !empty($password)?$password:null;
+
     parent::__construct($dsn, $username, $password);
   }
 
@@ -38,6 +41,7 @@ class Base extends \PDO
     /* @var $result \PDOStatement */
     $exec_time_start = microtime(true);
 
+    #echo " *** " . $query."\n";
     $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
 
     $error = parent::errorInfo();

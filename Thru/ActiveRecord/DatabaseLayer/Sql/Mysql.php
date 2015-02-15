@@ -6,6 +6,7 @@ use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
 use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
+use Thru\UUID;
 
 class Mysql extends Base
 {
@@ -129,7 +130,8 @@ class Mysql extends Base
         }
 
         $query = "{$selector}\n{$from}\n{$conditions}\n{$order}\n{$limit} {$offset}";
-        //header("Content-type: text/plain"); echo $query; exit;
+
+        #echo " *** " . str_replace("\n", " ", $query) . "\n";
 
         $delay = microtime(true);
         $result = $this->query($query, $thing->getModel());
@@ -279,7 +281,7 @@ class Mysql extends Base
     }
 
     public function buildTable(ActiveRecord $model){
-        $schema = $this->parseClassDefinition($model);
+        $schema = $model->get_class_schema();
         $params = array();
         foreach($model->_calculate_save_down_rows() as $p => $parameter){
             $auto_increment = false;
@@ -320,7 +322,7 @@ class Mysql extends Base
                   break;
 
                 case "uuid":
-                  $type = "VARCHAR(36)";
+                  $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
                   break;
 
                 case "md5":
@@ -359,56 +361,6 @@ class Mysql extends Base
         }Catch(Exception $e){
           throw new TableBuildFailureException($e->getMessage() . "\n" . $query);
         }
-    }
-
-    private function parseClassDefinition(ActiveRecord $model){
-        $reflection_class = new \ReflectionClass($model);
-        $rows = explode("\n", $reflection_class->getDocComment());
-        $variables = array();
-        foreach($rows as &$row){
-            $row = str_replace("*", "", $row);
-            $row = trim($row);
-            if(substr($row,0,4) == '@var'){
-                $property = $this->parseClassDefinitionProperty($model, $row);
-                $variables[$property['name']] = $property;
-            }
-        }
-        return $variables;
-    }
-
-    /**
-     * @param string $row
-     */
-    private function parseClassDefinitionProperty(ActiveRecord $model, $row){
-      $bits = explode(" ", $row);
-      $name = trim($bits[1],"$");
-      $type = $bits[2];
-      $type_bits = explode("(", $type, 2);
-      $type = strtolower($type_bits[0]);
-
-      $controls = array_slice($bits,3);
-      // TODO: Parse controls for relationships and so on.
-
-      if($type == 'enum' || $type == 'decimal'){
-        $options = explode(",", $type_bits[1]);
-        foreach($options as &$option){
-          $option = trim($option);
-          $option = trim($option, "'\")");
-        }
-      }else{
-        $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
-      }
-
-      $definition = array();
-      $definition['name'] = $name;
-      $definition['type'] = $type;
-      if(isset($length)) {
-        $definition['length'] = $length;
-      }
-      if(isset($options)){
-        $definition['options'] = $options;
-      }
-      return $definition;
     }
 
     private function processConditions($thing){
