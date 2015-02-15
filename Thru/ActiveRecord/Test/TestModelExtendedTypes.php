@@ -13,6 +13,7 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $uuid_field uuid
  * @var $md5_field md5
  * @var $sha1_field sha1
+ * @var $string_with_length_field string(4)
  */
 class TestModelExtendedTypes extends ActiveRecord{
 
@@ -25,5 +26,6 @@ class TestModelExtendedTypes extends ActiveRecord{
   public $uuid_field;
   public $md5_field;
   public $sha1_field;
+  public $string_with_length_field;
 
 }

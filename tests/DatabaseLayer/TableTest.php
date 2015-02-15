@@ -9,7 +9,8 @@
 namespace tests\DatabaseLayer;
 
 use Thru\ActiveRecord\DatabaseLayer\Table;
-
+use Thru\ActiveRecord\Test\TestModel;
+use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 class TableTest extends \PHPUnit_Framework_TestCase {
 
   public function testConstructTableWithAlias(){
@@ -28,4 +29,14 @@ class TableTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals("apples_delta_dookie", $table->getName());
     $this->assertEquals("a_d_d", $table->getAlias());
   }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException
+   */
+  /*public function testDoubleDestroyTable(){
+    $test_model = new TestModel();
+    $table_builder = new TableBuilder($test_model);
+    $table_builder->destroy();
+    $table_builder->destroy();
+  }*/
 }

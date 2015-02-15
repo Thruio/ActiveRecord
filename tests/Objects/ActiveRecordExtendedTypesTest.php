@@ -38,6 +38,7 @@ class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
     $this->extended->md5_field = md5($this->extended->blob_field);
     $this->extended->sha1_field = sha1($this->extended->blob_field);
     $this->extended->uuid_field = UUID::v4();
+    $this->extended->string_with_length_field = "blah";
     $result = $this->extended->save();
 
     $this->assertEquals($this->extended->blob_field, $result->blob_field);
@@ -46,6 +47,7 @@ class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($this->extended->md5_field, $result->md5_field);
     $this->assertEquals($this->extended->sha1_field, $result->sha1_field);
     $this->assertEquals($this->extended->uuid_field, $result->uuid_field);
+    $this->assertEquals($this->extended->string_with_length_field, $result->string_with_length_field);
   }
 
 
