@@ -1,7 +1,7 @@
 <?php
 namespace Thru\ActiveRecord;
 
-use Thru\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
 
 class DatabaseLayer
 {
@@ -100,18 +100,15 @@ class DatabaseLayer
 
     /**
      * @return string|false
-     * @throws Exception
+     * @throws ConfigurationException
      */
     private function _getDsn(){
         switch($this->options['db_type']){
-            case 'Sqlite':
-                $dsn = "sqlite:{$this->options['db_file']}";
-                break;
             case 'Mysql':
                 $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
                 break;
             default:
-                throw new Exception("DB TYPE not supported: {$this->options['db_type']}");
+                throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
         }
         return $dsn;
     }
