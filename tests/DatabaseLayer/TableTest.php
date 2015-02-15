@@ -22,4 +22,10 @@ class TableTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals("table_name", $table->getName());
     $this->assertEquals("tn", $table->getAlias());
   }
+
+  public function testConstructTableWithAliasWithReservedWord(){
+    $table = new Table("apples_delta_dookie");
+    $this->assertEquals("apples_delta_dookie", $table->getName());
+    $this->assertEquals("a_d_d", $table->getAlias());
+  }
 }
