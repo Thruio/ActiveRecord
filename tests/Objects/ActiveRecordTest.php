@@ -210,4 +210,18 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $model = new TestModel();
     $this->assertFalse($model->reload());
   }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
+   * @expectedExceptionMessage 42S02: Table 'active_record_test.test_models' doesn't exist
+   */
+  public function testTrigger42S02(){
+    $model = new TestModel();
+    $model->text_field = "Before";
+    $model->integer_field = 0;
+    $model->date_field = date("Y-m-d H:i:s");
+    $model->save();
+    TestModel::delete_table();
+    $model->save();
+  }
 }
