@@ -303,6 +303,17 @@ class ActiveRecord
     }
 
     /**
+     * Delete the selected records table.
+     * WARNING YO.
+     */
+    public static function delete_table(){
+        $class = get_called_class();
+        $object = new $class();
+        $table_builder = new TableBuilder($object);
+        return $table_builder->destroy();
+    }
+
+    /**
      * Pull a database record by the slug we're given.
      *
      * @param $slug string Slug
@@ -381,5 +392,69 @@ class ActiveRecord
 
     public function get_table_builder(){
         return new TableBuilder($this);
+    }
+
+    /**
+     * Fix types of fields to match definition
+     */
+    public function field_fix(){
+        $schema = $this->get_class_schema();
+
+        foreach($this->_calculate_save_down_rows() as $column){
+            $type = $schema[$column]['type'];
+            if($type == "integer" && !is_int($this->$column)){
+                $this->$column = intval($this->$column);
+            }
+        }
+
+        return true;
+    }
+
+    public function get_class_schema(){
+        $reflection_class = new \ReflectionClass($this);
+        $rows = explode("\n", $reflection_class->getDocComment());
+        $variables = array();
+        foreach($rows as &$row){
+            $row = str_replace("*", "", $row);
+            $row = trim($row);
+            if(substr($row,0,4) == '@var'){
+                $property = $this->_parse_class_schema_property($row);
+                $variables[$property['name']] = $property;
+            }
+        }
+        return $variables;
+    }
+
+    private function _parse_class_schema_property($row){
+        $bits = explode(" ", $row);
+        $name = trim($bits[1],"$");
+        $type = $bits[2];
+        $type_bits = explode("(", $type, 2);
+        $type = strtolower($type_bits[0]);
+
+        $controls = array_slice($bits,3);
+        // TODO: Parse controls for relationships and so on.
+
+        if($type == 'enum' || $type == 'decimal'){
+            $options = explode(",", $type_bits[1]);
+            foreach($options as &$option){
+                $option = trim($option);
+                $option = trim($option, "'\")");
+            }
+        }else{
+            $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
+        }
+
+        $definition = array();
+        $definition['name'] = $name;
+        $definition['type'] = $type;
+        if(isset($length)) {
+            $definition['length'] = $length;
+        }
+        if(isset($options)){
+            $definition['options'] = $options;
+        }
+        return $definition;
+
     }
 }

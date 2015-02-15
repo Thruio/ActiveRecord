@@ -107,6 +107,10 @@ class Search
         }
       }
 
+      foreach($results as $result){
+        $result->field_fix();
+      }
+
       // Check for ActiveRecord_class and recast as needed
       foreach ($results as $key => $result) {
         $results[$key] = $result->__recast();
