@@ -6,7 +6,11 @@
  * Time: 15:33
  */
 
+use \Thru\ActiveRecord\Test\TestModel;
 use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
+use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\TestModelSortable;
+use \Thru\ActiveRecord\Test\TestModelSearchOnly;
 use \Thru\UUID;
 
 class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
@@ -19,7 +23,11 @@ class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
   }
 
   public function tearDown(){
-    TestModelExtendedTypes::factory()->get_table_builder()->destroy();
+    TestModel::delete_table();
+    TestModelExtendedTypes::delete_table();
+    TestModelWithNameLabel::delete_table();
+    TestModelSortable::delete_table();
+    TestModelSearchOnly::delete_table();
   }
 
   public function testExtendedTypes(){
