@@ -17,9 +17,14 @@ class DatabaseLayer
     public static function get_instance()
     {
         if (!self::$instance) {
-            self::$instance = new DatabaseLayer();
+            throw new ConfigurationException("DatabaseLayer has not been configured");
         }
         return self::$instance;
+    }
+
+    public static function destroy_instance(){
+        self::$instance = null;
+        return true;
     }
 
     /**

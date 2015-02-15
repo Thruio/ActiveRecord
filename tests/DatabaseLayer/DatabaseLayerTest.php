@@ -12,6 +12,10 @@ use Thru\ActiveRecord\DatabaseLayer;
 
 class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
 
+  public function setUp(){
+    DatabaseLayer::destroy_instance();
+  }
+
   public function testConstructMySQL(){
     $database = new DatabaseLayer(array(
       'db_type'     => 'Mysql',
@@ -32,6 +36,7 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
    * @expectedExceptionMessage DB TYPE not supported: Bogus
    */
   public function testConstructInvalid(){
+
     $database = new DatabaseLayer(array(
       'db_type'     => 'Bogus',
       'db_hostname' => 'localhost',
@@ -44,5 +49,13 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
    */
   public function testConstructBogusSetting(DatabaseLayer $databaseLayer){
     $this->assertFalse($databaseLayer->get_option("not_an_option_really"));
+  }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\ConfigurationException
+   * @expectedExceptionMessage DatabaseLayer has not been configured
+   */
+  public function testBlankDatabaseLayer(){
+    DatabaseLayer::get_instance();
   }
 }
