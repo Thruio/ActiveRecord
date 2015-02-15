@@ -36,7 +36,7 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
-   * @expectedExceptionMessage  Operation BogusVirtualQuery  not supported
+   * @expectedExceptionMessage  Operation BogusVirtualQuery not supported
    */
   public function testProcessMySqlExceptionOnInvalidOperation(){
     $bogus_virtual_query = new BogusVirtualQuery();
