@@ -11,6 +11,7 @@ use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
 use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\TestModelSortable;
 use \Thru\ActiveRecord\Test\TestModelSearchOnly;
+use \Thru\ActiveRecord\Test\TestModelNoKey;
 use \Faker;
 
 class ActiveRecordTest extends PHPUnit_Framework_TestCase {
@@ -31,6 +32,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     TestModelWithNameLabel::delete_table();
     TestModelSortable::delete_table();
     TestModelSearchOnly::delete_table();
+    TestModelNoKey::delete_table();
   }
 
   public function testConstruct(){
@@ -182,5 +184,17 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
     $this->assertEquals($first, $second, "Both are identitical");
     $this->assertLessThanOrEqual($first_time, $second_time, "Query cache did indeed speed up loading");
+  }
+
+  public function testActiveRecordNoKey(){
+    $model = new TestModelNoKey();
+    $model->a = "foo";
+    $model->b = "bar";
+    $model->save();
+
+    $all = TestModelNoKey::search()->exec();
+    $this->assertTrue(is_array($all));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModelNoKey", get_class(reset($all)));
+
   }
 }

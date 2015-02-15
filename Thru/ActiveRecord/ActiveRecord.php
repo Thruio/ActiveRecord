@@ -253,18 +253,20 @@ class ActiveRecord
 
         $operation->setData($data);
 
-        if ($this->get_id()) {
+        if ($this->get_id() && $primary_key_column) {
             $operation->condition($primary_key_column, $this->$primary_key_column);
             $operation->execute();
         } else { // Else, we're an insert.
             $new_id = $operation->execute();
-            $this->$primary_key_column = $new_id;
+            if($primary_key_column) {
+                $this->$primary_key_column = $new_id;
+            }
         }
 
         // Expire any existing copy of this object.
         SearchIndex::get_instance()->expire($this->get_table_name(), $this->get_id());
 
-        if ($automatic_reload) {
+        if ($automatic_reload && $primary_key_column) {
             $this->reload();
         }
         $this->__post_save();

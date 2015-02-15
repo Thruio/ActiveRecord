@@ -286,6 +286,8 @@ class Mysql extends Base
         foreach($model->_calculate_save_down_rows() as $p => $parameter){
             $auto_increment = false;
             $type = "varchar(200)";
+            $auto_increment_possible = false;
+
             if(isset($schema[$parameter])){
               $psuedo_type = $schema[$parameter]['type'];
               switch(strtolower($psuedo_type)){
@@ -293,6 +295,7 @@ class Mysql extends Base
                 case 'integer':
                   $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
                   $type = "INT({$length})";
+                  $auto_increment_possible = true;
                   break;
 
                 case 'string':
@@ -335,8 +338,8 @@ class Mysql extends Base
               }
             }
 
-            if($p == 0){
-                // First param always primary key
+            if($p == 0 && $auto_increment_possible){
+                // First param always primary key if possible
                 $primary_key = $parameter;
                 $auto_increment = true;
             }
@@ -348,7 +351,9 @@ class Mysql extends Base
             $nullability = "NOT NULL";
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
-        $params[] = "  PRIMARY KEY (`$primary_key`)";
+        if(isset($primary_key)) {
+          $params[] = "  PRIMARY KEY (`$primary_key`)";
+        }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
         $query.= "(\n";

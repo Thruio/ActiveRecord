@@ -90,6 +90,7 @@ class Search
       $results = array();
 
       foreach ($response as $result) {
+        /* @var $result ActiveRecord */
         if ($result->get_primary_key_index()) {
           $results[$result->get_primary_key_index()] = $result;
         } else {
