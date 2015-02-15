@@ -162,4 +162,25 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
     TestModelSearchOnly::delete_table();
   }
+
+  public function testQueryCache(){
+    $insert = new TestModel();
+    $insert->text_field = "Before";
+    $insert->integer_field = 0;
+    $insert->date_field = date("Y-m-d H:i:s");
+    $insert->save();
+
+    // Run once
+    $first_time = microtime(true);
+    $first = TestModel::search()->where('test_model_id', 1)->execOne();
+    $first_time = microtime(true) - $first_time;
+
+    // Run twice
+    $second_time = microtime(true);
+    $second = TestModel::search()->where('test_model_id', 1)->execOne();
+    $second_time = microtime(true) - $second_time;
+
+    $this->assertEquals($first, $second, "Both are identitical");
+    $this->assertLessThanOrEqual($first_time, $second_time, "Query cache did indeed speed up loading");
+  }
 }
