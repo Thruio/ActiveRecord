@@ -13,6 +13,7 @@ use \Thru\ActiveRecord\Test\TestModelSortable;
 use \Thru\ActiveRecord\Test\TestModelSearchOnly;
 use \Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use \Thru\ActiveRecord\DatabaseLayer\IndexException;
+use \Thru\ActiveRecord\Test\BogusVirtualQuery;
 
 class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
 
@@ -26,10 +27,6 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
   public function setUp(){
     $this->base = new \Thru\ActiveRecord\DatabaseLayer\Sql\Base();
     $this->mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();
-    if(!class_exists("Bogus")) {
-      eval("class Bogus extends \\Thru\\ActiveRecord\\DatabaseLayer\\VirtualQuery{}");
-    }
-
     TestModel::delete_table();
     TestModelExtendedTypes::delete_table();
     TestModelWithNameLabel::delete_table();
@@ -39,10 +36,10 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
-   * @expectedExceptionMessage  Operation Bogus not supported
+   * @expectedExceptionMessage  Operation BogusVirtualQuery  not supported
    */
   public function testProcessMySqlExceptionOnInvalidOperation(){
-    $bogus_virtual_query = new Bogus();
+    $bogus_virtual_query = new BogusVirtualQuery();
     $this->mysql->process($bogus_virtual_query);
   }
 
@@ -51,7 +48,7 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
    * @expectedExceptionMessage  Base::process should have been overriden
    */
   public function testProcessBaseExceptionOnInvalidOperation(){
-    $bogus_virtual_query = new Bogus();
+    $bogus_virtual_query = new BogusVirtualQuery();
     $this->base->process($bogus_virtual_query);
   }
 
@@ -76,4 +73,19 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
     $mysql->getIndexes("test_models_sortable");
   }
 
+  public function testPassthru(){
+    $query = "SELECT \"hello\" as `col`";
+    $passthru = new \Thru\ActiveRecord\DatabaseLayer\Passthru();
+    $passthru->query($query);
+
+    $this->assertEquals($query, $passthru->get_sql_to_passthru());
+
+    $result = $passthru->execute();
+
+    $expected = new stdClass();
+    $expected->col = "hello";
+    $this->assertEquals($expected, reset($result));
+  }
+
 }
+

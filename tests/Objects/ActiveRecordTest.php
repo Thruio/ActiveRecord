@@ -35,6 +35,10 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     TestModelNoKey::delete_table();
   }
 
+  public function testTableName(){
+    $this->assertEquals("test_models", TestModel::get_table());
+  }
+
   public function testConstruct(){
     $test_model = new TestModel();
     $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($test_model));

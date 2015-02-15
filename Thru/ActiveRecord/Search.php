@@ -138,7 +138,7 @@ class Search
         $results = $this->exec();
 
         // Return the first result. Yes, that is what reset() does. :|
-        if (reset($results) !== NULL) {
+        if (reset($results) !== false) {
             return reset($results);
         }
         return FALSE;

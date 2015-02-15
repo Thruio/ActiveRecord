@@ -72,8 +72,9 @@ class DatabaseLayer
     {
       return new DatabaseLayer\Insert($table_name, $table_alias);
     }
+
     /**
-     * @param $table_name
+     * @param $sql
      * @return DatabaseLayer\Passthru
      */
     public function passthru($sql = null)
