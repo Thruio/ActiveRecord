@@ -30,10 +30,10 @@ class PrettyPrinterTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testJunkyJson(){
-    $junky_json = '{"foo": "bar"\r\n}';
-    $expected_encoded = file_get_contents(dirname(__FILE__) . "/junky.json");
+    $junky_json = file_get_contents(dirname(__FILE__) . "/junky.in.json");
+    $expected_encoded = file_get_contents(dirname(__FILE__) . "/junky.out.json");
     $actual_encoded = PrettyPrinter::Json($junky_json);
-    #file_put_contents(dirname(__FILE__) . "/junky.json", $actual_encoded);
+    #file_put_contents(dirname(__FILE__) . "/junky.out.json", $actual_encoded);
     $this->assertEquals($expected_encoded, $actual_encoded, "Junky json works as expected. Junk tho'.");
   }
 }
