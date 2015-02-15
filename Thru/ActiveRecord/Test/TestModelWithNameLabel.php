@@ -5,7 +5,7 @@ namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\ActiveRecord;
 
 /**
- * Class TestModelWithLabel
+ * Class TestModelWithNameLabel
  * @var $test_model_with_label_id integer
  * @var $name text
  */
