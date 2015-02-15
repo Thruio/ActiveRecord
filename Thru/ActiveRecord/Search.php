@@ -28,6 +28,7 @@ class Search
 
     public function condition(SearchCondition $condition){
       $this->conditions[] = $condition;
+      return $this;
     }
 
     public function limit($limit, $offset = 0)

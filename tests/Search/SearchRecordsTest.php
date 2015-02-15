@@ -100,4 +100,12 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
       ->execOne();
     $this->assertTrue($random_result instanceof TestModelSortable);
   }
+
+  public function testSearchDirectCondition(){
+    $condition = new \Thru\ActiveRecord\SearchCondition("text_field", "dog", "LIKE");
+    $result = TestModelSortable::search()->condition($condition)->execOne();
+
+    $this->assertTrue($result instanceof TestModelSortable);
+    $this->assertEquals("Dog", $result->text_field);
+  }
 }
