@@ -12,6 +12,7 @@ use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\TestModelSortable;
 use \Thru\ActiveRecord\Test\TestModelSearchOnly;
 use \Thru\ActiveRecord\Test\TestModelNoKey;
+use Thru\ActiveRecord\Test\TestModelBad;
 use \Faker;
 
 class ActiveRecordTest extends PHPUnit_Framework_TestCase {
@@ -223,5 +224,9 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $model->save();
     TestModel::delete_table();
     $model->save();
+  }
+
+  public function testTableBad(){
+    $model = new TestModelBad();
   }
 }

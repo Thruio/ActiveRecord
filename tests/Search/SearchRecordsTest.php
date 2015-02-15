@@ -93,6 +93,17 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(3, $in_result[1]->test_model_id);
   }
 
+  public function testSearchNotIn(){
+    $in_result = TestModelSortable::search()
+      ->where('test_model_id', array(1,3), "NOT IN")
+      ->order("test_model_id", "ASC")
+      ->exec();
+
+    $in_result = array_values($in_result);
+    $this->assertEquals(1, count($in_result));
+    $this->assertEquals(2, $in_result[0]->test_model_id);
+  }
+
   public function testSearchRand(){
     $random_result = TestModelSortable::search()
       ->order("test_model_id", "rand")
