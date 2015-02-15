@@ -87,5 +87,18 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($expected, reset($result));
   }
 
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+    */
+  public function testPassthruInvalidSQL(){
+    $query = "this isn't the sql you're looking for.";
+    $passthru = new \Thru\ActiveRecord\DatabaseLayer\Passthru();
+    $passthru->query($query);
+
+    $this->assertEquals($query, $passthru->get_sql_to_passthru());
+
+    $passthru->execute();
+  }
+
 }
 
