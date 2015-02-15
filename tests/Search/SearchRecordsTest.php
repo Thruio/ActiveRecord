@@ -19,6 +19,7 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
   private $three;
 
   public function setUp(){
+    TestModelSortable::delete_table();
     $this->one = new TestModelSortable();
     $this->two = new TestModelSortable();
     $this->three = new TestModelSortable();
@@ -41,11 +42,7 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
   }
 
   public function tearDown(){
-    $this->one->delete();
-    $this->two->delete();
-    $this->three->delete();
-
-    $this->three->get_table_builder()->destroy();
+    //TestModelSortable::delete_table();
   }
 
   public function testSearchBySlug(){
@@ -85,10 +82,15 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testSearchIn(){
-    $in_result = TestModelSortable::search()->where('test_model_id', array(1,3), "IN")->exec();
+    $in_result = TestModelSortable::search()
+      ->where('test_model_id', array(1,3), "IN")
+      ->order("test_model_id", "ASC")
+      ->exec();
+
+    $in_result = array_values($in_result);
     $this->assertEquals(2, count($in_result));
-    $this->assertEquals("1", reset($in_result)->test_model_id);
-    $this->assertEquals("3", end($in_result)->test_model_id);
+    $this->assertEquals(1, $in_result[0]->test_model_id);
+    $this->assertEquals(3, $in_result[1]->test_model_id);
   }
 
   public function testSearchRand(){

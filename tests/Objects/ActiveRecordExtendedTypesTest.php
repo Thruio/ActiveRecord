@@ -7,6 +7,7 @@
  */
 
 use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
+use \Thru\UUID;
 
 class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
 
@@ -18,18 +19,17 @@ class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
   }
 
   public function tearDown(){
-
-    #TestModelExtendedTypes::factory()->get_table_builder()->destroy();
+    TestModelExtendedTypes::factory()->get_table_builder()->destroy();
   }
 
   public function testExtendedTypes(){
     /* @var $result TestModelExtendedTypes */
-    $this->extended->blob_field = file_get_contents(dirname(__FILE__) . "/../vendor/bin/phpunit");
+    $this->extended->blob_field = file_get_contents(dirname(__FILE__) . "/../../vendor/bin/phpunit");
     $this->extended->decimal_field = 12345.67890;
     $this->extended->enum_field = "Yes";
     $this->extended->md5_field = md5($this->extended->blob_field);
     $this->extended->sha1_field = sha1($this->extended->blob_field);
-    $this->extended->uuid_field = \Thru\ActiveRecord\UUID::v4();
+    $this->extended->uuid_field = UUID::v4();
     $result = $this->extended->save();
 
     $this->assertEquals($this->extended->blob_field, $result->blob_field);
