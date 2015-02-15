@@ -41,59 +41,49 @@ class Search
 
     public function exec()
     {
-        try {
-          $primary_key_search = FALSE;
-          if (count($this->conditions) == 1) {
-            /* @var $model ActiveRecord */
-            $model = $this->model;
+        $primary_key_search = FALSE;
+        if (count($this->conditions) == 1) {
+          /* @var $model ActiveRecord */
+          $model = $this->model;
 
-            if (end($this->conditions)->get_column() == $model->get_table_primary_key() && end($this->conditions)->get_operation() == '=') {
-              $primary_key_search = TRUE;
-              if (SearchIndex::get_instance()->exists($model->get_table_name(), end($this->conditions)->get_value())) {
-                return array(
-                  SearchIndex::get_instance()
-                    ->get($model->get_table_name(), end($this->conditions)->get_value())
-                );
-              }
-            }
-            unset($model);
-          }
-
-          $database = DatabaseLayer::get_instance();
-
-          $select = $database->select($this->model->get_table_name(), $this->model->get_table_alias());
-          $select->fields($this->model->get_table_alias());
-
-          // Add WHERE Conditions
-          foreach ((array)$this->conditions as $condition) {
-            $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
-          }
-
-          if ($this->order) {
-            foreach ($this->order as $order) {
-              $select->orderBy($order['column'], $order['direction']);
+          if (end($this->conditions)->get_column() == $model->get_table_primary_key() && end($this->conditions)->get_operation() == '=') {
+            $primary_key_search = TRUE;
+            if (SearchIndex::get_instance()->exists($model->get_table_name(), end($this->conditions)->get_value())) {
+              return array(
+                SearchIndex::get_instance()
+                  ->get($model->get_table_name(), end($this->conditions)->get_value())
+              );
             }
           }
-
-          // Build LIMIT SQL if relevent
-          if ($this->limit) {
-            $select->range($this->offset, $this->limit);
-          }
-
-          // Get objects
-          $class = get_class($this->model);
-          $select->setModel($class);
-          $response = $select->execute();
-          return $this->execProcessResponse($response, $primary_key_search);
-        }catch(IndexException $e){
-          if($e->remedy == 'table_missing'){
-            $tableBuilder = new TableBuilder($this->model);
-            $tableBuilder->build();
-            return $this->exec();
-          }
-        }catch(Exception $e){
-          throw $e;
+          unset($model);
         }
+
+        $database = DatabaseLayer::get_instance();
+
+        $select = $database->select($this->model->get_table_name(), $this->model->get_table_alias());
+        $select->fields($this->model->get_table_alias());
+
+        // Add WHERE Conditions
+        foreach ((array)$this->conditions as $condition) {
+          $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
+        }
+
+        if ($this->order) {
+          foreach ($this->order as $order) {
+            $select->orderBy($order['column'], $order['direction']);
+          }
+        }
+
+        // Build LIMIT SQL if relevent
+        if ($this->limit) {
+          $select->range($this->offset, $this->limit);
+        }
+
+        // Get objects
+        $class = get_class($this->model);
+        $select->setModel($class);
+        $response = $select->execute();
+        return $this->execProcessResponse($response, $primary_key_search);
     }
 
     private function execProcessResponse($response, $primary_key_search){
