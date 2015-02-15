@@ -100,5 +100,4 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
       ->execOne();
     $this->assertTrue($random_result instanceof TestModelSortable);
   }
-
 }

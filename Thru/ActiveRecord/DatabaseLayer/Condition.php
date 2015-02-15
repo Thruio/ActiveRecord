@@ -10,9 +10,9 @@ class Condition
 
     public function __construct($column, $value, $operation = '=')
     {
-        $this->column = $column;
-        $this->value = $value;
-        $this->operation = $operation;
+        $this->setColumn($column);
+        $this->setValue($value);
+        $this->setOperation($operation);
     }
 
     public function getColumn(){

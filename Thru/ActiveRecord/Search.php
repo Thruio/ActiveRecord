@@ -26,6 +26,10 @@ class Search
         return $this;
     }
 
+    public function condition(SearchCondition $condition){
+      $this->conditions[] = $condition;
+    }
+
     public function limit($limit, $offset = 0)
     {
         $this->limit = $limit;
@@ -103,9 +107,9 @@ class Search
       }
 
       // Check for ActiveRecord_class and recast as needed
-      foreach ($results as $key => $result) {
+      /*foreach ($results as $key => $result) {
         $results[$key] = $result->__recast();
-      }
+      }*/
 
       // Call __post_construct on each of the newly constructed objects.
       foreach ($results as &$result) {

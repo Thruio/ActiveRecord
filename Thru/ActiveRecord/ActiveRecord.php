@@ -275,7 +275,7 @@ class ActiveRecord
 
     /**
      * Reload the selected record
-     * @return ActiveRecord
+     * @return ActiveRecord|false
      */
     public function reload()
     {
@@ -312,7 +312,13 @@ class ActiveRecord
         $class = get_called_class();
         $object = new $class();
         $table_builder = new TableBuilder($object);
-        return $table_builder->destroy();
+        $table_builder->destroy();
+    }
+
+    public static function get_table(){
+        $class = get_called_class();
+        $object = new $class();
+        return $object->get_table_name();
     }
 
     /**

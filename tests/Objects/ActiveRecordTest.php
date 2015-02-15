@@ -200,6 +200,10 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $all = TestModelNoKey::search()->exec();
     $this->assertTrue(is_array($all));
     $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModelNoKey", get_class(reset($all)));
+  }
 
+  public function testActiveRecordReloadUnsaved(){
+    $model = new TestModel();
+    $this->assertFalse($model->reload());
   }
 }
