@@ -85,6 +85,11 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     return $test_model;
   }
 
+  public function testSearchZeroResults(){
+    $this->assertEquals(false,    TestModel::search()->execOne());
+    $this->assertEquals(array(),  TestModel::search()->exec());
+  }
+
   public function testSearchInvalid(){
     $this->assertFalse(TestModel::search()->where('test_model_id', -1)->execOne());
   }

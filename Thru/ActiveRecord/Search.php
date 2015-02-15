@@ -111,9 +111,9 @@ class Search
       foreach ($results as &$result) {
         /* @var $result ActiveRecord */
         $result->__post_construct();
-        if ($result->__requires_recast()) {
+        /*if ($result->__requires_recast()) {
           $result = $result->__recast();
-        }
+        }*/
       }
 
       if ($primary_key_search) {

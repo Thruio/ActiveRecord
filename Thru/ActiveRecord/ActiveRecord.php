@@ -54,10 +54,10 @@ class ActiveRecord
     {
     }
 
-    public function __requires_recast()
+    /*public function __requires_recast()
     {
         return false;
-    }
+    }*/
 
     /**
      * Find an item by the Primary Key ID. This does not use the search() functionality
@@ -337,7 +337,7 @@ class ActiveRecord
      * @return ActiveRecord
      * @throws exception
      */
-    public function __recast()
+    /*public function __recast()
     {
         // If the object has a property called ActiveRecord_class, it can potentially be recast at runtime. There are some dependencies though
         if (property_exists($this, '__active_record_class')) {
@@ -355,7 +355,7 @@ class ActiveRecord
             }
         }
         return $this;
-    }
+    }*/
 
     /**
      * Get URL slug.
