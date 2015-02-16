@@ -165,8 +165,8 @@ class ActiveRecord
     {
         if (property_exists($this, '_label_column')) {
             if (property_exists($this, $this->_label_column)) {
-                $lable_column = $this->_label_column;
-                return $this->$lable_column;
+                $label_column = $this->_label_column;
+                return $this->$label_column;
             }
         }
         if (property_exists($this, 'name')) {
