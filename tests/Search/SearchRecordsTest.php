@@ -47,7 +47,8 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
 
   public function testSearchBySlug(){
     $slug_original = new TestModelWithNameLabel();
-    $slug_original->name = "Example";
+    $slug_original->name = "Bleh";
+    $slug_original->something_else = "Example";
     $slug_original->save();
 
     $this->assertStringMatchesFormat("%d-example", $slug_original->get_slug());

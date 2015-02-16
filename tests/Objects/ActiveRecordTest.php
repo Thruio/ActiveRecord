@@ -107,18 +107,36 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\TestModel ID 1", $test_model->get_label());
 
     $with_name_label = new \Thru\ActiveRecord\Test\TestModelWithNameLabel();
-    $with_name_label->name = "Label name here";
+    $with_name_label->name = "Wrong name here";
+    $with_name_label->something_else = "Right name here";
     $with_name_label->save();
 
-    $this->assertEquals($with_name_label->name, $with_name_label->get_label(), "Name label works");
+    $this->assertEquals($with_name_label->something_else, $with_name_label->get_label(), "Name label works");
+  }
 
+  public function testLabelAutoName(){
+    $model = new TestModel();
+    $model->name = 'bar';
+    $this->assertEquals("bar", $model->get_label());
+  }
+
+  public function testLabelAutoDescription(){
+    $model = new TestModel();
+    $model->test_model_id = $this->faker->numberBetween(1,100000);
+    $model->description = 'foo';
+    $this->assertEquals("foo", $model->get_label());
+  }
+
+  public function testLabelManual(){
+    $model = new TestModelWithNameLabel();
+    $model->something_else = 'foo';
+    $this->assertEquals("foo", $model->get_label());
+  }
+
+  public function testLabelFailure(){
     $model = new TestModel();
     $model->test_model_id = $this->faker->numberBetween(1,100000);
     $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\TestModel ID {$model->test_model_id}", $model->get_label());
-    $model->description = 'foo';
-    $this->assertEquals("foo", $model->get_label());
-    $model->name = 'bar';
-    $this->assertEquals("bar", $model->get_label());
   }
 
   public function testUpdate(){

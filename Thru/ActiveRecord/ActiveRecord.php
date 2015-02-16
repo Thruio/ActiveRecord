@@ -7,7 +7,7 @@ use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 class ActiveRecord
 {
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
-    protected $_label_column = 'name';
+    protected $_label_column = null;
     protected $_columns;
 
     /**

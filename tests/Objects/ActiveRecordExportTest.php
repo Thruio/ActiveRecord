@@ -30,7 +30,7 @@ class ActiveRecordExportTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($test_model->integer_field, $model_array['integer_field']);
     $this->assertEquals($test_model->text_field, $model_array['text_field']);
     $this->assertEquals($test_model->date_field, $model_array['date_field']);
-    $this->assertEquals("name", $model_array['_label_column']);
+    $this->assertEquals(null, $model_array['_label_column']);
     $this->assertEquals("test_model_id", $model_array['_columns'][0]);
     $this->assertEquals("integer_field", $model_array['_columns'][1]);
     $this->assertEquals("text_field", $model_array['_columns'][2]);
@@ -74,7 +74,7 @@ class ActiveRecordExportTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($test_model->integer_field, $decoded->integer_field);
     $this->assertEquals($test_model->text_field, $decoded->text_field);
     $this->assertEquals($test_model->date_field, $decoded->date_field);
-    $this->assertEquals("name", $decoded->_label_column);
+    $this->assertEquals(null, $decoded->_label_column);
     $this->assertEquals("test_model_id", $decoded->_columns[0]);
     $this->assertEquals("integer_field", $decoded->_columns[1]);
     $this->assertEquals("text_field", $decoded->_columns[2]);
