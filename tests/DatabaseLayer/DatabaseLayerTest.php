@@ -58,4 +58,15 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
   public function testBlankDatabaseLayer(){
     DatabaseLayer::get_instance();
   }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+   * @expectedExceptionMessage Query made PDO sad:
+   */
+  public function testTableExistsFailure(){
+    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
+    $database = DatabaseLayer::get_instance();
+    $select = $database->select("table_doesnt_exist");
+    $select->execute("NotStdClass");
+  }
 }

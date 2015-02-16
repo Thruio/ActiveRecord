@@ -57,11 +57,6 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase {
     $this->assertTrue(property_exists($result, 'date_field'));
   }
 
-  public function testDumbModelWhat(){
-    $database = DatabaseLayer::get_instance();
-    $select = $database->select("mysql.table_doesnt_exist");
-    $select->execute("NotStdClass");
 
-  }
 
 }

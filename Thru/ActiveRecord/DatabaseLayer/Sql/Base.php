@@ -34,19 +34,27 @@ class Base extends \PDO
     $username = !empty($username)?$username:null;
     $password = !empty($password)?$password:null;
 
-    parent::__construct($dsn, $username, $password);
+    $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
+
+    parent::__construct($dsn, $username, $password, $options);
   }
 
   public function query($query, $model = 'StdClass'){
     /* @var $result \PDOStatement */
     $exec_time_start = microtime(true);
     $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
-
     $error = parent::errorInfo();
-    #echo " *** {$error[0]} ({$model}) " . str_replace("\n", " ", $query) . "\n";
 
-    if($error[0] !== '00000'){
-      switch($error[0]){
+    /*if($model == "NotStdClass") {
+      echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
+      parent::Query("SELECT tde.* FROM table_doesnt_exist tde", \PDO::FETCH_CLASS, 'StdClass');
+      parent::Query("SELECT tde.* FROM table_doesnt_exist tde");
+
+      var_dump($error);
+      var_dump($result);
+    }*/
+    if(parent::errorCode() !== \PDO::ERR_NONE){
+      switch(parent::errorCode()){
         case '42S02':
           if($model != 'StdClass'){
             $instance = new $model();
@@ -54,14 +62,12 @@ class Base extends \PDO
               $table_builder = new TableBuilder($instance);
               $table_builder->build();
               $this->query($query); // Re-run the query
-            }else{
-              throw new DatabaseLayer\Exception($error[0] . ": " . $error[2] . "... and is not an ActiveRecord object, so we can't create it anyway! We were trying to run '{$query}'");
             }
-            throw new DatabaseLayer\TableDoesntExistException($error[0] . ": " . $error[2]);
+            throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
           }
           break;
         default:
-          throw new DatabaseLayer\Exception($error[0] . ": " . $error[2]);
+          throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
       }
     }
 
