@@ -45,7 +45,7 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
-   * @expectedExceptionMessage  Base::process should have been overriden
+   * @expectedExceptionMessage  Base::process should have been overridden
    */
   public function testProcessBaseExceptionOnInvalidOperation(){
     $bogus_virtual_query = new BogusVirtualQuery();
