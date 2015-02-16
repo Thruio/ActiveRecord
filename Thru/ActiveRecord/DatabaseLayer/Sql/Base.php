@@ -41,19 +41,16 @@ class Base extends \PDO
 
   public function query($query, $model = 'StdClass'){
     /* @var $result \PDOStatement */
-    $exec_time_start = microtime(true);
-    $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
-    $error = parent::errorInfo();
-
-    /*if($model == "NotStdClass") {
-      echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
-      parent::Query("SELECT tde.* FROM table_doesnt_exist tde", \PDO::FETCH_CLASS, 'StdClass');
-      parent::Query("SELECT tde.* FROM table_doesnt_exist tde");
-
-      var_dump($error);
-      var_dump($result);
-    }*/
-    if(parent::errorCode() !== \PDO::ERR_NONE){
+    try {
+      $exec_time_start = microtime(true);
+      $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
+      #echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
+      $exec_time_end = microtime(true);
+      $exec_time = $exec_time_end - $exec_time_start;
+      $this->query_log[] = new Log($query, $exec_time);
+      return $result;
+    }catch(\PDOException $e){
+      $error = parent::errorInfo();
       switch(parent::errorCode()){
         case '42S02':
           if($model != 'StdClass'){
@@ -61,7 +58,7 @@ class Base extends \PDO
             if($instance instanceof ActiveRecord) {
               $table_builder = new TableBuilder($instance);
               $table_builder->build();
-              $this->query($query); // Re-run the query
+              return $this->query($query); // Re-run the query
             }
             throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
           }
@@ -70,12 +67,6 @@ class Base extends \PDO
           throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
       }
     }
-
-    $exec_time_end = microtime(true);
-    $exec_time = $exec_time_end - $exec_time_start;
-    $this->query_log[] = new Log($query, $exec_time);
-
-    return $result;
   }
 
   /**

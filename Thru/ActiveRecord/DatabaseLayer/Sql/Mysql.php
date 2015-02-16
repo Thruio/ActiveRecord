@@ -205,8 +205,6 @@ class Mysql extends Base
     }
 
     public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
-        $conditions = array();
-
         // SELECTORS
         if(count($thing->getTables()) > 1){
             throw new Exception("Active Record Cannot insert into more than one table at a time!");
@@ -237,15 +235,11 @@ class Mysql extends Base
 
         $result = $this->query($query);
 
-        // TODO: Make this a Collection.
-        $results = array();
-        if($result !== false){
-            foreach($result as $result_item){
-                $results[] = $result_item;
-            }
+        if($result instanceof \PDOStatement) {
+          return $result->errorCode() == "00000" ? TRUE : FALSE;
+        }else {
+          return FALSE;
         }
-
-        return $results;
     }
 
     public function getIndexes($table){
