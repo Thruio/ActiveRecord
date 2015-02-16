@@ -43,7 +43,7 @@ class Base extends \PDO
     $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
 
     $error = parent::errorInfo();
-    echo " *** {$error[0]} ({$model}) " . str_replace("\n", " ", $query) . "\n";
+    #echo " *** {$error[0]} ({$model}) " . str_replace("\n", " ", $query) . "\n";
 
     if($error[0] !== '00000'){
       switch($error[0]){
