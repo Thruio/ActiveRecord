@@ -111,6 +111,14 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $with_name_label->save();
 
     $this->assertEquals($with_name_label->name, $with_name_label->get_label(), "Name label works");
+
+    $model = new TestModel();
+    $model->test_model_id = $this->faker->numberBetween(1,100000);
+    $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\TestModel ID {$model->test_model_id}", $model->get_label());
+    $model->description = 'foo';
+    $this->assertEquals("foo", $model->get_label());
+    $model->name = 'bar';
+    $this->assertEquals("bar", $model->get_label());
   }
 
   public function testUpdate(){
@@ -229,4 +237,6 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
   public function testTableBad(){
     $model = new TestModelBad();
   }
+
+
 }
