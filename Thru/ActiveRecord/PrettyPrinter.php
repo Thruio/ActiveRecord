@@ -63,6 +63,6 @@ class PrettyPrinter
             $prev_char = $char;
         }
 
-        return str_replace("\n", "\r\n", $result);
+        return $result;
     }
 }
