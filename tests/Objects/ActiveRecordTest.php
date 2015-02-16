@@ -252,9 +252,8 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $model->save();
   }
 
-  public function testTableBad(){
+  public function testTableBad() {
     $model = new TestModelBad();
   }
-
 
 }

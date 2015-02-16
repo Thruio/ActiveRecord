@@ -21,6 +21,7 @@ class Mysql extends Base
      */
     public function process(\Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing)
     {
+
         switch($thing->getOperation()){
             case 'Insert': //Create
                 return $this->processInsert($thing);

@@ -8,6 +8,7 @@
 
 namespace tests\Objects;
 
+use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DumbModel;
 use Thru\ActiveRecord\Test\TestModel;
 use Faker;
@@ -54,6 +55,13 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase {
     $this->assertTrue(property_exists($result, 'integer_field'));
     $this->assertTrue(property_exists($result, 'text_field'));
     $this->assertTrue(property_exists($result, 'date_field'));
+  }
+
+  public function testDumbModelWhat(){
+    $database = DatabaseLayer::get_instance();
+    $select = $database->select("mysql.table_doesnt_exist");
+    $select->execute("NotStdClass");
+
   }
 
 }

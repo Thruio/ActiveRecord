@@ -40,11 +40,11 @@ class Base extends \PDO
   public function query($query, $model = 'StdClass'){
     /* @var $result \PDOStatement */
     $exec_time_start = microtime(true);
-
-    #echo " *** " . $query."\n";
     $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
 
     $error = parent::errorInfo();
+    echo " *** {$error[0]} ({$model}) " . str_replace("\n", " ", $query) . "\n";
+
     if($error[0] !== '00000'){
       switch($error[0]){
         case '42S02':
@@ -78,6 +78,6 @@ class Base extends \PDO
    * @throws Exception
    */
   public function process(VirtualQuery $thing){
-    throw new Exception("Base::process should have been overriden");
+    throw new Exception("Base::process should have been overridden");
   }
 }
