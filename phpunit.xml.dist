@@ -3,6 +3,9 @@
          colors="true"
          stopOnFailure="false">
     <testsuites>
+        <testsuite name="utils">
+            <directory>tests/Utils</directory>
+        </testsuite>
         <testsuite name="objects">
             <directory>tests/Objects</directory>
         </testsuite>
@@ -14,9 +17,6 @@
         </testsuite>
         <testsuite name="dblayer">
             <directory>tests/DatabaseLayer</directory>
-        </testsuite>
-        <testsuite name="utils">
-            <directory>tests/Utils</directory>
         </testsuite>
     </testsuites>
     <logging>
