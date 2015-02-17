@@ -285,4 +285,12 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(JsonPrettyPrinter::Json($different_object), $reload_again->text_field);
   }
 
+  public function testDestroyTableThatDoesntExist(){
+    $model = new TestModel();
+    $model->delete_table();
+    $vq = new \Thru\ActiveRecord\DatabaseLayer\VirtualQuery();
+    $interpreter = $vq->getInterpreter();
+    $interpreter->destroyTable($model);
+  }
+
 }

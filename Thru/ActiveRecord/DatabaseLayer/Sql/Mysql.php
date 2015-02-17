@@ -271,12 +271,8 @@ class Mysql extends Base
 
     public function destroyTable(ActiveRecord $model){
       $query = "DROP TABLE {$model->get_table_name()};";
-      try {
-        $this->query($query);
-      }Catch(Exception $e){
-        throw new TableDestroyFailureException($e->getMessage());
-      }
-    }
+      $this->query($query);
+    } 
 
     public function buildTable(ActiveRecord $model){
         $schema = $model->get_class_schema();

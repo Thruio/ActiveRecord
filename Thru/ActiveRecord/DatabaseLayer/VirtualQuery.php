@@ -53,7 +53,7 @@ class VirtualQuery
     /**
      * @return \Thru\ActiveRecord\DatabaseLayer\Sql\Base
      */
-    protected function getInterpreter(){
+    public function getInterpreter(){
         $sql_interpreter_name = "\\Thru\\ActiveRecord\\DatabaseLayer\\Sql\\" . \Thru\ActiveRecord\DatabaseLayer::get_instance()->get_option('db_type');
         $sql_interpreter = $sql_interpreter_name::factory();
         return $sql_interpreter;
