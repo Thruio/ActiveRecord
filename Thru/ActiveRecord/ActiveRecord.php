@@ -3,6 +3,8 @@
 namespace Thru\ActiveRecord;
 
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
+use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
+
 
 class ActiveRecord
 {
@@ -386,7 +388,7 @@ class ActiveRecord
 
     public function __toJson($anticipated_rows = null){
         $array = $this->__toArray($anticipated_rows);
-        return json_encode($array);
+        return JsonPrettyPrinter::Json($array);
     }
 
     public function get_class($without_namespace = false){

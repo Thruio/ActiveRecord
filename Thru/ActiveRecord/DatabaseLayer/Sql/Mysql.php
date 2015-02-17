@@ -6,6 +6,7 @@ use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
 use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
+use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use Thru\UUID;
 
 class Mysql extends Base
@@ -216,7 +217,7 @@ class Mysql extends Base
         foreach($thing->getData() as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
-                $value = json_encode($value);
+                $value = JsonPrettyPrinter::Json($value);
             }
             $value_slashed = addslashes($value);
             if($value === null){
