@@ -120,4 +120,14 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue($result instanceof TestModelSortable);
     $this->assertEquals("Dog", $result->text_field);
   }
+
+  public function testSearchWithoutOffset(){
+    $array = TestModelSortable::search()->order("test_model_id", "ASC")->limit(1)->exec();
+    $this->assertEquals("Dog", end($array)->text_field);
+  }
+
+  public function testSearchWithOffset(){
+    $array = TestModelSortable::search()->order("test_model_id", "ASC")->limit(1,1)->exec();
+    $this->assertEquals("Parakeet", end($array)->text_field);
+  }
 }
