@@ -207,7 +207,7 @@ class Mysql extends Base
     public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
-            throw new Exception("Active Record Cannot insert into more than one table at a time!");
+            throw new Exception("Active Record Cannot update into more than one table at a time!");
         }
         $tables = $thing->getTables();
         $table = end($tables);

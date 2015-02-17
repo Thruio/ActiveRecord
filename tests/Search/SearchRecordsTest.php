@@ -147,6 +147,4 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("test_models",  $tables['tm']->getName());
     $this->assertEquals("tm",           $tables['tm']->getAlias());
   }
-
-
 }

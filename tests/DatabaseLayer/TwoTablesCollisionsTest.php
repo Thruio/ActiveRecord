@@ -27,6 +27,19 @@ class TwoTablesCollisionsTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+   * @expectedExceptionMessage Active Record Cannot update into more than one table at a time!
+   */
+  public function testUpdateIntoTwoTablesFails(){
+    $update = new DatabaseLayer\Update("test_models");
+    $update->setTables(array(
+      "tm" => new DatabaseLayer\Table("test_models"),
+      "tmb" => new DatabaseLayer\Table("test_model_bad")
+    ));
+    $update->execute();
+  }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
    * @expectedExceptionMessage Active Record Cannot delete from more than one table at a time!
    */
   public function testDeleteFromTwoTablesFails(){
