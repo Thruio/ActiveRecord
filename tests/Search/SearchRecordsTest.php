@@ -148,29 +148,5 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("tm",           $tables['tm']->getAlias());
   }
 
-  /**
-   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
-   * @expectedExceptionMessage Active Record Cannot insert into more than one table at a time!
-   */
-  public function testInsertIntoTwoTablesFails(){
-    $insert = new \Thru\ActiveRecord\DatabaseLayer\Insert("test_models");
-    $insert->setTables(array(
-      "tm" => new Thru\ActiveRecord\DatabaseLayer\Table("test_models"),
-      "tmb" => new Thru\ActiveRecord\DatabaseLayer\Table("test_model_bad")
-    ));
-    $insert->execute();
-  }
 
-  /**
-   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
-   * @expectedExceptionMessage Active Record Cannot delete from more than one table at a time!
-   */
-  public function testDeleteFromTwoTablesFails(){
-    $delete = new \Thru\ActiveRecord\DatabaseLayer\Delete("test_models");
-    $delete->setTables(array(
-      "tm" => new Thru\ActiveRecord\DatabaseLayer\Table("test_models"),
-      "tmb" => new Thru\ActiveRecord\DatabaseLayer\Table("test_model_bad")
-    ));
-    $delete->execute();
-  }
 }
