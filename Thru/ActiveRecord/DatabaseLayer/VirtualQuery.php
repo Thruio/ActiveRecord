@@ -10,9 +10,13 @@ class VirtualQuery
     protected $orders;      // ORDER BY *
     protected $model = 'StdClass';
 
-    public function getTables()
-    {
+    public function getTables(){
         return $this->tables;
+    }
+
+    public function setTables($tables){
+        $this->tables = $tables;
+        return $this;
     }
 
     public function getConditions(){

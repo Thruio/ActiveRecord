@@ -138,4 +138,26 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
   public function testSearchWithInvalidOrder(){
     TestModelSortable::search()->order("test_model_id", "invalid")->exec();
   }
+
+  public function testVirtualQueryTablesSane(){
+    $insert = new \Thru\ActiveRecord\DatabaseLayer\Insert("test_models");
+    $tables = $insert->getTables();
+    $this->assertArrayHasKey("tm", $tables);
+    $this->assertEquals("Thru\\ActiveRecord\\DatabaseLayer\\Table", get_class($tables['tm']));
+    $this->assertEquals("test_models",  $tables['tm']->getName());
+    $this->assertEquals("tm",           $tables['tm']->getAlias());
+  }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+   * @expectedExceptionMessage Active Record Cannot insert into more than one table at a time!
+   */
+  public function testInsertIntoTwoTablesFails(){
+    $insert = new \Thru\ActiveRecord\DatabaseLayer\Insert("test_models");
+    $insert->setTables(array(
+      "tm" => new Thru\ActiveRecord\DatabaseLayer\Table("test_models"),
+      "tmb" => new Thru\ActiveRecord\DatabaseLayer\Table("test_model_bad")
+    ));
+    $insert->execute();
+  }
 }
