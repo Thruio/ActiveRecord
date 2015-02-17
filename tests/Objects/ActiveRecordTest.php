@@ -244,14 +244,17 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
    * @expectedExceptionMessage 42S02: Table 'active_record_test.test_models' doesn't exist
    */
   public function testTrigger42S02(){
-    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
+
     $model = new TestModel();
     $model->text_field = "Before";
     $model->integer_field = 0;
     $model->date_field = date("Y-m-d H:i:s");
-    $model->save();
+    $model->save(false);
     TestModel::delete_table();
-    $model->save();
+    $model->save(false);
+
+    // If we've gotten this far, a 42S02 has not been triggered.
+    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
   }
 
   /**
