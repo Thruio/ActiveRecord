@@ -272,7 +272,7 @@ class Mysql extends Base
     public function destroyTable(ActiveRecord $model){
       $query = "DROP TABLE {$model->get_table_name()};";
       $this->query($query);
-    } 
+    }
 
     public function buildTable(ActiveRecord $model){
         $schema = $model->get_class_schema();
@@ -355,11 +355,7 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
-        try {
-          $this->query($query);
-        }Catch(Exception $e){
-          throw new TableBuildFailureException($e->getMessage() . "\n" . $query);
-        }
+        $this->query($query);
     }
 
     private function processConditions($thing){
