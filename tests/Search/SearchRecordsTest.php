@@ -160,4 +160,17 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     ));
     $insert->execute();
   }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+   * @expectedExceptionMessage Active Record Cannot delete from more than one table at a time!
+   */
+  public function testDeleteFromTwoTablesFails(){
+    $delete = new \Thru\ActiveRecord\DatabaseLayer\Delete("test_models");
+    $delete->setTables(array(
+      "tm" => new Thru\ActiveRecord\DatabaseLayer\Table("test_models"),
+      "tmb" => new Thru\ActiveRecord\DatabaseLayer\Table("test_model_bad")
+    ));
+    $delete->execute();
+  }
 }
