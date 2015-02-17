@@ -130,4 +130,12 @@ class SearchRecordsTest extends PHPUnit_Framework_TestCase {
     $array = TestModelSortable::search()->order("test_model_id", "ASC")->limit(1,1)->exec();
     $this->assertEquals("Parakeet", end($array)->text_field);
   }
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
+   * @expectedExceptionMessage Bad ORDER direction: invalid
+   */
+  public function testSearchWithInvalidOrder(){
+    TestModelSortable::search()->order("test_model_id", "invalid")->exec();
+  }
 }
