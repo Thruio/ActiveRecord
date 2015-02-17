@@ -71,7 +71,6 @@ class Mysql extends Base
     public function processSelect(\Thru\ActiveRecord\DatabaseLayer\Select $thing){
         $fields = array();
         $tables = array();
-        $conditions = array();
         $orders = array();
 
         // SELECTORS
