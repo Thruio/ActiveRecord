@@ -253,8 +253,26 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $model->save();
   }
 
+  /**
+   * TODO: flesh this out
+   */
   public function testTableBad() {
     $model = new TestModelBad();
+  }
+
+  public function testStoreObject(){
+    $object = new StdClass();
+    $object->foo = "bar";
+
+    $model = new TestModel();
+    $model->date_field = date("Y-m-d H:i:s");
+    $model->integer_field = 1;
+    $model->text_field = $object;
+    $model->save();
+
+    $reload = TestModel::search()->where('test_model_id', $model->test_model_id)->execOne();
+    $this->assertEquals(json_encode($object), $reload->text_field);
+    // TODO: This should really be returning a deserialised blob.
   }
 
 }

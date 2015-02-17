@@ -181,11 +181,14 @@ class Mysql extends Base
         $updates = array();
         foreach($thing->getData() as $key => $value){
             $key = trim($key,"`");
+            if(is_object($value) || is_array($value)){
+                $value = JsonPrettyPrinter::Json($value);
+            }
             $value_slashed = addslashes($value);
             if($value === null){
-              $updates[] = "`$key` = NULL";
+                $updates[] = "`$key` = NULL";
             }else{
-              $updates[] = "`$key` = \"$value_slashed\"";
+                $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
         $selector = "INSERT INTO {$table->getName()} ";
@@ -220,9 +223,9 @@ class Mysql extends Base
             }
             $value_slashed = addslashes($value);
             if($value === null){
-              $updates[] = "`$key` = NULL";
+                $updates[] = "`$key` = NULL";
             }else{
-              $updates[] = "`$key` = \"$value_slashed\"";
+                $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
         $selector = "UPDATE {$table->getName()} ";
