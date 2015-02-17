@@ -12,7 +12,8 @@ use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\TestModelSortable;
 use \Thru\ActiveRecord\Test\TestModelSearchOnly;
 use \Thru\ActiveRecord\Test\TestModelNoKey;
-use Thru\ActiveRecord\Test\TestModelBad;
+use \Thru\ActiveRecord\Test\TestModelBad;
+use \Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use \Faker;
 
 class ActiveRecordTest extends PHPUnit_Framework_TestCase {
@@ -264,6 +265,9 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $object = new StdClass();
     $object->foo = "bar";
 
+    $different_object = new StdClass();
+    $different_object->hello = "there";
+
     $model = new TestModel();
     $model->date_field = date("Y-m-d H:i:s");
     $model->integer_field = 1;
@@ -271,8 +275,14 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $model->save();
 
     $reload = TestModel::search()->where('test_model_id', $model->test_model_id)->execOne();
-    $this->assertEquals(json_encode($object), $reload->text_field);
+    $this->assertEquals(JsonPrettyPrinter::Json($object), $reload->text_field);
     // TODO: This should really be returning a deserialised blob.
+
+    $reload->text_field = $different_object;
+    $reload->save();
+
+    $reload_again = TestModel::search()->where('test_model_id', $model->test_model_id)->execOne();
+    $this->assertEquals(JsonPrettyPrinter::Json($different_object), $reload_again->text_field);
   }
 
 }
