@@ -15,8 +15,10 @@ Active Record for Composer.
 
 2. Use it as follows:
 
+I really aught to write some examples to go with this project. For now, have a look at how the [test models](https://github.com/Thruio/ActiveRecord/blob/master/Thru/ActiveRecord/Test/TestModel.php) work
+
     ```bash
-    I really aught to write some examples to go with this project. For now, have a look at how the [test models](https://github.com/Thruio/ActiveRecord/blob/master/Thru/ActiveRecord/Test/TestModel.php) work
+    Something needs to be written....
     ```
 
 
