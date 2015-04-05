@@ -391,6 +391,9 @@ class ActiveRecord
 
         $reflect = new \ReflectionObject($this);
         foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC /* + ReflectionProperty::IS_PROTECTED*/) as $prop) {
+            if($prop->isStatic()){
+                continue;
+            }
             $name = $prop->getName();
             $array[$name] = $this->$name;
         }
