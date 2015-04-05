@@ -386,6 +386,18 @@ class ActiveRecord
         return $array;
     }
 
+    public function __toPublicArray(){
+        $array = array();
+
+        $reflect = new \ReflectionObject($this);
+        foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC /* + ReflectionProperty::IS_PROTECTED*/) as $prop) {
+            $name = $prop->getName();
+            $array[$name] = $this->$name;
+        }
+        return $array;
+
+    }
+
     public function __toJson($anticipated_rows = null){
         $array = $this->__toArray($anticipated_rows);
         return JsonPrettyPrinter::Json($array);
