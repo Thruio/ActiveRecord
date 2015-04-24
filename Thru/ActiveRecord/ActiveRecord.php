@@ -136,11 +136,7 @@ class ActiveRecord
         foreach ($keys as $key) {
             $columns[$key->Column_name] = $key->Column_name;
         }
-        $keys = array();
-        foreach ($columns as $column) {
-            $keys[] = $this->$column;
-        }
-        return implode("-", $keys);
+        return implode("-", array_values($columns));
     }
 
     /**
