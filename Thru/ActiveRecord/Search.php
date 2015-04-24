@@ -97,11 +97,14 @@ class Search
       foreach ($response as $result) {
         /* @var $result ActiveRecord */
         if ($result->get_primary_key_index()) {
-          $results[$result->get_primary_key_index()] = $result;
+          $primary_key_column = $result->get_primary_key_index();
+          $results[$result->$primary_key_column] = $result;
         } else {
           $results[] = $result;
         }
       }
+
+      var_dump($results);
 
       foreach($results as $result){
         $result->field_fix();
