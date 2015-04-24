@@ -104,8 +104,6 @@ class Search
         }
       }
 
-      var_dump($results);
-
       foreach($results as $result){
         $result->field_fix();
       }
