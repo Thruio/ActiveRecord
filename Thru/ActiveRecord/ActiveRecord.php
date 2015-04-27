@@ -422,6 +422,7 @@ class ActiveRecord
         $schema = $this->get_class_schema();
 
         foreach($this->_calculate_save_down_rows() as $column){
+            trigger_error("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
             $type = $schema[$column]['type'];
             if($type == "integer" && !is_int($this->$column)){
                 $this->$column = intval($this->$column);
