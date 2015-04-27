@@ -11,17 +11,7 @@ use \Thru\ActiveRecord\Test\Models\TestModelBad;
 use \Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use \Faker;
 
-class ActiveRecordTest extends \PHPUnit_Framework_TestCase {
-
-  /** @var $faker \Faker\Generator */
-  private $faker;
-
-  public function setUp() {
-    $this->faker = Faker\Factory::create();
-    $this->faker->addProvider(new Faker\Provider\Company($this->faker));
-    $this->faker->addProvider(new Faker\Provider\Lorem($this->faker));
-    $this->faker->addProvider(new Faker\Provider\DateTime($this->faker));
-  }
+class ActiveRecordTest extends BaseTest {
 
   public function tearDown(){
     TestModel::delete_table();

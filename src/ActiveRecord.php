@@ -429,11 +429,12 @@ class ActiveRecord
      */
     public function field_fix(){
         $schema = $this->get_class_schema();
+        #var_dump($this->_calculate_save_down_rows());
+        #var_dump($schema);
         foreach($this->_calculate_save_down_rows() as $column){
-
             if(!isset($schema[$column]['type'])){
-                trigger_error("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
-                //throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.");
+                $class_name = get_called_class();
+                return trigger_error("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
             }
             $type = $schema[$column]['type'];
             if($type == "integer" && !is_int($this->$column)){
