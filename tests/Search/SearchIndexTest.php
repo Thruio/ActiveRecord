@@ -36,4 +36,8 @@ class SearchIndexTest extends PHPUnit_Framework_TestCase {
     SearchIndex::get_instance()->expire('nontable','nonkey');
     $this->assertFalse(SearchIndex::get_instance()->exists('nontable','nonkey'));
   }
+
+  public function testWipe(){
+    $this->assertTrue(SearchIndex::get_instance()->wipe());
+  }
 }
