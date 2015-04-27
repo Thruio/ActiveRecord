@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: geusebio
- * Date: 09/02/15
- * Time: 20:34
- */
 
-use \Thru\ActiveRecord\Test\TestModel;
+namespace Thru\ActiveRecord\Test;
 
-class ActiveRecordExportTest extends PHPUnit_Framework_TestCase {
+use Thru\ActiveRecord\Test\Models\TestModel;
+
+class ActiveRecordExportTest extends \PHPUnit_Framework_TestCase {
   public function testModelToArray(){
     /* @var $test_model TestModel */
     $test_model = TestModel::factory();

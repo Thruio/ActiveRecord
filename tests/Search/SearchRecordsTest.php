@@ -1,15 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: geusebio
- * Date: 09/02/15
- * Time: 20:32
- */
+namespace Thru\ActiveRecord\Test;
 
-use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
-use \Thru\ActiveRecord\Test\TestModelSortable;
+use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\Models\TestModelSortable;
 
-class SearchRecordsTest extends PHPUnit_Framework_TestCase {
+class SearchRecordsTest extends \PHPUnit_Framework_TestCase {
 
   /* @var $one TestModelSortable */
   private $one;

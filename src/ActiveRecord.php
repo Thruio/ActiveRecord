@@ -227,7 +227,12 @@ class ActiveRecord
      */
     public function save($automatic_reload = true)
     {
+        // Run Pre-saver.
         $this->__pre_save();
+
+        // Run Field Fixer.
+        $this->field_fix();
+
         // Calculate row to save_down
         $this->_calculate_save_down_rows();
         $primary_key_column = $this->get_table_primary_key();
@@ -267,7 +272,11 @@ class ActiveRecord
         if ($automatic_reload && $primary_key_column) {
             $this->reload();
         }
+
+        // Run Post Save.
         $this->__post_save();
+
+        // Return object. Should this return true/false based on success instead?
         return $this;
     }
 
@@ -420,17 +429,17 @@ class ActiveRecord
      */
     public function field_fix(){
         $schema = $this->get_class_schema();
-
         foreach($this->_calculate_save_down_rows() as $column){
+
             if(!isset($schema[$column]['type'])){
                 trigger_error("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
+                //throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.");
             }
             $type = $schema[$column]['type'];
             if($type == "integer" && !is_int($this->$column)){
                 $this->$column = intval($this->$column);
             }
         }
-
         return true;
     }
 

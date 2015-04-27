@@ -17,8 +17,13 @@
     "fzaninotto/faker": "1.5.*@dev"
   },
   "autoload"   : {
-    "psr-0": {
-      "Thru\\ActiveRecord\\": ""
+    "psr-4": {
+      "Thru\\ActiveRecord\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Thru\\ActiveRecord\\Test\\": "tests/"
     }
   }
 }

@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthew Baggett
- * Date: 15/02/2015
- * Time: 15:24
- */
-
-namespace tests\Objects;
+namespace Thru\ActiveRecord\Test;
 
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DumbModel;
-use Thru\ActiveRecord\Test\TestModel;
+use Thru\ActiveRecord\Test\Models\TestModel;
 use Faker;
 
 class DumbModelTest extends \PHPUnit_Framework_TestCase {

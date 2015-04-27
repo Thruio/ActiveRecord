@@ -6,9 +6,12 @@
  * Time: 15:33
  */
 
-use \Thru\ActiveRecord\DatabaseLayer\Select;
+namespace Thru\ActiveRecord\Test;
 
-class DatabaseLayerSelectTest extends PHPUnit_Framework_TestCase {
+use \Thru\ActiveRecord\DatabaseLayer\Select;
+use Thru\ActiveRecord\Test\Models\TestModel;
+
+class DatabaseLayerSelectTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
@@ -20,7 +23,7 @@ class DatabaseLayerSelectTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testRange(){
-    $test_model = new \Thru\ActiveRecord\Test\TestModel();
+    $test_model = new TestModel();
     $test_model->integer_field = 1;
     $test_model->text_field = "feh";
     $test_model->date_field = date("Y-m-d H:i:s");

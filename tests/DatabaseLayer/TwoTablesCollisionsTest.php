@@ -6,8 +6,7 @@
  * Time: 16:06
  */
 
-namespace DatabaseLayer;
-
+namespace Thru\ActiveRecord\Test;
 
 use Thru\ActiveRecord\DatabaseLayer;
 

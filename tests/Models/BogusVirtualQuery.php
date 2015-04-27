@@ -6,7 +6,7 @@
  * Time: 20:33
  */
 
-namespace Thru\ActiveRecord\Test;
+namespace Thru\ActiveRecord\Test\Models;
 
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 
