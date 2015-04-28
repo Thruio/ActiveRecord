@@ -6,8 +6,7 @@
  * Time: 15:19
  */
 
-namespace tests;
-
+namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\DatabaseLayer;
 
 class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {

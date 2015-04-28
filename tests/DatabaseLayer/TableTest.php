@@ -6,8 +6,7 @@
  * Time: 20:43
  */
 
-namespace tests\DatabaseLayer;
-
+namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\DatabaseLayer\Table;
 use Thru\ActiveRecord\Test\TestModel;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;

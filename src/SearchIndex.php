@@ -43,4 +43,9 @@ class SearchIndex
         return false;
       }
     }
+
+    public function wipe(){
+      $this->index = [];
+      return true;
+    }
 }

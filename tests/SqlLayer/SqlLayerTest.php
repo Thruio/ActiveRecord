@@ -1,21 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: geusebio
- * Date: 09/02/15
- * Time: 22:00
- */
-
-use \Thru\ActiveRecord\Test\TestModel;
-use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
-use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
-use \Thru\ActiveRecord\Test\TestModelSortable;
-use \Thru\ActiveRecord\Test\TestModelSearchOnly;
+namespace Thru\ActiveRecord\Test;
+use \Thru\ActiveRecord\Test\Models\TestModel;
+use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
+use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\Models\TestModelSortable;
+use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
 use \Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use \Thru\ActiveRecord\DatabaseLayer\IndexException;
-use \Thru\ActiveRecord\Test\BogusVirtualQuery;
+use Thru\ActiveRecord\Test\Models\BogusVirtualQuery;
 
-class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
+class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @var $base \Thru\ActiveRecord\DatabaseLayer\Sql\Base
@@ -82,7 +76,7 @@ class SqlLayerMysqlTest extends PHPUnit_Framework_TestCase {
 
     $result = $passthru->execute();
 
-    $expected = new stdClass();
+    $expected = new \StdClass();
     $expected->col = "hello";
     $this->assertEquals($expected, reset($result));
   }

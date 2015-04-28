@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthew Baggett
- * Date: 16/02/2015
- * Time: 19:02
- */
+namespace Thru\ActiveRecord\Test;
 
-namespace tests\Utils;
-
-
-use Thru\ActiveRecord\Test\TestModel;
+use Thru\ActiveRecord\Test\Models\TestModel;
 
 class SanityTest extends \PHPUnit_Framework_TestCase {
   public function testOutputEmpty(){

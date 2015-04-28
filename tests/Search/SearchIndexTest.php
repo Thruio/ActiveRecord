@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: geusebio
- * Date: 09/02/15
- * Time: 19:05
- */
-
+namespace Thru\ActiveRecord\Test;
 use \Thru\ActiveRecord\SearchIndex;
-use \Thru\ActiveRecord\Test\TestModel;
+use \Thru\ActiveRecord\Test\Models\TestModel;
 
-class SearchIndexTest extends PHPUnit_Framework_TestCase {
+class SearchIndexTest extends \PHPUnit_Framework_TestCase {
   public function testSearchIndexSuccess(){
     $dummy_object = new TestModel();
     $dummy_object->test_model_id = 90;
@@ -20,7 +14,7 @@ class SearchIndexTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(SearchIndex::get_instance()->exists('nontable','nonkey'));
 
     $fetch = SearchIndex::get_instance()->get('nontable','nonkey');
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($fetch));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", get_class($fetch));
     $this->assertEquals($dummy_object->test_model_id, $fetch->test_model_id);
     $this->assertEquals($dummy_object->text_field, $fetch->text_field);
     $this->assertEquals($dummy_object->date_field, $fetch->date_field);
@@ -35,5 +29,9 @@ class SearchIndexTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(SearchIndex::get_instance()->exists('nontable','nonkey'));
     SearchIndex::get_instance()->expire('nontable','nonkey');
     $this->assertFalse(SearchIndex::get_instance()->exists('nontable','nonkey'));
+  }
+
+  public function testWipe(){
+    $this->assertTrue(SearchIndex::get_instance()->wipe());
   }
 }

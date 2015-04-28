@@ -1,32 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Baggett
- * Date: 09/02/2015
- * Time: 15:33
- */
-
-use \Thru\ActiveRecord\Test\TestModel;
-use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
-use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
-use \Thru\ActiveRecord\Test\TestModelSortable;
-use \Thru\ActiveRecord\Test\TestModelSearchOnly;
-use \Thru\ActiveRecord\Test\TestModelNoKey;
-use \Thru\ActiveRecord\Test\TestModelBad;
+namespace Thru\ActiveRecord\Test;
+use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
+use \Thru\ActiveRecord\Test\Models\TestModel;
+use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
+use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\Models\TestModelSortable;
+use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
+use \Thru\ActiveRecord\Test\Models\TestModelNoKey;
+use \Thru\ActiveRecord\Test\Models\TestModelBad;
 use \Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use \Faker;
 
-class ActiveRecordTest extends PHPUnit_Framework_TestCase {
-
-  /** @var $faker \Faker\Generator */
-  private $faker;
-
-  public function setUp() {
-    $this->faker = Faker\Factory::create();
-    $this->faker->addProvider(new Faker\Provider\Company($this->faker));
-    $this->faker->addProvider(new Faker\Provider\Lorem($this->faker));
-    $this->faker->addProvider(new Faker\Provider\DateTime($this->faker));
-  }
+class ActiveRecordTest extends BaseTest {
 
   public function tearDown(){
     TestModel::delete_table();
@@ -43,7 +28,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
   public function testConstruct(){
     $test_model = new TestModel();
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($test_model));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", get_class($test_model));
     $this->assertTrue(in_array("Thru\\ActiveRecord\\ActiveRecord", class_parents($test_model)));
   }
 
@@ -59,7 +44,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $test_model->text_field = $this->faker->paragraph(5);
     $test_model->date_field = $this->faker->date("Y-m-d H:i:s");
     $result_object = $test_model->save();
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($result_object));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", get_class($result_object));
 
     $this->assertEquals($test_model->integer_field, $result_object->integer_field);
     $this->assertEquals($test_model->text_field, $result_object->text_field);
@@ -82,7 +67,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(1, TestModel::search()->count());
 
     $result_object = TestModel::search()->where('test_model_id', $test_model->test_model_id)->execOne();
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", get_class($result_object));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", get_class($result_object));
     $this->assertEquals($test_model->integer_field, $result_object->integer_field);
     $this->assertEquals($test_model->text_field, $result_object->text_field);
     $this->assertEquals($test_model->date_field, $result_object->date_field);
@@ -102,12 +87,12 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @depends testSearchOneResult
-   * @param \Thru\ActiveRecord\Test\TestModel $test_model
+   * @param \Thru\ActiveRecord\Test\Models\TestModel $test_model
    */
   public function testLabels(TestModel $test_model){
-    $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\TestModel ID 1", $test_model->get_label());
+    $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID 1", $test_model->get_label());
 
-    $with_name_label = new \Thru\ActiveRecord\Test\TestModelWithNameLabel();
+    $with_name_label = new \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel();
     $with_name_label->name = "Wrong name here";
     $with_name_label->something_else = "Right name here";
     $with_name_label->save();
@@ -137,7 +122,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
   public function testLabelFailure(){
     $model = new TestModel();
     $model->test_model_id = $this->faker->numberBetween(1,100000);
-    $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\TestModel ID {$model->test_model_id}", $model->get_label());
+    $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID {$model->test_model_id}", $model->get_label());
   }
 
   public function testUpdate(){
@@ -192,12 +177,12 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
    * @depends testUpdate
    */
   public function testGetClass(TestModel $testModel){
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModel", $testModel->get_class(false));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", $testModel->get_class(false));
     $this->assertEquals("TestModel", $testModel->get_class(true));
   }
 
   public function testCreateTableOnSearch(){
-    $this->assertEquals(0, \Thru\ActiveRecord\Test\TestModelSearchOnly::search()->count());
+    $this->assertEquals(0, TestModelSearchOnly::search()->count());
 
     TestModelSearchOnly::delete_table();
   }
@@ -231,7 +216,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
 
     $all = TestModelNoKey::search()->exec();
     $this->assertTrue(is_array($all));
-    $this->assertEquals("Thru\\ActiveRecord\\Test\\TestModelNoKey", get_class(reset($all)));
+    $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModelNoKey", get_class(reset($all)));
   }
 
   public function testActiveRecordReloadUnsaved(){
@@ -265,10 +250,10 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testStoreObject(){
-    $object = new StdClass();
+    $object = new \StdClass();
     $object->foo = "bar";
 
-    $different_object = new StdClass();
+    $different_object = new \StdClass();
     $different_object->hello = "there";
 
     $model = new TestModel();
@@ -291,7 +276,7 @@ class ActiveRecordTest extends PHPUnit_Framework_TestCase {
   public function testDestroyTableThatDoesntExist(){
     $model = new TestModel();
     $model->delete_table();
-    $vq = new \Thru\ActiveRecord\DatabaseLayer\VirtualQuery();
+    $vq = new VirtualQuery();
     $interpreter = $vq->getInterpreter();
     $interpreter->destroyTable($model);
   }

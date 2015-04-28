@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Baggett
- * Date: 09/02/2015
- * Time: 15:33
- */
+namespace Thru\ActiveRecord\Test;
 
-use \Thru\ActiveRecord\Test\TestModel;
-use \Thru\ActiveRecord\Test\TestModelExtendedTypes;
-use \Thru\ActiveRecord\Test\TestModelWithNameLabel;
-use \Thru\ActiveRecord\Test\TestModelSortable;
-use \Thru\ActiveRecord\Test\TestModelSearchOnly;
+
+use \Thru\ActiveRecord\Test\Models\TestModel;
+use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
+use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
+use \Thru\ActiveRecord\Test\Models\TestModelSortable;
+use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
 use \Thru\UUID;
 
-class ActiveRecordExtendedTypesTest extends PHPUnit_Framework_TestCase {
+class ActiveRecordExtendedTypesTest extends \PHPUnit_Framework_TestCase {
 
   /* @var $extended TestModelExtendedTypes */
   private $extended;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Thru\ActiveRecord\Test;
+namespace Thru\ActiveRecord\Test\Models;
 
 use Thru\ActiveRecord\ActiveRecord;
 

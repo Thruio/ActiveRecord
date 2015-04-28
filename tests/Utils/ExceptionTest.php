@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Baggett
- * Date: 09/02/2015
- * Time: 14:00
- */
+namespace Thru\ActiveRecord\Test;
 
-class ExceptionTest extends PHPUnit_Framework_TestCase {
+class ExceptionTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException         \Thru\ActiveRecord\Exception
