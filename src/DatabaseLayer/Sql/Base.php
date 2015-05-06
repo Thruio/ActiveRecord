@@ -45,6 +45,14 @@ class Base extends \PDO
       $exec_time_start = microtime(true);
       $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
       #echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
+      if(DatabaseLayer::get_instance()->get_option('db_debug')){
+        $file_path = DatabaseLayer::get_instance()->get_option('db_log');
+        global $test_id;
+        if(isset($test_id)) {
+          $file_path = str_replace("%test%", $test_id, $file_path);
+        }
+        file_put_contents($file_path, str_replace("\n", " ", $query) . "\n", FILE_APPEND);
+      }
       $exec_time_end = microtime(true);
       $exec_time = $exec_time_end - $exec_time_start;
       $this->query_log[] = new Log($query, $exec_time);

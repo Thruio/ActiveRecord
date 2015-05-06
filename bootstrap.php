@@ -8,6 +8,7 @@ $database = new \Thru\ActiveRecord\DatabaseLayer(array(
   'db_port'     => '3306',
   'db_username' => 'travis',
   'db_password' => 'travis',
-  'db_database' => 'active_record_test'
+  'db_database' => 'active_record_test',
+  'db_log'      => 'build/querys.%test%.log',
+  'db_debug'    => true,
 ));
-

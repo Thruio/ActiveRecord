@@ -1,8 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-use Thru\ActiveRecord\Exception;
-
 class Select extends VirtualQuery
 {
 
@@ -25,7 +23,7 @@ class Select extends VirtualQuery
         if (isset($this->tables[$alias])) {
             $this->tables[$alias]->setFields($fields);
         } else {
-            throw new Exception("No table matching alias '{$alias}' selectable");
+            throw new \Thru\ActiveRecord\Exception("No table matching alias '{$alias}' selectable");
         }
         return $this;
     }

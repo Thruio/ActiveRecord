@@ -23,6 +23,8 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     $this->faker->addProvider(new Provider\Company($this->faker));
     $this->faker->addProvider(new Provider\Lorem($this->faker));
     $this->faker->addProvider(new Provider\DateTime($this->faker));
+    global $test_id;
+    $test_id = $this->getName();
   }
 
   public function tearDown()

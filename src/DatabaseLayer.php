@@ -105,6 +105,16 @@ class DatabaseLayer
     }
 
     /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function set_option($name, $value){
+        $this->options[$name] = $value;
+        return $this;
+    }
+
+    /**
      * @return string|false
      * @throws ConfigurationException
      */

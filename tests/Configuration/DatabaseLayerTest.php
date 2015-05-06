@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthew Baggett
- * Date: 15/02/2015
- * Time: 15:19
- */
 
 namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\DatabaseLayer;
@@ -63,7 +57,7 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
    * @expectedExceptionMessage Query made PDO sad:
    */
   public function testTableExistsFailure(){
-    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
+    #$this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
     $database = DatabaseLayer::get_instance();
     $select = $database->select("table_doesnt_exist");
     $select->execute("NotStdClass");

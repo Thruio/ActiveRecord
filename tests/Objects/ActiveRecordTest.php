@@ -1,5 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\Test;
+use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use \Thru\ActiveRecord\Test\Models\TestModel;
 use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
@@ -230,6 +231,7 @@ class ActiveRecordTest extends BaseTest {
    */
   public function testTrigger42S02(){
 
+    DatabaseLayer::get_instance()->set_option("db_disable_automatic_tables", true);
     $model = new TestModel();
     $model->text_field = "Before";
     $model->integer_field = 0;
@@ -237,9 +239,12 @@ class ActiveRecordTest extends BaseTest {
     $model->save(false);
     TestModel::delete_table();
     $model->save(false);
+    die("yo");
 
     // If we've gotten this far, a 42S02 has not been triggered.
-    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
+    #$this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
+
+    DatabaseLayer::get_instance()->set_option("db_disable_automatic_tables", false);
   }
 
   /**

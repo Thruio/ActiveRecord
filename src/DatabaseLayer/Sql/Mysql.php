@@ -1,6 +1,7 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
+use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
@@ -254,9 +255,7 @@ class Mysql extends Base
 
         $results = array();
         if(!$indexes instanceof \PDOStatement){
-          $indexException = new IndexException("Error running query: {$query}");
-          $indexException->remedy = 'table_missing';
-          throw $indexException;
+          throw new Exception("Could not find indexes");
         }
         if($indexes->rowCount() > 0){
             foreach($indexes as $index){
