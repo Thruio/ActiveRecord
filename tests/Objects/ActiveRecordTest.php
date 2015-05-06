@@ -14,14 +14,6 @@ use \Faker;
 
 class ActiveRecordTest extends BaseTest {
 
-  public function tearDown(){
-    TestModel::delete_table();
-    TestModelExtendedTypes::delete_table();
-    TestModelWithNameLabel::delete_table();
-    TestModelSortable::delete_table();
-    TestModelSearchOnly::delete_table();
-    TestModelNoKey::delete_table();
-  }
 
   public function testTableName(){
     $this->assertEquals("test_models", TestModel::get_table());
@@ -59,6 +51,7 @@ class ActiveRecordTest extends BaseTest {
   public function testSearchOneResult(){
     /* @var $test_model TestModel */
     /* @var $result_object TestModel */
+    TestModel::delete_table();
     $test_model = TestModel::factory();
     $test_model->integer_field = $this->faker->numberBetween(0, 9999999);
     $test_model->text_field = $this->faker->paragraph(5);
@@ -78,6 +71,7 @@ class ActiveRecordTest extends BaseTest {
   }
 
   public function testSearchZeroResults(){
+    TestModel::delete_table();
     $this->assertEquals(false,    TestModel::search()->execOne());
     $this->assertEquals(array(),  TestModel::search()->exec());
   }
@@ -189,6 +183,7 @@ class ActiveRecordTest extends BaseTest {
   }
 
   public function testQueryCache(){
+    TestModel::delete_table();
     $insert = new TestModel();
     $insert->text_field = "Before";
     $insert->integer_field = 0;
@@ -227,7 +222,7 @@ class ActiveRecordTest extends BaseTest {
 
   /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
-   * @expectedExceptionMessage 42S02: Table 'active_record_test.test_models' doesn't exist
+   * @expectedExceptionMessage Table 'active_record_test.test_models' doesn't exist
    */
   public function testTrigger42S02(){
 
@@ -239,7 +234,6 @@ class ActiveRecordTest extends BaseTest {
     $model->save(false);
     TestModel::delete_table();
     $model->save(false);
-    die("yo");
 
     // If we've gotten this far, a 42S02 has not been triggered.
     #$this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
@@ -284,6 +278,15 @@ class ActiveRecordTest extends BaseTest {
     $vq = new VirtualQuery();
     $interpreter = $vq->getInterpreter();
     $interpreter->destroyTable($model);
+  }
+
+  public function testCleanup(){
+    TestModel::delete_table();
+    TestModelExtendedTypes::delete_table();
+    TestModelWithNameLabel::delete_table();
+    TestModelSortable::delete_table();
+    TestModelSearchOnly::delete_table();
+    TestModelNoKey::delete_table();
   }
 
 }

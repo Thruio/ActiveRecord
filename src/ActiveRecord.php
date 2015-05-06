@@ -72,7 +72,7 @@ class ActiveRecord
         $select = $database->select($this->get_table_name(), $this->get_table_alias());
         $select->fields($this->get_table_alias());
         $select->condition($this->get_table_primary_key(), $id);
-        $results = $select->execute(get_called_class());
+        $results = $select->execute(get_called_class())->result;
         $result = end($results);
         return $result;
     }
@@ -118,6 +118,7 @@ class ActiveRecord
         if(!isset($keys[0])){
           return false;
         }
+
         $primary_key = $keys[0]->Column_name;
         return $primary_key;
     }
@@ -258,9 +259,17 @@ class ActiveRecord
 
         if ($this->get_id() && $primary_key_column) {
             $operation->condition($primary_key_column, $this->$primary_key_column);
-            $operation->execute();
+            $result = $operation->execute();
+            if($result->is_error()){
+                throw $result->get_error_exception();
+            }
         } else { // Else, we're an insert.
-            $new_id = $operation->execute();
+            $new_id = $operation->execute()->result;
+            if(is_numeric($new_id)){
+                $new_id = intval($new_id);
+            }else{
+                throw new Exception("Primary key is not numeric, somehow.");
+            }
             if($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
@@ -429,8 +438,6 @@ class ActiveRecord
      */
     public function field_fix(){
         $schema = $this->get_class_schema();
-        #var_dump($this->_calculate_save_down_rows());
-        #var_dump($schema);
         foreach($this->_calculate_save_down_rows() as $column){
             if(!isset($schema[$column]['type'])){
                 $class_name = get_called_class();

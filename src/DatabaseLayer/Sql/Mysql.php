@@ -41,14 +41,15 @@ class Mysql extends Base
     }
 
     /**
-     * @param \Thru\ActiveRecord\DatabaseLayer\Passthru $thing
-     * @return array
-     * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
+     * @param DatabaseLayer\Passthru $thing
+     * @return DatabaseLayer\Response
+     * @throws DatabaseLayer\Exception
      */
     public function processPassthru(\Thru\ActiveRecord\DatabaseLayer\Passthru $thing){
-      $sql = $thing->get_sql_to_passthru();
+      $query = $thing->get_sql_to_passthru();
+      $delay = microtime(true);
       $result = $this->query(
-        $sql,
+        $query,
         $thing->getModel()
       );
 
@@ -61,12 +62,18 @@ class Mysql extends Base
         }
       }
 
-      return $results;
+      // Capture error codes and return them
+      $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+      // Capture query delay and log it.
+      $delay = microtime(true) - $delay;
+
+      return new DatabaseLayer\Response($results, $error, $delay, $query);
     }
 
     /**
      * @param \Thru\ActiveRecord\DatabaseLayer\Select $thing
-     * @return array
+     * @return DatabaseLayer\Response
      * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
      */
     public function processSelect(\Thru\ActiveRecord\DatabaseLayer\Select $thing){
@@ -137,20 +144,37 @@ class Mysql extends Base
 
         $delay = microtime(true);
         $result = $this->query($query, $thing->getModel());
+
+        // TODO: Write Query into a log structure of some sort here.
+
+        // Capture error codes and return them
+        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+        // Capture query delay and log it.
         $delay = microtime(true) - $delay;
 
         // TODO: Make this a Collection.
 
-        $results = array();
-        if($result !== false){
-            foreach($result as $result_item){
-                $results[] = $result_item;
+        if($error->code != "00000"){
+            $results = false;
+        }else {
+            $results = array();
+            if ($result !== false) {
+                foreach ($result as $result_item) {
+                    $results[] = $result_item;
+                }
             }
         }
 
-        return $results;
+        return new DatabaseLayer\Response($results, $error, $delay, $query);
     }
 
+    /**
+     * @param DatabaseLayer\Delete $thing
+     * @return DatabaseLayer\Response
+     * @throws DatabaseLayer\TableDoesntExistException
+     * @throws Exception
+     */
     public function processDelete(\Thru\ActiveRecord\DatabaseLayer\Delete $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
@@ -165,12 +189,28 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$conditions}";
 
+        $delay = microtime(true);
+
         $result = $this->query($query);
 
-        return true;
+        // Capture error codes and return them
+        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+        // Capture query delay and log it.
+        $delay = microtime(true) - $delay;
+
+        return new DatabaseLayer\Response($result, $error, $delay, $query);
+
     }
 
     // TODO: For the love of god, rewrite this to use PDO prepared statements
+    /**
+     * @param DatabaseLayer\Insert $thing
+     * @return DatabaseLayer\Response
+     * @throws DatabaseLayer\TableDoesntExistException
+     * @throws Exception
+     * @throws \Exception
+     */
     public function processInsert(\Thru\ActiveRecord\DatabaseLayer\Insert $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
@@ -197,17 +237,31 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$data}";
 
+        $delay = microtime(true);
         $this->query($query);
 
         if($this->errorCode() !== '00000'){
             $info = $this->errorInfo();
-            throw new \exception($info[2] . " -> {$query}");
+            throw new \Exception($info[2] . " -> {$query}");
         }
         $insertId = $this->lastInsertId();
 
-        return $insertId;
+        // Capture error codes and return them
+        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+        // Capture query delay and log it.
+        $delay = microtime(true) - $delay;
+
+        return new DatabaseLayer\Response($insertId, $error, $delay, $query);
+
     }
 
+    /**
+     * @param DatabaseLayer\Update $thing
+     * @return DatabaseLayer\Response
+     * @throws DatabaseLayer\TableDoesntExistException
+     * @throws Exception
+     */
     public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
@@ -237,25 +291,42 @@ class Mysql extends Base
         $query = "{$selector}\n$data\n{$conditions}";
         //header("Content-type: text/plain"); echo $query; exit;
 
+        $delay = microtime(true);
+
         $result = $this->query($query);
 
         if($result instanceof \PDOStatement) {
-          return $result->errorCode() == "00000" ? TRUE : FALSE;
+          $success = $result->errorCode() == "00000" ? TRUE : FALSE;
         }else {
-          return FALSE;
+          $success = FALSE;
         }
+
+        // Capture error codes and return them
+        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+        // Capture query delay and log it.
+        $delay = microtime(true) - $delay;
+
+        return new DatabaseLayer\Response($success, $error, $delay, $query);
     }
 
+    /**
+     * @param $table
+     * @return DatabaseLayer\Response
+     * @throws DatabaseLayer\TableDoesntExistException
+     * @throws Exception
+     */
     public function getIndexes($table){
         if(isset($this->known_indexes[$table])){
           return $this->known_indexes[$table];
         }
         $query = "SHOW INDEX FROM {$table} WHERE Key_name = 'PRIMARY'";
+        $delay = microtime(true);
         $indexes = $this->query($query);
 
         $results = array();
         if(!$indexes instanceof \PDOStatement){
-          throw new Exception("Could not find indexes");
+          throw new IndexException("Could not find indexes for table {$table}, does {$table} exist?");
         }
         if($indexes->rowCount() > 0){
             foreach($indexes as $index){
@@ -264,13 +335,26 @@ class Mysql extends Base
                 $results[] = $result;
             }
         }
-        $this->known_indexes[$table] = $results;
-        return $results;
+
+        // Capture error codes and return them
+        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+        // Capture query delay and log it.
+        $delay = microtime(true) - $delay;
+
+        $return = new DatabaseLayer\Response($results, $error, $delay, $query);
+
+        $this->known_indexes[$table] = $return;
+
+        return $return;
+
     }
 
     public function destroyTable(ActiveRecord $model){
       $query = "DROP TABLE {$model->get_table_name()};";
       $this->query($query);
+
+      // TODO: This should probably return something.
     }
 
     public function buildTable(ActiveRecord $model){
@@ -355,6 +439,8 @@ class Mysql extends Base
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
         $this->query($query);
+
+        // TODO: This should probably return something.
     }
 
     private function processConditions($thing){

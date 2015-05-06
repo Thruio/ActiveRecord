@@ -7,6 +7,7 @@
  */
 
 namespace Thru\ActiveRecord\Test;
+use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Table;
 use Thru\ActiveRecord\Test\TestModel;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
@@ -38,4 +39,14 @@ class TableTest extends \PHPUnit_Framework_TestCase {
     $table_builder->destroy();
     $table_builder->destroy();
   }*/
+
+  /**
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
+   * @expectedExceptionMessage Table 'active_record_test.table_doesnt_exist' doesn't exist
+   */
+  public function testTableExistsFailure(){
+    $database = DatabaseLayer::get_instance();
+    $select = $database->select("table_doesnt_exist");
+    $select->execute();
+  }
 }

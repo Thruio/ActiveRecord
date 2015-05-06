@@ -80,6 +80,7 @@ class Base extends \PDO
   /**
    * Turn a VirtualQuery into a SQL statement
    * @param VirtualQuery $thing
+   * @return DatabaseLayer\Response
    * @throws Exception
    */
   public function process(VirtualQuery $thing){

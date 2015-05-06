@@ -94,7 +94,7 @@ class Search
     private function execProcessResponse($response, $primary_key_search){
       $results = array();
 
-      foreach ($response as $result) {
+      foreach ($response->result as $result) {
         /* @var $result ActiveRecord */
         if ($result->get_primary_key_index()) {
           $primary_key_column = $result->get_primary_key_index();
@@ -137,7 +137,6 @@ class Search
     {
         // Get all the corresponding items
         $results = $this->exec();
-
         // Return the first result. Yes, that is what reset() does. :|
         if (reset($results) !== false) {
             return reset($results);

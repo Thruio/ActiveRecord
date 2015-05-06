@@ -2,6 +2,8 @@
 namespace Thru\ActiveRecord;
 
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
+use Thru\ActiveRecord\DatabaseLayer\Exception;
+use Thru\ActiveRecord\DatabaseLayer\Response;
 
 class DatabaseLayer
 {
@@ -89,7 +91,13 @@ class DatabaseLayer
 
     public function get_table_indexes($table_name){
         $util = new DatabaseLayer\Util();
-        return $util->getIndexes($table_name);
+        try {
+            $result = $util->getIndexes($table_name);
+            return isset($result) ? $result->result : false;
+        }catch(Exception $databaseException){
+            trigger_error($databaseException->getMessage(), E_USER_ERROR);
+        }
+        return false;
     }
 
     /**

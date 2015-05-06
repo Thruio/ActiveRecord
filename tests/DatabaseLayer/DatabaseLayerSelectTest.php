@@ -31,7 +31,7 @@ class DatabaseLayerSelectTest extends \PHPUnit_Framework_TestCase {
 
     $select = new Select("test_models");
     $select->range(0,1);
-    $result = $select->execute();
+    $result = $select->execute()->result;
     $this->assertTrue(is_array($result));
     $this->assertEquals(1, count($result));
 

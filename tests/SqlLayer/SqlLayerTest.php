@@ -54,7 +54,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase {
     $model->save();
 
     $mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();
-    $indexes = $mysql->getIndexes("test_models_sortable");
+    $indexes = $mysql->getIndexes("test_models_sortable")->result;
     $this->assertTrue(is_array($indexes));
     $this->assertTrue($indexes[0]->Column_name == "test_model_id");
   }
@@ -78,7 +78,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase {
 
     $expected = new \StdClass();
     $expected->col = "hello";
-    $this->assertEquals($expected, reset($result));
+    $this->assertEquals($expected, reset($result->result));
   }
 
   /**

@@ -8,6 +8,7 @@ class Util extends VirtualQuery
     {
     }
 
+
     public function getIndexes($table){
         return $this->getInterpreter()->getIndexes($table);
     }

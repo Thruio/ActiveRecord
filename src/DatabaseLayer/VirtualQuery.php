@@ -71,12 +71,20 @@ class VirtualQuery
         return $this;
     }
 
+    /**
+     * @param null $model
+     * @returns Response
+     * @throws \Thru\ActiveRecord\Exception
+     */
     public function execute($model = null)
     {
         if($model){
             $this->setModel($model);
         }
         $result = $this->getInterpreter()->process($this);
+        if($result->is_error()){
+            throw $result->get_error_exception();
+        }
         return $result;
     }
 
