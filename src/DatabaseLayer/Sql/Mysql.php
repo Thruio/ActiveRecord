@@ -18,26 +18,36 @@ class Mysql extends Base
     /**
      * Turn a VirtualQuery into a SQL statement
      * @param \Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing
-     * @return array of results
+     * @return DatabaseLayer\Response
      * @throws Exception
      */
     public function process(\Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing)
     {
+        $operationType = $thing->getOperation();
 
-        switch($thing->getOperation()){
+        switch($operationType){
             case 'Insert': //Create
-                return $this->processInsert($thing);
+                $response = $this->processInsert($thing);
+                break;
             case 'Select': //Read
-                return $this->processSelect($thing);
+                $response = $this->processSelect($thing);
+                break;
             case 'Update': //Update
-                return $this->processUpdate($thing);
+                $response = $this->processUpdate($thing);
+                break;
             case 'Delete': //Delete
-                return $this->processDelete($thing);
+                $response = $this->processDelete($thing);
+                break;
             case 'Passthru': //Delete
-                return $this->processPassthru($thing);
+                $response = $this->processPassthru($thing);
+                break;
             default:
                 throw new Exception("Operation {$thing->getOperation()} not supported");
         }
+
+        $response->query_type = $operationType;
+
+        return $response;
     }
 
     /**
@@ -47,28 +57,13 @@ class Mysql extends Base
      */
     public function processPassthru(\Thru\ActiveRecord\DatabaseLayer\Passthru $thing){
       $query = $thing->get_sql_to_passthru();
-      $delay = microtime(true);
-      $result = $this->query(
+
+      $response = $this->query(
         $query,
         $thing->getModel()
       );
 
-      // TODO: Make this a Collection.
-
-      $results = array();
-      if($result !== false){
-        foreach($result as $result_item){
-          $results[] = $result_item;
-        }
-      }
-
-      // Capture error codes and return them
-      $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
-
-      // Capture query delay and log it.
-      $delay = microtime(true) - $delay;
-
-      return new DatabaseLayer\Response($results, $error, $delay, $query);
+      return $response;
     }
 
     /**
@@ -140,33 +135,9 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$from}\n{$conditions}\n{$order}\n{$limit} {$offset}";
 
-        #echo " *** " . str_replace("\n", " ", $query) . "\n";
+        $response = $this->query($query, $thing->getModel());
 
-        $delay = microtime(true);
-        $result = $this->query($query, $thing->getModel());
-
-        // TODO: Write Query into a log structure of some sort here.
-
-        // Capture error codes and return them
-        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
-
-        // Capture query delay and log it.
-        $delay = microtime(true) - $delay;
-
-        // TODO: Make this a Collection.
-
-        if($error->code != "00000"){
-            $results = false;
-        }else {
-            $results = array();
-            if ($result !== false) {
-                foreach ($result as $result_item) {
-                    $results[] = $result_item;
-                }
-            }
-        }
-
-        return new DatabaseLayer\Response($results, $error, $delay, $query);
+        return $response;
     }
 
     /**
@@ -189,17 +160,9 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$conditions}";
 
-        $delay = microtime(true);
+        $response = $this->query($query);
 
-        $result = $this->query($query);
-
-        // Capture error codes and return them
-        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
-
-        // Capture query delay and log it.
-        $delay = microtime(true) - $delay;
-
-        return new DatabaseLayer\Response($result, $error, $delay, $query);
+        return $response;
 
     }
 
@@ -237,23 +200,9 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$data}";
 
-        $delay = microtime(true);
-        $this->query($query);
+        $response = $this->query($query);
 
-        if($this->errorCode() !== '00000'){
-            $info = $this->errorInfo();
-            throw new \Exception($info[2] . " -> {$query}");
-        }
-        $insertId = $this->lastInsertId();
-
-        // Capture error codes and return them
-        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
-
-        // Capture query delay and log it.
-        $delay = microtime(true) - $delay;
-
-        return new DatabaseLayer\Response($insertId, $error, $delay, $query);
-
+        return $response;
     }
 
     /**
@@ -291,23 +240,11 @@ class Mysql extends Base
         $query = "{$selector}\n$data\n{$conditions}";
         //header("Content-type: text/plain"); echo $query; exit;
 
-        $delay = microtime(true);
+        $response = $this->query($query);
 
-        $result = $this->query($query);
+        $response->result = $response->is_error() ? true : false;
 
-        if($result instanceof \PDOStatement) {
-          $success = $result->errorCode() == "00000" ? TRUE : FALSE;
-        }else {
-          $success = FALSE;
-        }
-
-        // Capture error codes and return them
-        $error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
-
-        // Capture query delay and log it.
-        $delay = microtime(true) - $delay;
-
-        return new DatabaseLayer\Response($success, $error, $delay, $query);
+        return $response;
     }
 
     /**
@@ -322,7 +259,7 @@ class Mysql extends Base
         }
         $query = "SHOW INDEX FROM {$table} WHERE Key_name = 'PRIMARY'";
         $delay = microtime(true);
-        $indexes = $this->query($query);
+        $indexes = $this->query($query)->result;
 
         $results = array();
         if(!$indexes instanceof \PDOStatement){
@@ -352,7 +289,7 @@ class Mysql extends Base
 
     public function destroyTable(ActiveRecord $model){
       $query = "DROP TABLE {$model->get_table_name()};";
-      $this->query($query);
+      $this->query($query)->result;
 
       // TODO: This should probably return something.
     }
@@ -438,7 +375,7 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
-        $this->query($query);
+        $this->query($query)->result;
 
         // TODO: This should probably return something.
     }

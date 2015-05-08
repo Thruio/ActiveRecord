@@ -1,10 +1,25 @@
 <?php
 namespace Thru\ActiveRecord;
 
+use Thru\ActiveRecord\DatabaseLayer\Response;
+
 class Exception extends \Exception
 {
 
-  public function __construct($message = null, $int = null, \Exception $previous = null){
-    parent::__construct($message, $int, $previous);
+  /** @var Response $response */
+  protected $response;
+
+  public function __construct($message = null, $code = null, \Exception $previous = null, Response $response = null){
+    $this->response = $response;
+    $code = intval($code);
+    parent::__construct($message, $code, $previous);
   }
+
+  public function getResponse(){
+    return $this->response;
+  }
+
+    public function __toString() {
+        return parent::__toString() . "\n" . var_export($this->getResponse(),true);
+    }
 }

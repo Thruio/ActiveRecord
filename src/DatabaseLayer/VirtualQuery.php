@@ -82,9 +82,6 @@ class VirtualQuery
             $this->setModel($model);
         }
         $result = $this->getInterpreter()->process($this);
-        if($result->is_error()){
-            throw $result->get_error_exception();
-        }
         return $result;
     }
 

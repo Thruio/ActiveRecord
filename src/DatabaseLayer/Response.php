@@ -1,21 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: geusebio
- * Date: 06/05/15
- * Time: 19:34
- */
 
 namespace Thru\ActiveRecord\DatabaseLayer;
 
+use Thru\ActiveRecord\Exception;
 
 class Response {
 
 	public $result;
 	public $delay;
 	public $error;
+    public $query_type;
 
-	public function __construct($result, $error, $delay, $query){
+	public function __construct($result = null, $error = null, $delay = null, $query = null){
 		$this->result = $result;
 		$this->delay = $delay;
 		$this->error = $error;
@@ -24,9 +20,9 @@ class Response {
 
 	public function get_error_exception(){
 		if($this->error->code == "42S02"){
-			return new TableDoesntExistException($this->error->info[2]);
+			return new TableDoesntExistException($this->error->info[2], $this->error->code, null, $this);
 		}
-		return new Exception("Uncaught Database Exception: {$this->error->info[2]}", $this->error->code);
+		return new Exception("Uncaught Database Exception: {$this->error->info[2]}", $this->error->code, null, $this);
 	}
 
 	public function is_error(){

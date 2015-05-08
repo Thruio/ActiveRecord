@@ -10,6 +10,10 @@ class SanityTest extends \PHPUnit_Framework_TestCase {
     $output = ob_get_contents();
     ob_end_clean();
 
+    if(!empty($output)){
+        echo "Output: \n";
+        var_dump($output);
+    }
     $this->assertEmpty($output);
   }
 }

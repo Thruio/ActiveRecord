@@ -11,6 +11,7 @@ class ActiveRecord
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
     protected $_label_column = null;
     protected $_columns;
+    private $_last_query_response;
 
     /**
      * Start a Search on this type of active record
@@ -133,7 +134,7 @@ class ActiveRecord
         $database = DatabaseLayer::get_instance();
 
         $keys = $database->get_table_indexes($this->_table);
-        $columns = array();
+        $columns = [];
         foreach ($keys as $key) {
             $columns[$key->Column_name] = $key->Column_name;
         }
@@ -239,7 +240,7 @@ class ActiveRecord
         $primary_key_column = $this->get_table_primary_key();
 
         // Make an array out of the objects columns.
-        $data = array();
+        $data = [];
         foreach ($this->_columns as $column) {
             // Never update the primary key. Bad bad bad.
             if ($column != $primary_key_column) {
@@ -259,16 +260,19 @@ class ActiveRecord
 
         if ($this->get_id() && $primary_key_column) {
             $operation->condition($primary_key_column, $this->$primary_key_column);
-            $result = $operation->execute();
-            if($result->is_error()){
-                throw $result->get_error_exception();
+            $this->_last_query_response = $operation->execute();
+            $result = $this->_last_query_response->result;
+            if($this->_last_query_response->is_error()){
+                throw $this->_last_query_response->get_error_exception();
             }
         } else { // Else, we're an insert.
-            $new_id = $operation->execute()->result;
+            $response = $operation->execute();
+            $new_id = $response->result;
             if(is_numeric($new_id)){
                 $new_id = intval($new_id);
             }else{
-                throw new Exception("Primary key is not numeric, somehow.");
+                var_dump($response);
+                throw new Exception("Primary key is not numeric, somehow.", null, null, $response);
             }
             if($primary_key_column) {
                 $this->$primary_key_column = $new_id;
@@ -287,6 +291,13 @@ class ActiveRecord
 
         // Return object. Should this return true/false based on success instead?
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_query_response(){
+        return $this->_last_query_response;
     }
 
     /**
@@ -391,7 +402,7 @@ class ActiveRecord
 
     public function __toArray($anticipated_rows = null)
     {
-        $array = array();
+        $array = [];
         foreach (get_object_vars($this) as $k => $v) {
             if ($anticipated_rows === null || in_array($k, $anticipated_rows)) {
                 $array[$k] = $v;
@@ -401,7 +412,7 @@ class ActiveRecord
     }
 
     public function __toPublicArray(){
-        $array = array();
+        $array = [];
 
         $reflect = new \ReflectionObject($this);
         foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC /* + ReflectionProperty::IS_PROTECTED*/) as $prop) {
@@ -454,7 +465,7 @@ class ActiveRecord
     public function get_class_schema(){
         $reflection_class = new \ReflectionClass($this);
         $rows = explode("\n", $reflection_class->getDocComment());
-        $variables = array();
+        $variables = [];
         foreach($rows as &$row){
             $row = str_replace("*", "", $row);
             $row = trim($row);
@@ -486,7 +497,7 @@ class ActiveRecord
             $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
         }
 
-        $definition = array();
+        $definition = [];
         $definition['name'] = $name;
         $definition['type'] = $type;
         if(isset($length)) {

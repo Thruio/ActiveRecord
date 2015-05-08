@@ -34,31 +34,59 @@ class Base extends \PDO
     $username = !empty($username)?$username:null;
     $password = !empty($password)?$password:null;
 
-    $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
+    $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
 
     parent::__construct($dsn, $username, $password, $options);
   }
 
+  /**
+   * @param string $query
+   * @param string $model
+   * @return \PDOStatement|DatabaseLayer\Response
+   * @throws DatabaseLayer\ConfigurationException
+   * @throws DatabaseLayer\Exception
+   * @throws DatabaseLayer\TableDoesntExistException
+   */
   public function query($query, $model = 'StdClass'){
     /* @var $result \PDOStatement */
+
+    $response = new DatabaseLayer\Response();
+    $response->query = $query;
     try {
       $exec_time_start = microtime(true);
+
       $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
-      #echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
+      file_put_contents("/tmp/querylog", "Running for {$model}: ".str_replace("\n", " ", $query) .  "\n  " . var_export($result, true) . "\n\n", FILE_APPEND);
+      foreach($result as $i => $result_elem){
+          $response->result[$i] = $result_elem;
+      }
+
       if(DatabaseLayer::get_instance()->get_option('db_debug')){
         $file_path = DatabaseLayer::get_instance()->get_option('db_log');
         global $test_id;
         if(isset($test_id)) {
           $file_path = str_replace("%test%", $test_id, $file_path);
         }
+        if(!file_exists(dirname($file_path))){
+          mkdir(dirname($file_path), 0777, true);
+        }
         file_put_contents($file_path, str_replace("\n", " ", $query) . "\n", FILE_APPEND);
       }
-      $exec_time_end = microtime(true);
-      $exec_time = $exec_time_end - $exec_time_start;
-      $this->query_log[] = new Log($query, $exec_time);
-      return $result;
+
+      // Capture error codes and return them
+      $response->error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
+
+      // Capture query delay and log it.
+      $response->delay = microtime(true) - $exec_time_start;
+
+      // Log the Query. TODO: Make this better.
+      $this->query_log[] = new Log($response->query, $response->delay);
+
+
+      return $response;
+
     }catch(\PDOException $e){
-      $error = parent::errorInfo();
+      $response->error = (object) ['code' => $this->errorCode(), 'info' => $this->errorInfo()];
       switch(parent::errorCode()){
         case '42S02':
           if($model != 'StdClass'){
@@ -68,11 +96,11 @@ class Base extends \PDO
               $table_builder->build();
               return $this->query($query); // Re-run the query
             }
-            throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
           }
+          throw new DatabaseLayer\TableDoesntExistException(parent::errorInfo(), parent::errorCode(), $e, $response);
           break;
         default:
-          throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
+          throw new DatabaseLayer\Exception($e->getMessage(), $e->getCode(), $e, $response);
       }
     }
   }
