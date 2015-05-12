@@ -1,5 +1,6 @@
 <?php
 
-class NotStdClass{
+class NotStdClass
+{
 
 }

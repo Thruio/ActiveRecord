@@ -9,8 +9,8 @@ class SearchCondition
 
     public function __construct($column, $value, $operation)
     {
-        $this->column = $column;
-        $this->value = $value;
+        $this->column    = $column;
+        $this->value     = $value;
         $this->operation = $operation;
     }
 

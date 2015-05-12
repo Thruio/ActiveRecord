@@ -19,6 +19,7 @@ class ActiveRecord
     static public function search()
     {
         $class = get_called_class();
+
         return new Search(new $class);
     }
 
@@ -29,6 +30,7 @@ class ActiveRecord
     public static function factory()
     {
         $name = get_called_class();
+
         return new $name();
     }
 
@@ -37,8 +39,8 @@ class ActiveRecord
      */
     public function __construct()
     {
-      $tableBuilder = $this->get_table_builder();
-      $tableBuilder->build($this);
+        $tableBuilder = $this->get_table_builder();
+        $tableBuilder->build($this);
     }
 
     /**
@@ -69,18 +71,19 @@ class ActiveRecord
     public function get_by_id($id)
     {
         $database = DatabaseLayer::get_instance();
-        $select = $database->select($this->get_table_name(), $this->get_table_alias());
+        $select   = $database->select($this->get_table_name(), $this->get_table_alias());
         $select->fields($this->get_table_alias());
         $select->condition($this->get_table_primary_key(), $id);
         $results = $select->execute(get_called_class());
-        $result = end($results);
+        $result  = end($results);
+
         return $result;
     }
 
     /**
      * Get the short alias name of a table.
      *
-     * @param string $table_name Optional table name
+     * @param  string $table_name Optional table name
      * @return string Table alias
      */
     public function get_table_alias($table_name = null)
@@ -88,11 +91,12 @@ class ActiveRecord
         if (!$table_name) {
             $table_name = $this->get_table_name();
         }
-        $bits = explode("_", $table_name);
+        $bits  = explode("_", $table_name);
         $alias = '';
         foreach ($bits as $bit) {
             $alias .= strtolower(substr($bit, 0, 1));
         }
+
         return $alias;
     }
 
@@ -114,11 +118,12 @@ class ActiveRecord
     public function get_table_primary_key()
     {
         $database = DatabaseLayer::get_instance();
-        $keys = $database->get_table_indexes($this->_table);
-        if(!isset($keys[0])){
-          return false;
+        $keys     = $database->get_table_indexes($this->_table);
+        if (!isset($keys[0])) {
+            return false;
         }
         $primary_key = $keys[0]->Column_name;
+
         return $primary_key;
     }
 
@@ -131,11 +136,12 @@ class ActiveRecord
     {
         $database = DatabaseLayer::get_instance();
 
-        $keys = $database->get_table_indexes($this->_table);
-        $columns = array();
+        $keys    = $database->get_table_indexes($this->_table);
+        $columns = [];
         foreach ($keys as $key) {
             $columns[$key->Column_name] = $key->Column_name;
         }
+
         return implode("-", array_values($columns));
     }
 
@@ -152,6 +158,7 @@ class ActiveRecord
                 return $id;
             }
         }
+
         return false;
     }
 
@@ -164,6 +171,7 @@ class ActiveRecord
         if (property_exists($this, '_label_column')) {
             if (property_exists($this, $this->_label_column)) {
                 $label_column = $this->_label_column;
+
                 return $this->$label_column;
             }
         }
@@ -173,6 +181,7 @@ class ActiveRecord
         if (property_exists($this, 'description')) {
             return $this->description;
         }
+
         return "No label for " . get_called_class() . " ID " . $this->get_id();
     }
 
@@ -184,16 +193,17 @@ class ActiveRecord
         if (!$this->_columns) {
             foreach (get_object_vars($this) as $potential_column => $discard) {
                 switch ($potential_column) {
-                    case 'table':
-                    case substr($potential_column, 0, 1) == "_":
-                        // Not a valid column
-                        break;
-                    default:
-                        $this->_columns[] = $potential_column;
-                        break;
+                case 'table':
+                case substr($potential_column, 0, 1) == "_":
+                    // Not a valid column
+                    break;
+                default:
+                    $this->_columns[] = $potential_column;
+                    break;
                 }
             }
         }
+
         return $this->_columns;
     }
 
@@ -210,10 +220,11 @@ class ActiveRecord
         foreach ($row as $column => &$value) {
             // Only save columns beginning with a normal letter.
             if (preg_match('/^[a-z]/i', $column)) {
-                $this->$column = & $value;
+                $this->$column = &$value;
             }
         }
         $this->__post_construct();
+
         return $this;
     }
 
@@ -238,7 +249,7 @@ class ActiveRecord
         $primary_key_column = $this->get_table_primary_key();
 
         // Make an array out of the objects columns.
-        $data = array();
+        $data = [];
         foreach ($this->_columns as $column) {
             // Never update the primary key. Bad bad bad.
             if ($column != $primary_key_column) {
@@ -261,7 +272,7 @@ class ActiveRecord
             $operation->execute();
         } else { // Else, we're an insert.
             $new_id = $operation->execute();
-            if($primary_key_column) {
+            if ($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
         }
@@ -286,45 +297,50 @@ class ActiveRecord
      */
     public function reload()
     {
-      $item = $this->get_by_id($this->get_id());
-      if($item !== false){
-        $this->loadFromRow($item);
-        return $this;
-      }else{
-        return false;
-      }
+        $item = $this->get_by_id($this->get_id());
+        if ($item !== false) {
+            $this->loadFromRow($item);
+
+            return $this;
+        } else {
+            return false;
+        }
     }
+
     /**
      * Delete the selected record
      * @return boolean
      */
     public function delete()
     {
-      $database = DatabaseLayer::get_instance();
-      $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
-      $delete->condition($this->get_table_primary_key(), $this->get_id());
-      $delete->execute();
+        $database = DatabaseLayer::get_instance();
+        $delete   = $database->delete($this->get_table_name(), $this->get_table_alias());
+        $delete->condition($this->get_table_primary_key(), $this->get_id());
+        $delete->execute();
 
-      // Invalidate cache.
-      SearchIndex::get_instance()->expire($this->get_table_name(),$this->get_id());
+        // Invalidate cache.
+        SearchIndex::get_instance()->expire($this->get_table_name(), $this->get_id());
 
-      return true;
+        return true;
     }
 
     /**
      * Delete the selected records table.
      * WARNING YO.
      */
-    public static function delete_table(){
-        $class = get_called_class();
-        $object = new $class();
+    public static function delete_table()
+    {
+        $class         = get_called_class();
+        $object        = new $class();
         $table_builder = new TableBuilder($object);
         $table_builder->destroy();
     }
 
-    public static function get_table(){
-        $class = get_called_class();
+    public static function get_table()
+    {
+        $class  = get_called_class();
         $object = new $class();
+
         return $object->get_table_name();
     }
 
@@ -337,10 +353,11 @@ class ActiveRecord
      */
     static public function get_by_slug($slug)
     {
-        $slug_parts = explode("-", $slug, 2);
-        $class = get_called_class();
-        $temp_this = new $class();
+        $slug_parts  = explode("-", $slug, 2);
+        $class       = get_called_class();
+        $temp_this   = new $class();
         $primary_key = $temp_this->get_table_primary_key();
+
         return self::search()->where($primary_key, $slug_parts[0])->execOne();
     }
 
@@ -382,112 +399,127 @@ class ActiveRecord
 
     public function __toArray($anticipated_rows = null)
     {
-        $array = array();
+        $array = [];
         foreach (get_object_vars($this) as $k => $v) {
             if ($anticipated_rows === null || in_array($k, $anticipated_rows)) {
                 $array[$k] = $v;
             }
         }
+
         return $array;
     }
 
-    public function __toPublicArray(){
-        $array = array();
+    public function __toPublicArray()
+    {
+        $array = [];
 
         $reflect = new \ReflectionObject($this);
         foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC /* + ReflectionProperty::IS_PROTECTED*/) as $prop) {
-            if($prop->isStatic()){
+            if ($prop->isStatic()) {
                 continue;
             }
-            $name = $prop->getName();
+            $name         = $prop->getName();
             $array[$name] = $this->$name;
         }
+
         return $array;
 
     }
 
-    public function __toJson($anticipated_rows = null){
+    public function __toJson($anticipated_rows = null)
+    {
         $array = $this->__toArray($anticipated_rows);
+
         return JsonPrettyPrinter::Json($array);
     }
 
-    public function get_class($without_namespace = false){
-        if($without_namespace){
-          $bits = explode("\\", get_called_class());
-          return end($bits);
-        }else{
-          return get_called_class();
+    public function get_class($without_namespace = false)
+    {
+        if ($without_namespace) {
+            $bits = explode("\\", get_called_class());
+
+            return end($bits);
+        } else {
+            return get_called_class();
         }
     }
 
-    public function get_table_builder(){
+    public function get_table_builder()
+    {
         return new TableBuilder($this);
     }
 
     /**
      * Fix types of fields to match definition
      */
-    public function field_fix(){
+    public function field_fix()
+    {
         $schema = $this->get_class_schema();
-        #var_dump($this->_calculate_save_down_rows());
-        #var_dump($schema);
-        foreach($this->_calculate_save_down_rows() as $column){
-            if(!isset($schema[$column]['type'])){
+        // var_dump($this->_calculate_save_down_rows());
+        // var_dump($schema);
+        foreach ($this->_calculate_save_down_rows() as $column) {
+            if (!isset($schema[$column]['type'])) {
                 $class_name = get_called_class();
+
                 return trigger_error("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
             }
             $type = $schema[$column]['type'];
-            if($type == "integer" && !is_int($this->$column)){
+            if ($type == "integer" && !is_int($this->$column)) {
                 $this->$column = intval($this->$column);
             }
         }
+
         return true;
     }
 
-    public function get_class_schema(){
+    public function get_class_schema()
+    {
         $reflection_class = new \ReflectionClass($this);
-        $rows = explode("\n", $reflection_class->getDocComment());
-        $variables = array();
-        foreach($rows as &$row){
+        $rows             = explode("\n", $reflection_class->getDocComment());
+        $variables        = [];
+        foreach ($rows as &$row) {
             $row = str_replace("*", "", $row);
             $row = trim($row);
-            if(substr($row,0,4) == '@var'){
-                $property = $this->_parse_class_schema_property($row);
+            if (substr($row, 0, 4) == '@var') {
+                $property                     = $this->_parse_class_schema_property($row);
                 $variables[$property['name']] = $property;
             }
         }
+
         return $variables;
     }
 
-    private function _parse_class_schema_property($row){
-        $bits = explode(" ", $row);
-        $name = trim($bits[1],"$");
-        $type = $bits[2];
+    private function _parse_class_schema_property($row)
+    {
+        $bits      = explode(" ", $row);
+        $name      = trim($bits[1], "$");
+        $type      = $bits[2];
         $type_bits = explode("(", $type, 2);
-        $type = strtolower($type_bits[0]);
+        $type      = strtolower($type_bits[0]);
 
-        $controls = array_slice($bits,3);
+        $controls = array_slice($bits, 3);
         // TODO: Parse controls for relationships and so on.
 
-        if($type == 'enum' || $type == 'decimal'){
+        if ($type == 'enum' || $type == 'decimal') {
             $options = explode(",", $type_bits[1]);
-            foreach($options as &$option){
+            foreach ($options as &$option) {
                 $option = trim($option);
                 $option = trim($option, "'\")");
             }
-        }else{
-            $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
+        } else {
+            $length = isset($type_bits[1]) ? trim($type_bits[1], ")") : null;
         }
 
-        $definition = array();
+        $definition         = [];
         $definition['name'] = $name;
         $definition['type'] = $type;
-        if(isset($length)) {
+        if (isset($length)) {
             $definition['length'] = $length;
         }
-        if(isset($options)){
+        if (isset($options)) {
             $definition['options'] = $options;
         }
+
         return $definition;
 
     }

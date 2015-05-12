@@ -8,12 +8,14 @@ class DumbModel
     {
         $database = DatabaseLayer::get_instance();
         $passthru = $database->passthru($query);
+
         return $passthru->execute($type);
     }
 
     static public function queryOne($query, $type = 'StdClass')
     {
         $result = self::query($query, $type);
+
         return end($result);
     }
 }

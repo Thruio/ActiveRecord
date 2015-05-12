@@ -12,18 +12,27 @@ class Order
         $this->setDirection($direction);
     }
 
-    public function getColumn(){
+    public function getColumn()
+    {
         return $this->column;
     }
-    public function setColumn($column){
+
+    public function setColumn($column)
+    {
         $this->column = $column;
+
         return $this;
     }
-    public function getDirection(){
+
+    public function getDirection()
+    {
         return $this->direction;
     }
-    public function setDirection($direction){
+
+    public function setDirection($direction)
+    {
         $this->direction = $direction;
+
         return $this;
     }
 

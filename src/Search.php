@@ -23,44 +23,49 @@ class Search
             $operation = '=';
         }
         $this->conditions[] = new SearchCondition($column, $value, $operation);
+
         return $this;
     }
 
-    public function condition(SearchCondition $condition){
-      $this->conditions[] = $condition;
-      return $this;
+    public function condition(SearchCondition $condition)
+    {
+        $this->conditions[] = $condition;
+
+        return $this;
     }
 
     public function limit($limit, $offset = 0)
     {
-        $this->limit = $limit;
+        $this->limit  = $limit;
         $this->offset = $offset;
+
         return $this;
     }
 
     public function order($column, $direction = 'DESC')
     {
-        $this->order[] = array('column' => $column, 'direction' => $direction);
+        $this->order[] = ['column' => $column, 'direction' => $direction];
+
         return $this;
     }
 
     public function exec()
     {
-        $primary_key_search = FALSE;
+        $primary_key_search = false;
         if (count($this->conditions) == 1) {
-          /* @var $model ActiveRecord */
-          $model = $this->model;
+            /* @var $model ActiveRecord */
+            $model = $this->model;
 
-          if (end($this->conditions)->get_column() == $model->get_table_primary_key() && end($this->conditions)->get_operation() == '=') {
-            $primary_key_search = TRUE;
-            if (SearchIndex::get_instance()->exists($model->get_table_name(), end($this->conditions)->get_value())) {
-              return array(
-                SearchIndex::get_instance()
-                  ->get($model->get_table_name(), end($this->conditions)->get_value())
-              );
+            if (end($this->conditions)->get_column() == $model->get_table_primary_key() && end($this->conditions)->get_operation() == '=') {
+                $primary_key_search = true;
+                if (SearchIndex::get_instance()->exists($model->get_table_name(), end($this->conditions)->get_value())) {
+                    return [
+                        SearchIndex::get_instance()
+                            ->get($model->get_table_name(), end($this->conditions)->get_value())
+                    ];
+                }
             }
-          }
-          unset($model);
+            unset($model);
         }
 
         $database = DatabaseLayer::get_instance();
@@ -70,66 +75,69 @@ class Search
 
         // Add WHERE Conditions
         foreach ((array)$this->conditions as $condition) {
-          $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
+            $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
         }
 
         if ($this->order) {
-          foreach ($this->order as $order) {
-            $select->orderBy($order['column'], $order['direction']);
-          }
+            foreach ($this->order as $order) {
+                $select->orderBy($order['column'], $order['direction']);
+            }
         }
 
         // Build LIMIT SQL if relevent
         if ($this->limit) {
-          $select->range($this->offset, $this->limit);
+            $select->range($this->offset, $this->limit);
         }
 
         // Get objects
         $class = get_class($this->model);
         $select->setModel($class);
         $response = $select->execute();
+
         return $this->execProcessResponse($response, $primary_key_search);
     }
 
-    private function execProcessResponse($response, $primary_key_search){
-      $results = array();
+    private function execProcessResponse($response, $primary_key_search)
+    {
+        $results = [];
 
-      foreach ($response as $result) {
-        /* @var $result ActiveRecord */
-        if ($result->get_primary_key_index()) {
-          $primary_key_column = $result->get_primary_key_index();
-          $results[$result->$primary_key_column] = $result;
-        } else {
-          $results[] = $result;
+        foreach ($response as $result) {
+            /* @var $result ActiveRecord */
+            if ($result->get_primary_key_index()) {
+                $primary_key_column                    = $result->get_primary_key_index();
+                $results[$result->$primary_key_column] = $result;
+            } else {
+                $results[] = $result;
+            }
         }
-      }
 
-      foreach($results as $result){
-        $result->field_fix();
-      }
+        foreach ($results as $result) {
+            $result->field_fix();
+        }
 
-      // Check for ActiveRecord_class and recast as needed
-      /*foreach ($results as $key => $result) {
-        $results[$key] = $result->__recast();
-      }*/
-
-      // Call __post_construct on each of the newly constructed objects.
-      foreach ($results as &$result) {
-        /* @var $result ActiveRecord */
-        $result->__post_construct();
-        /*if ($result->__requires_recast()) {
-          $result = $result->__recast();
+        // Check for ActiveRecord_class and recast as needed
+        /*foreach ($results as $key => $result) {
+          $results[$key] = $result->__recast();
         }*/
-      }
 
-      if ($primary_key_search) {
-        $active_record_to_store = end($results);
-        if ($active_record_to_store instanceof ActiveRecord) {
-          SearchIndex::get_instance()
-            ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
+        // Call __post_construct on each of the newly constructed objects.
+        foreach ($results as &$result) {
+            /* @var $result ActiveRecord */
+            $result->__post_construct();
+            /*if ($result->__requires_recast()) {
+              $result = $result->__recast();
+            }*/
         }
-      }
-      return $results;
+
+        if ($primary_key_search) {
+            $active_record_to_store = end($results);
+            if ($active_record_to_store instanceof ActiveRecord) {
+                SearchIndex::get_instance()
+                    ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
+            }
+        }
+
+        return $results;
     }
 
 
@@ -142,7 +150,8 @@ class Search
         if (reset($results) !== false) {
             return reset($results);
         }
-        return FALSE;
+
+        return false;
     }
 
     public function count()

@@ -19,14 +19,15 @@ class Select extends VirtualQuery
      */
     public function fields($alias, $fields = '*')
     {
-        if(!is_array($fields)){
-            $fields = array($fields);
+        if (!is_array($fields)) {
+            $fields = [$fields];
         }
         if (isset($this->tables[$alias])) {
             $this->tables[$alias]->setFields($fields);
         } else {
             throw new Exception("No table matching alias '{$alias}' selectable");
         }
+
         return $this;
     }
 
@@ -36,15 +37,18 @@ class Select extends VirtualQuery
     public function range($offset, $limit)
     {
         $this->offset = $offset;
-        $this->limit = $limit;
+        $this->limit  = $limit;
+
         return $this;
     }
 
     /**
      * @param string $direction
      */
-    public function orderBy($column, $direction){
+    public function orderBy($column, $direction)
+    {
         $this->addOrder(new Order($column, $direction));
+
         return $this;
     }
 }

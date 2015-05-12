@@ -10,15 +10,16 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $name text
  * @var $something_else text
  */
-class TestModelWithNameLabel extends ActiveRecord{
+class TestModelWithNameLabel extends ActiveRecord
+{
 
-  protected $_table = "test_models_with_name_labels";
+    protected $_table = "test_models_with_name_labels";
 
-  protected $_label_column = "something_else";
+    protected $_label_column = "something_else";
 
-  public $test_model_with_label_id;
-  public $name;
-  public $something_else;
+    public $test_model_with_label_id;
+    public $name;
+    public $something_else;
 
 
 }

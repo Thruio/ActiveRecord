@@ -15,17 +15,18 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $sha1_field sha1
  * @var $string_with_length_field string(4)
  */
-class TestModelExtendedTypes extends ActiveRecord{
+class TestModelExtendedTypes extends ActiveRecord
+{
 
-  protected $_table = "test_models_extended_types";
+    protected $_table = "test_models_extended_types";
 
-  public $test_model_id;
-  public $enum_field;
-  public $blob_field;
-  public $decimal_field;
-  public $uuid_field;
-  public $md5_field;
-  public $sha1_field;
-  public $string_with_length_field;
+    public $test_model_id;
+    public $enum_field;
+    public $blob_field;
+    public $decimal_field;
+    public $uuid_field;
+    public $md5_field;
+    public $sha1_field;
+    public $string_with_length_field;
 
 }

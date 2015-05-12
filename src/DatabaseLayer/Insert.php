@@ -7,17 +7,20 @@ class Insert extends VirtualQuery
 
     public function __construct($table, $alias = null)
     {
-        $table_object = new Table($table);
-        $alias = $alias!==null?$alias:$table_object->getAlias();
+        $table_object         = new Table($table);
+        $alias                = $alias !== null ? $alias : $table_object->getAlias();
         $this->tables[$alias] = $table_object;
     }
 
-    public function setData($data){
+    public function setData($data)
+    {
         $this->data = $data;
+
         return $this;
     }
 
-    public function getData(){
+    public function getData()
+    {
         return $this->data;
     }
 }

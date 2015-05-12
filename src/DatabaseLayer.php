@@ -19,11 +19,14 @@ class DatabaseLayer
         if (!self::$instance) {
             throw new ConfigurationException("DatabaseLayer has not been configured");
         }
+
         return self::$instance;
     }
 
-    public static function destroy_instance(){
+    public static function destroy_instance()
+    {
         self::$instance = null;
+
         return true;
     }
 
@@ -33,15 +36,15 @@ class DatabaseLayer
     public function __construct($options = null)
     {
         $this->options = $options;
-        if(!isset($this->options['db_dsn'])){
-          $this->options['db_dsn'] = $this->_getDsn();
+        if (!isset($this->options['db_dsn'])) {
+            $this->options['db_dsn'] = $this->_getDsn();
         }
         self::$instance = $this;
     }
 
     /**
      * @param $table_name
-     * @param null $table_alias
+     * @param null       $table_alias
      * @return DatabaseLayer\Select
      */
     public function select($table_name, $table_alias = null)
@@ -58,6 +61,7 @@ class DatabaseLayer
     {
         return new DatabaseLayer\Update($table_name, $table_alias);
     }
+
     /**
      * @param string $table_name
      * @param string $table_alias
@@ -75,7 +79,7 @@ class DatabaseLayer
      */
     public function insert($table_name, $table_alias = null)
     {
-      return new DatabaseLayer\Insert($table_name, $table_alias);
+        return new DatabaseLayer\Insert($table_name, $table_alias);
     }
 
     /**
@@ -84,11 +88,13 @@ class DatabaseLayer
      */
     public function passthru($sql = null)
     {
-      return new DatabaseLayer\Passthru($sql);
+        return new DatabaseLayer\Passthru($sql);
     }
 
-    public function get_table_indexes($table_name){
+    public function get_table_indexes($table_name)
+    {
         $util = new DatabaseLayer\Util();
+
         return $util->getIndexes($table_name);
     }
 
@@ -97,10 +103,12 @@ class DatabaseLayer
      *
      * @return string|null
      */
-    public function get_option($name){
-        if(isset($this->options[$name])){
+    public function get_option($name)
+    {
+        if (isset($this->options[$name])) {
             return $this->options[$name];
         }
+
         return false;
     }
 
@@ -108,14 +116,16 @@ class DatabaseLayer
      * @return string|false
      * @throws ConfigurationException
      */
-    private function _getDsn(){
-        switch($this->options['db_type']){
-            case 'Mysql':
-                $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
-                break;
-            default:
-                throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
+    private function _getDsn()
+    {
+        switch ($this->options['db_type']) {
+        case 'Mysql':
+            $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
+            break;
+        default:
+            throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
         }
+
         return $dsn;
     }
 }

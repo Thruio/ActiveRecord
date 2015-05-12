@@ -1,13 +1,13 @@
 {
-  "name"       : "thru.io/active_record",
+  "name": "thru.io/active_record",
   "description": "An active-record like implementation",
-  "authors"    : [
+  "authors": [
     {
-      "name" : "Matthew Baggett",
+      "name": "Matthew Baggett",
       "email": "matthew@baggett.me"
     }
   ],
-  "require"    : {
+  "require": {
     "thru.io/uuid": "1.0",
     "thru.io/json-pretty-printer": "1.0.*"
   },
@@ -16,7 +16,7 @@
     "codeclimate/php-test-reporter": "dev-master",
     "fzaninotto/faker": "1.5.*@dev"
   },
-  "autoload"   : {
+  "autoload": {
     "psr-4": {
       "Thru\\ActiveRecord\\": "src"
     }
