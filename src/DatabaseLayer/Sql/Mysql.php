@@ -54,7 +54,7 @@ class Mysql extends Base
       // TODO: Make this a Collection.
 
       $results = array();
-      if($result !== false){
+      if($result !== false && $result !== null){
         foreach($result as $result_item){
           $results[] = $result_item;
         }
