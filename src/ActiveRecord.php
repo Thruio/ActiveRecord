@@ -2,6 +2,8 @@
 
 namespace Thru\ActiveRecord;
 
+use Monolog\Logger;
+use Slim\Slim;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 
@@ -30,6 +32,20 @@ class ActiveRecord
     {
         $name = get_called_class();
         return new $name();
+    }
+
+    /**
+     * @param $level
+     * @param $object
+     * @return bool
+     */
+    static public function log($level, $object){
+        global $app;
+
+        if($app instanceof Slim){
+            return $app->log->log($level, $object);
+        }
+        return false;
     }
 
     /**
