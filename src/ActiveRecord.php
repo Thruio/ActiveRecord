@@ -210,6 +210,19 @@ class ActiveRecord
                 }
             }
         }
+
+        // reorder the columns to match get_class_schema
+        //TODO: Write test to verify that this works right.
+        foreach($this->get_class_schema() as $schemaKey => $dontCare){
+          if(in_array($schemaKey, $this->_columns)){
+            $sortedColumns[] = $schemaKey;
+          }
+        }
+        $this->_columns = $sortedColumns;
+
+        #\Kint::dump($this->get_class(true), $this->_columns, $this->get_class_schema());
+
+        // Return sorted columns.
         return $this->_columns;
     }
 
