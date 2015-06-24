@@ -461,18 +461,28 @@ class ActiveRecord
     }
 
     public function get_class_schema(){
-        $reflection_class = new \ReflectionClass($this);
-        $rows = explode("\n", $reflection_class->getDocComment());
+        $current = get_class($this);
+        $parents[] = $current;
+        while($current = get_parent_class($current)){
+          $parents[] = $current;
+        }
         $variables = array();
-        foreach($rows as &$row){
+        foreach(array_reverse($parents) as $parent) {
+          $reflection_class = new \ReflectionClass($parent);
+          $rows = explode("\n", $reflection_class->getDocComment());
+
+          foreach ($rows as &$row) {
             $row = str_replace("*", "", $row);
             $row = trim($row);
-            if(substr($row,0,4) == '@var'){
-                $property = $this->_parse_class_schema_property($row);
-                $variables[$property['name']] = $property;
+            if (substr($row, 0, 4) == '@var') {
+              $property = $this->_parse_class_schema_property($row);
+              $variables[$parent][$property['name']] = $property;
             }
+          }
         }
-        return $variables;
+      $merged_variables = call_user_func_array('array_merge', $variables);
+
+      return $merged_variables;
     }
 
     private function _parse_class_schema_property($row){
