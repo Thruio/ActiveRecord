@@ -172,7 +172,7 @@ class ActiveRecordTest extends BaseTest {
    */
   public function testDeleteVerify($test_model_id){
     $reload = TestModel::search()->where('test_model_id', $test_model_id)->execOne();
-    $this->assertFalse($reload , "Delete verified");
+    $this->assertFalse($reload, "Delete verified");
   }
 
   /**
@@ -226,23 +226,7 @@ class ActiveRecordTest extends BaseTest {
     $this->assertFalse($model->reload());
   }
 
-  /**
-   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
-   * @expectedExceptionMessage 42S02: Table 'active_record_test.test_models' doesn't exist
-   */
-  public function testTrigger42S02(){
 
-    $model = new TestModel();
-    $model->text_field = "Before";
-    $model->integer_field = 0;
-    $model->date_field = date("Y-m-d H:i:s");
-    $model->save(false);
-    TestModel::delete_table();
-    $model->save(false);
-
-    // If we've gotten this far, a 42S02 has not been triggered.
-    $this->markTestSkipped("Disabled until further notice. This exposed an actual PHP bug. See: https://bugs.php.net/bug.php?id=69063");
-  }
 
   /**
    * TODO: flesh this out
@@ -305,6 +289,17 @@ class ActiveRecordTest extends BaseTest {
     $this->assertEquals($originalId, $versionedRecord->id, "ID did not change");
     $this->assertNotEquals($originalSequence, $versionedRecord->sequence, "But the sequence did");
     $this->assertEquals($originalSequence+1, $versionedRecord->sequence, "infact, it incremented by 1.");
+  }
+
+  public function testSetTable(){
+    $testModel = new TestModel();
+    $this->assertEquals("test_models", $testModel->get_database_table());
+
+    $testModel->set_database_table("something_else");
+    $this->assertEquals("something_else", $testModel->get_database_table());
+
+    $testModel = new TestModel();
+    $this->assertEquals("test_models", $testModel->get_database_table());
   }
 
 }

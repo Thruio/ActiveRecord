@@ -3,6 +3,8 @@ namespace Thru\ActiveRecord;
 
 use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
+use Thru\ActiveRecord\DatabaseLayer\IndexException;
+use Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException;
 
 class DatabaseLayer
 {
@@ -111,7 +113,12 @@ class DatabaseLayer
 
     public function get_table_indexes($table_name){
         $util = new DatabaseLayer\Util();
-        return $util->getIndexes($table_name);
+        try {
+          $indexes = $util->getIndexes($table_name);
+          return $indexes;
+        }catch(IndexException $indexException){
+          // Supress.
+        }
     }
 
     /**

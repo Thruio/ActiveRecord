@@ -32,7 +32,9 @@ class VirtualQuery
     }
 
     public function setModel($model){
-        // TODO: Check Model is valid
+        if(is_object($model)){
+          $model = get_class($model);
+        }
         $this->model = $model;
         return $this;
     }

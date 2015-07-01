@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Baggett
- * Date: 09/02/2015
- * Time: 15:33
- */
 
 namespace Thru\ActiveRecord\Test;
 

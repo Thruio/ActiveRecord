@@ -54,27 +54,31 @@ class Base extends \PDO
       $this->query_log[] = new Log($query, $exec_time);
       return $result;
     }catch(\PDOException $e){
-      $error = parent::errorInfo();
-      switch(parent::errorCode()){
-        case '42S02':
-          if($model != 'StdClass'){
-            $instance = new $model();
-            if($instance instanceof ActiveRecord) {
-              $table_builder = new TableBuilder($instance);
-              $table_builder->build();
-              return $this->query($query); // Re-run the query
-            }
-            throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
-          }
-          break;
-        default:
+      $this->handleError($model, $query);
+    }
+  }
 
-          // Write exception to log.
-          if(DatabaseLayer::get_instance()->getLogger()) {
-            DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $error[2] . "\n\nrunning:\n\n{$query}");
+  public function handleError($model, $query){
+    $error = parent::errorInfo();
+
+    switch(parent::errorCode()){
+      case '42S02':
+        if($model != 'StdClass'){
+          $instance = new $model();
+          if($instance instanceof ActiveRecord) {
+            $table_builder = new TableBuilder($instance);
+            $table_builder->build();
+            return $this->query($query); // Re-run the query
           }
-          throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
-      }
+          throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
+        }
+        break;
+      default:
+        // Write exception to log.
+        if(DatabaseLayer::get_instance()->getLogger()) {
+          DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $error[2] . "\n\nrunning:\n\n{$query}");
+        }
+        throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2] . ".\n\n" . $query);
     }
   }
 

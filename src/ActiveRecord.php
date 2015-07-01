@@ -11,6 +11,7 @@ abstract class ActiveRecord
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
     protected $_label_column = null;
     protected $_columns;
+    protected $_table;
 
     /**
      * Start a Search on this type of active record
@@ -219,10 +220,17 @@ abstract class ActiveRecord
         //TODO: Write test to verify that this works right.
         foreach($this->get_class_schema() as $schemaKey => $dontCare){
           if(in_array($schemaKey, $this->_columns)){
-            $sortedColumns[] = $schemaKey;
+            $sortedColumns[$schemaKey] = $schemaKey;
           }
         }
-        $this->_columns = $sortedColumns;
+        foreach ($this->_columns as $column) {
+          if(!isset($sortedColumns[$column])){
+            $class_name = get_called_class();
+            throw new Exception("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
+          }
+        }
+
+        $this->_columns = array_values($sortedColumns);
 
         // Return sorted columns.
         return $this->_columns;
@@ -332,7 +340,9 @@ abstract class ActiveRecord
     public function delete()
     {
       $database = DatabaseLayer::get_instance();
+
       $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
+      $delete->setModel($this);
       $delete->condition($this->get_table_primary_key(), $this->get_id());
       $delete->execute();
 
@@ -357,6 +367,15 @@ abstract class ActiveRecord
         $class = get_called_class();
         $object = new $class();
         return $object->get_table_name();
+    }
+
+    public function set_database_table($table){
+      $this->_table = $table;
+      return $this;
+    }
+
+    public function get_database_table(){
+      return $this->_table;
     }
 
     /**
@@ -460,13 +479,10 @@ abstract class ActiveRecord
      */
     public function field_fix(){
         $schema = $this->get_class_schema();
-        #var_dump($this->_calculate_save_down_rows());
-        #var_dump($schema);
         foreach($this->_calculate_save_down_rows() as $column){
-            if(!isset($schema[$column]['type'])){
-                $class_name = get_called_class();
-                return trigger_error("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
-            }
+
+            if(!isset($schema[$column]['type'])) throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
+
             $type = $schema[$column]['type'];
             if($type == "integer" && !is_int($this->$column)){
                 $this->$column = intval($this->$column);

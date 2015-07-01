@@ -6,12 +6,17 @@ use Thru\ActiveRecord\Test\Models\TestModel;
 
 class SanityTest extends \PHPUnit_Framework_TestCase {
   public function testOutputEmpty(){
+    $this->markTestSkipped("");
     ob_start();
     TestModel::search()->exec();
     $output = ob_get_contents();
     ob_end_clean();
 
     $this->assertEmpty($output);
+  }
+
+  public function testWorksWithMonolog(){
+    TestModel::search()->exec();
   }
 
   public function testWorksWithoutMonolog(){
@@ -22,4 +27,6 @@ class SanityTest extends \PHPUnit_Framework_TestCase {
 
     DatabaseLayer::get_instance()->setLogger($logger);
   }
+
+
 }

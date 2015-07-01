@@ -165,7 +165,7 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$conditions}";
 
-        $result = $this->query($query);
+        $result = $this->query($query, $thing->getModel());
 
         return true;
     }
@@ -200,8 +200,7 @@ class Mysql extends Base
         $this->query($query);
 
         if($this->errorCode() !== '00000'){
-            $info = $this->errorInfo();
-            throw new \exception($info[2] . " -> {$query}");
+            return $this->handleError($thing->getModel(), $query);
         }
         $insertId = $this->lastInsertId();
 

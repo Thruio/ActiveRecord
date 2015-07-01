@@ -5,10 +5,11 @@ use Thru\ActiveRecord\SearchIndex;
 use Thru\ActiveRecord\Test\Models\TestModel;
 use Thru\ActiveRecord\Test\Models\TestModelBadHinting;
 
-class TestDocBlockHinting extends BaseTest {
+class DocBlockHintingTest extends BaseTest {
 
   /**
-   * @expectedException PHPUnit_Framework_Error_Warning
+   * @expectedException \Thru\ActiveRecord\Exception
+   * @expectedExceptionMessage No type hinting/docblock found for 'text_field' in 'Thru\ActiveRecord\Test\Models\TestModelBadHinting'.
    */
   public function testMissingDocHintWarningOnSave(){
     $o = new TestModelBadHinting();
@@ -22,7 +23,8 @@ class TestDocBlockHinting extends BaseTest {
   }
 
   /**
-   * @expectedException PHPUnit_Framework_Error_Warning
+   * @expectedException \Thru\ActiveRecord\Exception
+   * @expectedExceptionMessage No type hinting/docblock found for 'text_field' in 'Thru\ActiveRecord\Test\Models\TestModelBadHinting'.
    */
   public function testMissingDocHintWarningOnLoad(){
     $tmp = new TestModel();
@@ -35,3 +37,4 @@ class TestDocBlockHinting extends BaseTest {
     $j = TestModelBadHinting::search()->where('test_model_id', $tmp->test_model_id)->execOne();
   }
 }
+
