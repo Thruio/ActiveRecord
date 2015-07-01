@@ -338,8 +338,8 @@ class Mysql extends Base
 
             if($p == 0){
                 // First param always primary key if possible
-                $primary_key = $parameter;
                 if($auto_increment_possible && !$model instanceof VersionedObject) {
+                  $primary_key = $parameter;
                   $auto_increment = true;
                 }
             }
@@ -370,7 +370,8 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
-        file_put_contents("/home/fsuk/Desktop/{$model->get_table_name()}.sql", $query);
+        // TODO capture this to monolog
+        //file_put_contents("/tmp/ar-table-construct-{$model->get_table_name()}-".date("Ymd-His").".sql", $query);
         $this->query($query);
     }
 

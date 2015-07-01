@@ -1,8 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-use Thru\ActiveRecord\Exception;
-
 class LockController extends VirtualQuery
 {
 

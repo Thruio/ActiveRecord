@@ -8,6 +8,7 @@ use \Thru\ActiveRecord\Test\Models\TestModelSortable;
 use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
 use \Thru\ActiveRecord\Test\Models\TestModelNoKey;
 use \Thru\ActiveRecord\Test\Models\TestModelBad;
+use Thru\ActiveRecord\Test\Models\TestVersionedModel;
 use \Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use \Faker;
 
@@ -20,6 +21,7 @@ class ActiveRecordTest extends BaseTest {
     TestModelSortable::delete_table();
     TestModelSearchOnly::delete_table();
     TestModelNoKey::delete_table();
+    TestVersionedModel::delete_table();
   }
 
   public function testTableName(){
@@ -279,6 +281,30 @@ class ActiveRecordTest extends BaseTest {
     $vq = new VirtualQuery();
     $interpreter = $vq->getInterpreter();
     $interpreter->destroyTable($model);
+  }
+
+  public function testCreateVersionedRecord(){
+    $versionedRecord = new TestVersionedModel();
+    $versionedRecord->value = "blue";
+    $versionedRecord->save();
+    $this->assertGreaterThan(0, $versionedRecord->id);
+    $this->assertEquals(1, $versionedRecord->sequence);
+    return $versionedRecord;
+  }
+
+  /**
+   * @depends testCreateVersionedRecord
+   */
+  public function testUpdateVersionedRecord(TestVersionedModel $versionedRecord){
+    $originalSequence = $versionedRecord->sequence;
+    $originalId = $versionedRecord->id;
+
+    $versionedRecord->value = "red";
+    $versionedRecord->save();
+
+    $this->assertEquals($originalId, $versionedRecord->id, "ID did not change");
+    $this->assertNotEquals($originalSequence, $versionedRecord->sequence, "But the sequence did");
+    $this->assertEquals($originalSequence+1, $versionedRecord->sequence, "infact, it incremented by 1.");
   }
 
 }
