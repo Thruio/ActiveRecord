@@ -1,6 +1,7 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
+use Guzzle\Common\Version;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
@@ -8,6 +9,7 @@ use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
 use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use Thru\UUID;
+use TigerKit\Models\VersionedObject;
 
 class Mysql extends Base
 {
@@ -179,6 +181,7 @@ class Mysql extends Base
         $table = end($tables);
 
         $updates = array();
+        #\Kint::dump($thing->getData());
         foreach($thing->getData() as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
@@ -196,6 +199,7 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$data}";
 
+        #\Kint::dump($query);
         $this->query($query);
 
         if($this->errorCode() !== '00000'){
@@ -332,10 +336,12 @@ class Mysql extends Base
               }
             }
 
-            if($p == 0 && $auto_increment_possible){
+            if($p == 0){
                 // First param always primary key if possible
                 $primary_key = $parameter;
-                $auto_increment = true;
+                if($auto_increment_possible && !$model instanceof VersionedObject) {
+                  $auto_increment = true;
+                }
             }
             if($auto_increment){
               $auto_increment_sql = 'AUTO_INCREMENT';
@@ -343,10 +349,19 @@ class Mysql extends Base
               $auto_increment_sql = '';
             }
             $nullability = "NOT NULL";
+            // TODO make nullability settable.
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
-        if(isset($primary_key)) {
-          $params[] = "  PRIMARY KEY (`$primary_key`)";
+
+        // Disable auto-increment if this object is versioned.
+        if($model instanceof VersionedObject){
+          if(isset($primary_key)) {
+            $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
+          }
+        }else{
+          if(isset($primary_key)) {
+            $params[] = "  PRIMARY KEY (`$primary_key`)";
+          }
         }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
@@ -355,6 +370,7 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
+        file_put_contents("/home/fsuk/Desktop/{$model->get_table_name()}.sql", $query);
         $this->query($query);
     }
 

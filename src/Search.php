@@ -97,7 +97,7 @@ class Search
       foreach ($response as $result) {
         /* @var $result ActiveRecord */
         if ($result->get_primary_key_index()) {
-          $primary_key_column = $result->get_primary_key_index();
+          $primary_key_column = $result->get_primary_key_index()[0];
           $results[$result->$primary_key_column] = $result;
         } else {
           $results[] = $result;

@@ -6,9 +6,10 @@ use Monolog\Logger;
 use Slim\Slim;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
+use TigerKit\Models\VersionedObject;
 
 
-class ActiveRecord
+abstract class ActiveRecord
 {
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
     protected $_label_column = null;
@@ -152,7 +153,7 @@ class ActiveRecord
         foreach ($keys as $key) {
             $columns[$key->Column_name] = $key->Column_name;
         }
-        return implode("-", array_values($columns));
+        return array_values($columns);
     }
 
     /**
@@ -269,18 +270,18 @@ class ActiveRecord
         // Make an array out of the objects columns.
         $data = array();
         foreach ($this->_columns as $column) {
-            // Never update the primary key. Bad bad bad.
-            if ($column != $primary_key_column) {
+            // Never update the primary key. Bad bad bad. Except if we're versioned.
+            if ($column != $primary_key_column || $this instanceof VersionedObject) {
                 $data["`{$column}`"] = $this->$column;
             }
         }
 
         // If we already have an ID, this is an update.
         $database = DatabaseLayer::get_instance();
-        if ($this->get_id()) {
-            $operation = $database->update($this->get_table_name(), $this->get_table_alias());
-        } else { // Else, we're an insert.
+        if (!$this->get_id() || property_exists($this, '_is_versioned') && $this->_is_versioned == true) {
             $operation = $database->insert($this->get_table_name(), $this->get_table_alias());
+        } else { // Else, we're an insert.
+            $operation = $database->update($this->get_table_name(), $this->get_table_alias());
         }
 
         $operation->setData($data);
@@ -480,22 +481,42 @@ class ActiveRecord
           $parents[] = $current;
         }
         $variables = array();
+        $rows = [];
+        $abstractRows = [];
         foreach(array_reverse($parents) as $parent) {
           $reflection_class = new \ReflectionClass($parent);
-          $rows = explode("\n", $reflection_class->getDocComment());
-
-          foreach ($rows as &$row) {
-            $row = str_replace("*", "", $row);
-            $row = trim($row);
-            if (substr($row, 0, 4) == '@var') {
-              $property = $this->_parse_class_schema_property($row);
-              $variables[$parent][$property['name']] = $property;
-            }
+          if(!$reflection_class->isAbstract()){
+            $rows[] = explode("\n", $reflection_class->getDocComment());
+          }else{
+            $abstractRows[] = explode("\n", $reflection_class->getDocComment());
           }
-        }
-      $merged_variables = call_user_func_array('array_merge', $variables);
 
-      return $merged_variables;
+
+        }
+
+        foreach ($rows as $rowGroup) {
+            foreach($rowGroup as $row) {
+                $row = str_replace("*", "", $row);
+                $row = trim($row);
+                if (substr($row, 0, 4) == '@var') {
+                    $property = $this->_parse_class_schema_property($row);
+                    $variables[][$property['name']] = $property;
+                }
+            }
+        }
+        foreach ($abstractRows as $abstractRowGroup) {
+            foreach($abstractRowGroup as $row) {
+                $row = str_replace("*", "", $row);
+                $row = trim($row);
+                if (substr($row, 0, 4) == '@var') {
+                    $property = $this->_parse_class_schema_property($row);
+                    $variables[][$property['name']] = $property;
+                }
+            }
+        }
+        $merged_variables = call_user_func_array('array_merge', $variables);
+
+        return $merged_variables;
     }
 
     private function _parse_class_schema_property($row){
