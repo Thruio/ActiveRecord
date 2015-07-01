@@ -6,7 +6,7 @@ use Monolog\Logger;
 use Monolog\Handler as LogHandler;
 use Monolog\Formatter as LogFormatter;
 
-$fileLoggerHandler = new LogHandler\StreamHandler(__DIR__ . "/build/logs/" . date('Y-m-d') . '.log', null, null, 0664);
+$fileLoggerHandler = new LogHandler\StreamHandler(__DIR__ . "/build/logs/active-record." . date('Y-m-d') . '.log', null, null, 0664);
 $monologHandlers = [$fileLoggerHandler];
 $monolog = new Logger("ActiveRecord", $monologHandlers);
 
