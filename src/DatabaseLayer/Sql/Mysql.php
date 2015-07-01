@@ -1,15 +1,12 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
-use Guzzle\Common\Version;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
-use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
-use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
+use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use Thru\UUID;
-use TigerKit\Models\VersionedObject;
 
 class Mysql extends Base
 {
@@ -181,7 +178,6 @@ class Mysql extends Base
         $table = end($tables);
 
         $updates = array();
-        #\Kint::dump($thing->getData());
         foreach($thing->getData() as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
@@ -199,7 +195,6 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$data}";
 
-        #\Kint::dump($query);
         $this->query($query);
 
         if($this->errorCode() !== '00000'){
@@ -338,7 +333,7 @@ class Mysql extends Base
 
             if($p == 0){
                 // First param always primary key if possible
-                if($auto_increment_possible && !$model instanceof VersionedObject) {
+                if($auto_increment_possible && !$model instanceof VersionedActiveRecord) {
                   $primary_key = $parameter;
                   $auto_increment = true;
                 }
@@ -354,7 +349,7 @@ class Mysql extends Base
         }
 
         // Disable auto-increment if this object is versioned.
-        if($model instanceof VersionedObject){
+        if($model instanceof VersionedActiveRecord){
           if(isset($primary_key)) {
             $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
           }
@@ -371,7 +366,7 @@ class Mysql extends Base
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
         // TODO capture this to monolog
-        //file_put_contents("/tmp/ar-table-construct-{$model->get_table_name()}-".date("Ymd-His").".sql", $query);
+        file_put_contents("/tmp/ar-table-construct-{$model->get_table_name()}-".date("Ymd-His").".sql", $query);
         $this->query($query);
     }
 

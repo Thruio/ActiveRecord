@@ -2,12 +2,9 @@
 
 namespace Thru\ActiveRecord;
 
-use Monolog\Logger;
-use Slim\Slim;
+use CodeClimate\Bundle\TestReporterBundle\Version;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
-use TigerKit\Models\VersionedObject;
-
 
 abstract class ActiveRecord
 {
@@ -132,7 +129,7 @@ abstract class ActiveRecord
     {
         $database = DatabaseLayer::get_instance();
         $keys = $database->get_table_indexes($this->_table);
-        if(!isset($keys[0])){
+        if (!isset($keys[0])) {
           return false;
         }
         $primary_key = $keys[0]->Column_name;
@@ -146,12 +143,18 @@ abstract class ActiveRecord
      */
     public function get_primary_key_index()
     {
-        $database = DatabaseLayer::get_instance();
+      $database = DatabaseLayer::get_instance();
 
-        $keys = $database->get_table_indexes($this->_table);
-        $columns = array();
-        foreach ($keys as $key) {
+      $columns = array();
+
+      if ($this instanceof VersionedActiveRecord) {
+          $schema = $this->get_class_schema();
+          $firstColummn = reset($schema)['name'];
+          $columns = [$firstColummn => $firstColummn, "sequence" => "sequence"];
+        } else {
+          foreach ($database->get_table_indexes($this->_table) as $key) {
             $columns[$key->Column_name] = $key->Column_name;
+          }
         }
         return array_values($columns);
     }
@@ -221,8 +224,6 @@ abstract class ActiveRecord
         }
         $this->_columns = $sortedColumns;
 
-        #\Kint::dump($this->get_class(true), $this->_columns, $this->get_class_schema());
-
         // Return sorted columns.
         return $this->_columns;
     }
@@ -271,7 +272,7 @@ abstract class ActiveRecord
         $data = array();
         foreach ($this->_columns as $column) {
             // Never update the primary key. Bad bad bad. Except if we're versioned.
-            if ($column != $primary_key_column || $this instanceof VersionedObject) {
+            if ($column != $primary_key_column || $this instanceof VersionedActiveRecord) {
                 $data["`{$column}`"] = $this->$column;
             }
         }
