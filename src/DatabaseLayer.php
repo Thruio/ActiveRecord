@@ -113,12 +113,8 @@ class DatabaseLayer
 
     public function get_table_indexes($table_name){
         $util = new DatabaseLayer\Util();
-        try {
           $indexes = $util->getIndexes($table_name);
           return $indexes;
-        }catch(IndexException $indexException){
-          // Supress.
-        }
     }
 
     /**

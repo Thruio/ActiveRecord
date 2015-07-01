@@ -34,20 +34,6 @@ abstract class ActiveRecord
     }
 
     /**
-     * @param $level
-     * @param $object
-     * @return bool
-     */
-    static public function log($level, $object){
-        global $app;
-
-        if($app instanceof Slim){
-            return $app->log->log($level, $object);
-        }
-        return false;
-    }
-
-    /**
      * Override-able __construct call
      */
     public function __construct()
@@ -393,32 +379,6 @@ abstract class ActiveRecord
         $primary_key = $temp_this->get_table_primary_key();
         return self::search()->where($primary_key, $slug_parts[0])->execOne();
     }
-
-    /**
-     * Recast an object from a parent class to an extending class, if ActiveRecord_class is present
-     *
-     * @return ActiveRecord
-     * @throws exception
-     */
-    /*public function __recast()
-    {
-        // If the object has a property called ActiveRecord_class, it can potentially be recast at runtime. There are some dependencies though
-        if (property_exists($this, '__active_record_class')) {
-            if ($this->__active_record_class !== get_called_class() && $this->__active_record_class != null) {
-                if (!class_exists($this->__active_record_class)) {
-                    throw new Exception("Active Record Class: {$this->__active_record_class} does not exist.");
-                }
-                if (!is_subclass_of($this->__active_record_class, get_called_class())) {
-                    throw new Exception("Active Record Class: " . $this->__active_record_class . " must extend " . get_called_class());
-                }
-                $recast_class = $this->__active_record_class;
-                $new_this = new $recast_class();
-                $new_this->loadFromRow((array)$this);
-                return $new_this;
-            }
-        }
-        return $this;
-    }*/
 
     /**
      * Get URL slug.
