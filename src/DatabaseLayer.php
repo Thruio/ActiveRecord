@@ -1,6 +1,7 @@
 <?php
 namespace Thru\ActiveRecord;
 
+use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
 
 class DatabaseLayer
@@ -10,6 +11,7 @@ class DatabaseLayer
 
     static $instance;
     private $options;
+    private $logger;
 
     /**
      * @return DatabaseLayer
@@ -20,6 +22,18 @@ class DatabaseLayer
             throw new ConfigurationException("DatabaseLayer has not been configured");
         }
         return self::$instance;
+    }
+
+    public function setLogger(Logger $logger = null){
+      $this->logger = $logger;
+      return $this;
+    }
+
+    /**
+     * @returns Logger
+     */
+    public function getLogger(){
+      return $this->logger;
     }
 
     public static function destroy_instance(){
