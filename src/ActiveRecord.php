@@ -467,34 +467,32 @@ abstract class ActiveRecord
           }else{
             $abstractRows[] = explode("\n", $reflection_class->getDocComment());
           }
-
-
         }
 
         foreach ($rows as $rowGroup) {
             foreach($rowGroup as $row) {
-                $row = str_replace("*", "", $row);
-                $row = trim($row);
-                if (substr($row, 0, 4) == '@var') {
-                    $property = $this->_parse_class_schema_property($row);
-                    $variables[][$property['name']] = $property;
-                }
+              $property = $this->_parse_schema_docblock_row($row);
+              $variables[][$property['name']] = $property;
             }
         }
         foreach ($abstractRows as $abstractRowGroup) {
             foreach($abstractRowGroup as $row) {
-                $row = str_replace("*", "", $row);
-                $row = trim($row);
-                if (substr($row, 0, 4) == '@var') {
-                    $property = $this->_parse_class_schema_property($row);
-                    $variables[][$property['name']] = $property;
-                }
+              $property = $this->_parse_schema_docblock_row($row);
+              $variables[][$property['name']] = $property;
             }
         }
         $merged_variables = call_user_func_array('array_merge', $variables);
 
         return $merged_variables;
     }
+
+  private function _parse_schema_docblock_row($row){
+    $row = str_replace("*", "", $row);
+    $row = trim($row);
+    if (substr($row, 0, 4) == '@var') {
+      return $this->_parse_class_schema_property($row);
+    }
+  }
 
     private function _parse_class_schema_property($row){
         $bits = explode(" ", $row);
@@ -503,7 +501,8 @@ abstract class ActiveRecord
         $type_bits = explode("(", $type, 2);
         $type = strtolower($type_bits[0]);
 
-        $controls = array_slice($bits,3);
+        $controls = implode(" ", array_slice($bits,3));
+        $controls = explode(" ", $controls);
         // TODO: Parse controls for relationships and so on.
 
         if($type == 'enum' || $type == 'decimal'){
@@ -524,6 +523,14 @@ abstract class ActiveRecord
         }
         if(isset($options)){
             $definition['options'] = $options;
+        }
+        if(in_array("nullable", $controls)){
+            $definition['nullable'] = true;
+        }else{
+            $definition['nullable'] = false;
+        }
+        if($name == "text_field_nullable") {
+          \Kint::dump($controls, $definition);
         }
         return $definition;
 

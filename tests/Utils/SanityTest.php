@@ -6,7 +6,6 @@ use Thru\ActiveRecord\Test\Models\TestModel;
 
 class SanityTest extends \PHPUnit_Framework_TestCase {
   public function testOutputEmpty(){
-    $this->markTestSkipped("");
     ob_start();
     TestModel::search()->exec();
     $output = ob_get_contents();

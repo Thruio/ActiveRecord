@@ -3,6 +3,7 @@ namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\DatabaseLayer\VirtualQuery;
 use \Thru\ActiveRecord\Test\Models\TestModel;
 use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
+use Thru\ActiveRecord\Test\Models\TestModelNullable;
 use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\Models\TestModelSortable;
 use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
@@ -300,6 +301,16 @@ class ActiveRecordTest extends BaseTest {
 
     $testModel = new TestModel();
     $this->assertEquals("test_models", $testModel->get_database_table());
+  }
+
+  public function testValueIsNull(){
+    $testModelNullable = new TestModelNullable();
+    $testModelNullable->integer_field = 1;
+    $testModelNullable->text_field_nullable = null;
+    $testModelNullable->date_field = date(TestModel::$MYSQL_FORMAT);
+    $testModelNullable->save();
+
+    $this->assertEquals(null, $testModelNullable->text_field_nullable);
   }
 
 }

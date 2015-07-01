@@ -20,11 +20,17 @@ abstract class VersionedActiveRecord extends ActiveRecord
     $databaseLayer = DatabaseLayer::get_instance();
     $lockController = $databaseLayer->lockController($this->get_table(), $this->get_table_alias());
 
+    // Check the table exists.
+    $this->get_table_builder()->build();
+
     // Lock the table.
     $lockController->lock();
 
     // Get our primary key
     $primaryColumn = $this->get_primary_key_index()[0];
+    if(!$primaryColumn){
+      throw new Exception("Primary key for {$this->get_table()} is missing.");
+    }
 
     // Get the highest primary key
     $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->get_table()}");
