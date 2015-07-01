@@ -1,6 +1,8 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
+use Monolog\Logger;
+use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
@@ -365,8 +367,11 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
-        // TODO capture this to monolog
-        file_put_contents("/tmp/ar-table-construct-{$model->get_table_name()}-".date("Ymd-His").".sql", $query);
+        // Log it.
+        if(DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
+          DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
+        }
+
         $this->query($query);
     }
 

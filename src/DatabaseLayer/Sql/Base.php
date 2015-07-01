@@ -47,6 +47,10 @@ class Base extends \PDO
       #echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
       $exec_time_end = microtime(true);
       $exec_time = $exec_time_end - $exec_time_start;
+      if(DatabaseLayer::get_instance()->getLogger()) {
+        DatabaseLayer::get_instance()->getLogger()->addDebug($query);
+      }
+
       $this->query_log[] = new Log($query, $exec_time);
       return $result;
     }catch(\PDOException $e){
@@ -64,8 +68,11 @@ class Base extends \PDO
           }
           break;
         default:
-          // TODO capture this to a Monolog.
-          //file_put_contents("/tmp/ar-exception-" . date("Ymd-His").".sql", $query);
+
+          // Write exception to log.
+          if(DatabaseLayer::get_instance()->getLogger()) {
+            DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $error[2] . "\n\nrunning:\n\n{$query}");
+          }
           throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
       }
     }
