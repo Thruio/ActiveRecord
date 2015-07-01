@@ -41,6 +41,14 @@ class DatabaseLayer
 
     /**
      * @param $table_name
+     * @return DatabaseLayer\LockController
+     */
+    public function lockController($table_name, $table_alias = null){
+        return new DatabaseLayer\LockController($table_name, $table_alias);
+    }
+
+    /**
+     * @param $table_name
      * @param null $table_alias
      * @return DatabaseLayer\Select
      */

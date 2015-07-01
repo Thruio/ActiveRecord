@@ -64,6 +64,8 @@ class Base extends \PDO
           }
           break;
         default:
+          // TODO capture this to a Monolog.
+          //file_put_contents("/tmp/ar-exception-" . date("Ymd-His").".sql", $query);
           throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2]);
       }
     }

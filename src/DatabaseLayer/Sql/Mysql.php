@@ -4,8 +4,7 @@ namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
-use Thru\ActiveRecord\DatabaseLayer\TableBuildFailureException;
-use Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException;
+use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use Thru\UUID;
 
@@ -332,10 +331,12 @@ class Mysql extends Base
               }
             }
 
-            if($p == 0 && $auto_increment_possible){
+            if($p == 0){
                 // First param always primary key if possible
-                $primary_key = $parameter;
-                $auto_increment = true;
+                if($auto_increment_possible && !$model instanceof VersionedActiveRecord) {
+                  $primary_key = $parameter;
+                  $auto_increment = true;
+                }
             }
             if($auto_increment){
               $auto_increment_sql = 'AUTO_INCREMENT';
@@ -343,10 +344,19 @@ class Mysql extends Base
               $auto_increment_sql = '';
             }
             $nullability = "NOT NULL";
+            // TODO make nullability settable.
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
-        if(isset($primary_key)) {
-          $params[] = "  PRIMARY KEY (`$primary_key`)";
+
+        // Disable auto-increment if this object is versioned.
+        if($model instanceof VersionedActiveRecord){
+          if(isset($primary_key)) {
+            $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
+          }
+        }else{
+          if(isset($primary_key)) {
+            $params[] = "  PRIMARY KEY (`$primary_key`)";
+          }
         }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
@@ -355,6 +365,8 @@ class Mysql extends Base
         $query.= ")\n";
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
+        // TODO capture this to monolog
+        file_put_contents("/tmp/ar-table-construct-{$model->get_table_name()}-".date("Ymd-His").".sql", $query);
         $this->query($query);
     }
 
