@@ -42,7 +42,6 @@ abstract class VersionedActiveRecord extends ActiveRecord
     $this->sequence = $this->sequence + 1;
 
     // Save the object
-    #\Kint::dump($this->__toArray());
     $object = parent::save($automatic_reload);
 
     // Unlock the table.
