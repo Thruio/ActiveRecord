@@ -51,24 +51,4 @@ abstract class VersionedActiveRecord extends ActiveRecord
     // return the object.
     return $object;
   }
-
-  /**
-   * @return User|false
-   */
-  public function getCreatedUser(){
-    if(!$this->_created_user){
-      $this->_created_user = User::search()->where('user_id', $this->created_user_id)->execOne();
-    }
-    return $this->_created_user;
-  }
-
-  /**
-   * @return User|false
-   */
-  public function getUpdatedUser(){
-    if(!$this->_updated_user){
-      $this->_updated_user = User::search()->where('user_id', $this->updated_user_id)->execOne();
-    }
-    return $this->_updated_user;
-  }
 }
