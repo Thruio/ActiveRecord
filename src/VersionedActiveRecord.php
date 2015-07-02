@@ -28,9 +28,6 @@ abstract class VersionedActiveRecord extends ActiveRecord
 
     // Get our primary key
     $primaryColumn = $this->get_primary_key_index()[0];
-    if(!$primaryColumn){
-      throw new Exception("Primary key for {$this->get_table()} is missing.");
-    }
 
     // Get the highest primary key
     $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->get_table()}");

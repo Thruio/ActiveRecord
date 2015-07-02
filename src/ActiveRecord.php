@@ -136,14 +136,14 @@ abstract class ActiveRecord
 
       if ($this instanceof VersionedActiveRecord) {
           $schema = $this->get_class_schema();
-          $firstColummn = reset($schema)['name'];
-          $columns = [$firstColummn => $firstColummn, "sequence" => "sequence"];
-        } else {
+          $firstColumn = reset($schema)['name'];
+          $columns = [$firstColumn => $firstColumn, "sequence" => "sequence"];
+      } else {
           foreach ($database->get_table_indexes($this->_table) as $key) {
             $columns[$key->Column_name] = $key->Column_name;
           }
-        }
-        return array_values($columns);
+      }
+      return array_values($columns);
     }
 
     /**
@@ -483,7 +483,7 @@ abstract class ActiveRecord
         }
         $merged_variables = call_user_func_array('array_merge', $variables);
 
-        return $merged_variables;
+        return array_filter($merged_variables);
     }
 
   private function _parse_schema_docblock_row($row){
@@ -528,9 +528,6 @@ abstract class ActiveRecord
             $definition['nullable'] = true;
         }else{
             $definition['nullable'] = false;
-        }
-        if($name == "text_field_nullable") {
-          \Kint::dump($controls, $definition);
         }
         return $definition;
 

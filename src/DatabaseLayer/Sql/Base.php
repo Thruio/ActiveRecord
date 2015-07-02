@@ -34,9 +34,11 @@ class Base extends \PDO
     $username = !empty($username)?$username:null;
     $password = !empty($password)?$password:null;
 
-    $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
+    //$options = array(self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION);
 
-    parent::__construct($dsn, $username, $password, $options);
+    parent::__construct($dsn, $username, $password); //, $options);
+
+    $this->setAttribute(self::ATTR_ERRMODE, self::ERRMODE_EXCEPTION);
   }
 
   public function query($query, $model = 'StdClass'){
@@ -44,24 +46,23 @@ class Base extends \PDO
     try {
       $exec_time_start = microtime(true);
       $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
-      #echo " *** " . parent::errorCode() . " ({$model}) " . str_replace("\n", " ", $query) . "\n";
+
       $exec_time_end = microtime(true);
       $exec_time = $exec_time_end - $exec_time_start;
       if(DatabaseLayer::get_instance()->getLogger()) {
-        DatabaseLayer::get_instance()->getLogger()->addDebug($query);
+        DatabaseLayer::get_instance()->getLogger()->addDebug("{$exec_time} sec: {$query}");
       }
 
       $this->query_log[] = new Log($query, $exec_time);
       return $result;
     }catch(\PDOException $e){
-      $this->handleError($model, $query);
+      $this->handleError($model, $query, $e);
     }
   }
 
-  public function handleError($model, $query){
-    $error = parent::errorInfo();
+  public function handleError($model, $query, \PDOException $e){
 
-    switch(parent::errorCode()){
+    switch($e->getCode()){
       case '42S02':
         if($model != 'StdClass'){
           $instance = new $model();
@@ -70,15 +71,15 @@ class Base extends \PDO
             $table_builder->build();
             return $this->query($query); // Re-run the query
           }
-          throw new DatabaseLayer\TableDoesntExistException(parent::errorCode() . ": " . $error[2]);
+          throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
         }
         break;
       default:
         // Write exception to log.
         if(DatabaseLayer::get_instance()->getLogger()) {
-          DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $error[2] . "\n\nrunning:\n\n{$query}");
+          DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
         }
-        throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $error[2] . ".\n\n" . $query);
+        throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $e->getMessage() . ".\n\n" . $query);
     }
   }
 

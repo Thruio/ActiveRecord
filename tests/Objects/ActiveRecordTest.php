@@ -311,6 +311,21 @@ class ActiveRecordTest extends BaseTest {
     $testModelNullable->save();
 
     $this->assertEquals(null, $testModelNullable->text_field_nullable);
+
+    return $testModelNullable;
+  }
+
+  /**
+   * @depends testValueIsNull
+   */
+  public function testValueIsNullUpdatable(TestModelNullable $testModelNullable){
+    $testModelNullable->text_field_nullable = "hello";
+    $testModelNullable->save();
+    $this->assertEquals("hello", $testModelNullable->text_field_nullable);
+    $testModelNullable->text_field_nullable = null;
+    $testModelNullable->save();
+    $testModelNullable->reload();
+    $this->assertNull($testModelNullable->text_field_nullable);
   }
 
 }

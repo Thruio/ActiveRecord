@@ -21,7 +21,7 @@ class Mysql extends Base
      * @return array of results
      * @throws Exception
      */
-    public function process(\Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing)
+    public function process(DatabaseLayer\VirtualQuery $thing)
     {
 
         switch($thing->getOperation()){
@@ -45,7 +45,7 @@ class Mysql extends Base
      * @return array
      * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
      */
-    public function processPassthru(\Thru\ActiveRecord\DatabaseLayer\Passthru $thing){
+    public function processPassthru(DatabaseLayer\Passthru $thing){
       $sql = $thing->get_sql_to_passthru();
       $result = $this->query(
         $sql,
@@ -69,14 +69,14 @@ class Mysql extends Base
      * @return array
      * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
      */
-    public function processSelect(\Thru\ActiveRecord\DatabaseLayer\Select $thing){
+    public function processSelect(DatabaseLayer\Select $thing){
         $fields = array();
         $tables = array();
         $orders = array();
 
         // SELECTORS
         foreach ($thing->getTables() as $table) {
-            /* @var $table \Thru\ActiveRecord\DatabaseLayer\Table */
+            /* @var $table DatabaseLayer\Table */
             $tables[] = $table->getName() . " " . $table->getAlias();
             foreach ($table->getFields() as $field) {
                 $fields[] = $table->getAlias() . "." . $field;
@@ -100,7 +100,7 @@ class Mysql extends Base
         // Handle ORDERs
         if(count($thing->getOrders()) > 0){
             foreach($thing->getOrders() as $order){
-                /* @var $order \Thru\ActiveRecord\DatabaseLayer\Order */
+                /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
                 switch(strtolower($order->getDirection())){
                     case 'asc':
@@ -151,7 +151,7 @@ class Mysql extends Base
         return $results;
     }
 
-    public function processDelete(\Thru\ActiveRecord\DatabaseLayer\Delete $thing){
+    public function processDelete(DatabaseLayer\Delete $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
           throw new Exception("Active Record Cannot delete from more than one table at a time!");
@@ -171,7 +171,7 @@ class Mysql extends Base
     }
 
     // TODO: For the love of god, rewrite this to use PDO prepared statements
-    public function processInsert(\Thru\ActiveRecord\DatabaseLayer\Insert $thing){
+    public function processInsert(DatabaseLayer\Insert $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
             throw new Exception("Active Record Cannot insert into more than one table at a time!");
@@ -199,15 +199,12 @@ class Mysql extends Base
 
         $this->query($query);
 
-        if($this->errorCode() !== '00000'){
-            return $this->handleError($thing->getModel(), $query);
-        }
         $insertId = $this->lastInsertId();
 
         return $insertId;
     }
 
-    public function processUpdate(\Thru\ActiveRecord\DatabaseLayer\Update $thing){
+    public function processUpdate(DatabaseLayer\Update $thing){
         // SELECTORS
         if(count($thing->getTables()) > 1){
             throw new Exception("Active Record Cannot update into more than one table at a time!");
@@ -238,11 +235,7 @@ class Mysql extends Base
 
         $result = $this->query($query);
 
-        if($result instanceof \PDOStatement) {
-          return $result->errorCode() == "00000" ? TRUE : FALSE;
-        }else {
-          return FALSE;
-        }
+        return $result->errorCode() == "00000" ? TRUE : FALSE;
     }
 
     public function getIndexes($table){
@@ -334,7 +327,7 @@ class Mysql extends Base
 
             if($p == 0){
                 // First param always primary key if possible
-                if($auto_increment_possible && !$model instanceof VersionedActiveRecord) {
+                if($auto_increment_possible) {
                   $primary_key = $parameter;
                   $auto_increment = true;
                 }
@@ -378,7 +371,7 @@ class Mysql extends Base
         // CONDITIONS
         if(count($thing->getConditions()) > 0){
             foreach($thing->getConditions() as $condition){
-                /* @var $condition \Thru\ActiveRecord\DatabaseLayer\Condition */
+                /* @var $condition DatabaseLayer\Condition */
                 if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
                     $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
                 }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
