@@ -10,12 +10,7 @@ class SanityTest extends \PHPUnit_Framework_TestCase {
     TestModel::search()->exec();
     $output = ob_get_contents();
     ob_end_clean();
-
-    if(!empty($output)){
-      $this->markTestSkipped("DANGER WILL ROBINSON! Output was not empty! We're outputting strings or other such junk!");
-    }else{
-      $this->assertEmpty($output);
-    }
+    $this->assertEmpty($output);
   }
 
   public function testWorksWithMonolog(){
