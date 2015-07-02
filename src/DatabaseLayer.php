@@ -20,10 +20,15 @@ class DatabaseLayer
      */
     public static function get_instance()
     {
-        if (!self::$instance) {
+        if (!DatabaseLayer::$instance) {
             throw new ConfigurationException("DatabaseLayer has not been configured");
         }
-        return self::$instance;
+        return DatabaseLayer::$instance;
+    }
+
+    public static function set_instance(DatabaseLayer $instance){
+        echo "DatabaseLayer configured\n";
+        self::$instance = $instance;
     }
 
     public function setLogger(Logger $logger = null){

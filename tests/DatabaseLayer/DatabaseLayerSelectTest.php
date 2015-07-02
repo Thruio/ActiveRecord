@@ -2,6 +2,7 @@
 
 namespace Thru\ActiveRecord\Test;
 
+use Thru\ActiveRecord\DatabaseLayer;
 use \Thru\ActiveRecord\DatabaseLayer\Select;
 use Thru\ActiveRecord\Test\Models\TestModel;
 
