@@ -24,6 +24,7 @@ I really aught to write some examples to go with this project. For now, have a l
 
 ### TODO List:
 
- * nullable types
+ * ~~nullable types~~ Done!
+ * ~~versionable objects~~ Done!
  * inter-object relationships
  * returning collections, not arrays.
