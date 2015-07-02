@@ -28,7 +28,7 @@ class ActiveRecordExtendedTypesTest extends \PHPUnit_Framework_TestCase {
 
   public function testExtendedTypes(){
     /* @var $result TestModelExtendedTypes */
-    $this->extended->blob_field = file_get_contents(dirname(__FILE__) . "/../../vendor/bin/phpunit");
+    $this->extended->blob_field = file_get_contents($_SERVER['SCRIPT_FILENAME']);
     $this->extended->decimal_field = 12345.67890;
     $this->extended->enum_field = "Yes";
     $this->extended->md5_field = md5($this->extended->blob_field);
