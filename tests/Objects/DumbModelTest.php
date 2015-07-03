@@ -52,10 +52,11 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
-   * @expectedExceptionMessage 42S02: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'active_record_test.doesntexist' doesn't exist
+   * @expectedExceptionMessageRegExp /42S02: SQLSTATE\[42S02\]: Base table or view not found: 1146 Table '(.*).doesntexist' doesn't exist/
    */
   public function testTableExistsGotcha(){
     $result = DumbModel::queryOne("SELECT * FROM doesntexist", 'Thru\ActiveRecord\Test\Models\NotStdClass');
   }
 }
+
 
