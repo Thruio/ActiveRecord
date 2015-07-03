@@ -1,18 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthew Baggett
- * Date: 15/02/2015
- * Time: 15:19
- */
 
 namespace Thru\ActiveRecord\Test;
 use Thru\ActiveRecord\DatabaseLayer;
 
 class DatabaseLayerTest extends \PHPUnit_Framework_TestCase {
 
+  private $originalInstance;
+
   public function setUp(){
+    $this->originalInstance = DatabaseLayer::get_instance();
     DatabaseLayer::destroy_instance();
+  }
+
+  public function tearDown(){
+    DatabaseLayer::set_instance($this->originalInstance);
   }
 
   public function testConstructMySQL(){

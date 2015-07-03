@@ -27,7 +27,6 @@ class DatabaseLayer
     }
 
     public static function set_instance(DatabaseLayer $instance){
-        echo "DatabaseLayer configured\n";
         self::$instance = $instance;
     }
 
