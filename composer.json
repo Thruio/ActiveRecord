@@ -16,7 +16,8 @@
     "codeclimate/php-test-reporter": "dev-master",
     "fzaninotto/faker": "1.5.*@dev",
     "raveren/kint": "dev-master",
-    "monolog/monolog": ">=1.6.0"
+    "monolog/monolog": ">=1.6.0",
+    "johnkary/phpunit-speedtrap": "~1.0@dev"
   },
   "autoload"   : {
     "psr-4": {

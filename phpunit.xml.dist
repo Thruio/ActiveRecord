@@ -33,4 +33,18 @@
             <directory>Thru/ActiveRecord/Test</directory>
         </blacklist>
     </filter>
+    <listeners>
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" >
+            <arguments>
+                <array>
+                    <element key="slowThreshold">
+                        <integer>500</integer>
+                    </element>
+                    <element key="reportLength">
+                        <integer>5</integer>
+                    </element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 </phpunit>
