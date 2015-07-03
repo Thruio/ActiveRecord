@@ -2,6 +2,7 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Monolog\Logger;
+use SebastianBergmann\Version;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
@@ -242,7 +243,7 @@ class Mysql extends Base
         if(isset($this->known_indexes[$table])){
           return $this->known_indexes[$table];
         }
-        $query = "SHOW INDEX FROM {$table} WHERE Key_name = 'PRIMARY'";
+        $query = "SHOW COLUMNS FROM {$table} WHERE `Key` = 'PRI'";
         $indexes = $this->query($query);
 
         $results = array();
@@ -254,7 +255,8 @@ class Mysql extends Base
         if($indexes->rowCount() > 0){
             foreach($indexes as $index){
                 $result = new \StdClass();
-                $result->Column_name = $index->Column_name;
+                $result->Column_name = $index->Field;
+                $result->Auto_increment = stripos($index->Extra, "auto_increment")!==false?true:false;
                 $results[] = $result;
             }
         }
@@ -329,7 +331,9 @@ class Mysql extends Base
                 // First param always primary key if possible
                 if($auto_increment_possible) {
                   $primary_key = $parameter;
-                  $auto_increment = true;
+                  if(!$model instanceof VersionedActiveRecord) {
+                    $auto_increment = true;
+                  }
                 }
             }
             if($auto_increment){

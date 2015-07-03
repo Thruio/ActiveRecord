@@ -114,13 +114,8 @@ abstract class ActiveRecord
      */
     public function get_table_primary_key()
     {
-        $database = DatabaseLayer::get_instance();
-        $keys = $database->get_table_indexes($this->_table);
-        if (!isset($keys[0])) {
-          return false;
-        }
-        $primary_key = $keys[0]->Column_name;
-        return $primary_key;
+        $keys = $this->get_primary_key_index();
+        return isset($keys[0])?$keys[0]:false;
     }
 
     /**

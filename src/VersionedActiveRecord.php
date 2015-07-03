@@ -30,16 +30,18 @@ abstract class VersionedActiveRecord extends ActiveRecord
     $primaryColumn = $this->get_primary_key_index()[0];
 
     // Get the highest primary key
-    $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->get_table()}");
-    $highestKey = end($highest)->highest;
-    if(!$highestKey){
-      $highestKey = 1;
-    }
+    if(!$this->$primaryColumn) {
+      $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->get_table()}");
+      $highestKey = end($highest)->highest;
+      if (!$highestKey) {
+        $highestKey = 1;
+      }
 
-    // Set our primary key to this +1
-    $newKey = $highestKey + 1;
-    $this->$primaryColumn = $newKey;
-    #echo "{$this->get_table()}: {$primaryColumn} = {$newKey}\n";
+      // Set our primary key to this +1
+      $newKey = $highestKey + 1;
+      $this->$primaryColumn = $newKey;
+      #echo "{$this->get_table()}: {$primaryColumn} = {$newKey}\n";
+    }
 
     // Set sequence to sequence + 1
     $this->sequence = $this->sequence + 1;
