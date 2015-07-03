@@ -16,6 +16,11 @@ abstract class VersionedActiveRecord extends ActiveRecord
 
   public $_is_versioned = true;
 
+  public function __post_construct(){
+    parent::__post_construct();
+    $this->sequence = intval($this->sequence);
+  }
+
   public function save($automatic_reload = true){
     $databaseLayer = DatabaseLayer::get_instance();
     $lockController = $databaseLayer->lockController($this->get_table(), $this->get_table_alias());
@@ -44,15 +49,23 @@ abstract class VersionedActiveRecord extends ActiveRecord
     }
 
     // Set sequence to sequence + 1
-    $this->sequence = $this->sequence + 1;
+    \Kint::dump("SELECT max(sequence) as highest FROM {$this->get_table()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
+    $highestSequence = DumbModel::query("SELECT max(sequence) as highest FROM {$this->get_table()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
+    $highestSequenceKey = end($highestSequence)->highest;
+    \Kint::dump($highestSequence);
+    if (!$highestSequenceKey) {
+      $this->sequence = 1;
+    }else{
+      $this->sequence = intval($highestSequenceKey) + 1;
+    }
 
     // Save the object
-    $object = parent::save($automatic_reload);
+    parent::save($automatic_reload);
 
     // Unlock the table.
     $lockController->unlock();
 
     // return the object.
-    return $object;
+    return $this;
   }
 }
