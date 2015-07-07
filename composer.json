@@ -12,12 +12,15 @@
     "thru.io/json-pretty-printer": "1.0.*"
   },
   "require-dev": {
-    "phpunit/phpunit": "*",
+    "phpunit/phpunit": ">=4.7",
     "codeclimate/php-test-reporter": "dev-master",
     "fzaninotto/faker": "1.5.*@dev",
     "raveren/kint": "dev-master",
     "monolog/monolog": ">=1.6.0",
-    "johnkary/phpunit-speedtrap": "~1.0@dev"
+    "johnkary/phpunit-speedtrap": "~1.0@dev",
+    "lstrojny/phpunit-clever-and-smart": "0.*",
+    "brianium/paratest": "dev-master",
+    "fiunchinho/phpunit-randomizer": "dev-master"
   },
   "autoload"   : {
     "psr-4": {

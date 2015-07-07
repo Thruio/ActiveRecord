@@ -46,5 +46,15 @@
                 </array>
             </arguments>
         </listener>
+
+        <!--<listener class="PHPUnit\Runner\CleverAndSmart\TestListener">
+          <arguments>
+            <object class="PHPUnit\Runner\CleverAndSmart\Storage\Sqlite3Storage">
+              <arguments>
+                <string>build/logs/phpunit-cas.db</string>
+              </arguments>
+            </object>
+          </arguments>
+        </listener>-->
     </listeners>
 </phpunit>
