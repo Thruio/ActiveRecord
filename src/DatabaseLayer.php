@@ -142,6 +142,9 @@ class DatabaseLayer
             case 'Mysql':
                 $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
                 break;
+            case 'Sqlite':
+                $dsn = "sqlite:{$this->options['db_file']}";
+                break;
             default:
                 throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
         }
