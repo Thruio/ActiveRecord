@@ -342,7 +342,6 @@ class Mysql extends Base
               $auto_increment_sql = '';
             }
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
-            // TODO make nullability settable.
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
 
