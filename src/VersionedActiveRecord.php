@@ -49,10 +49,8 @@ abstract class VersionedActiveRecord extends ActiveRecord
     }
 
     // Set sequence to sequence + 1
-    \Kint::dump("SELECT max(sequence) as highest FROM {$this->get_table()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
     $highestSequence = DumbModel::query("SELECT max(sequence) as highest FROM {$this->get_table()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
     $highestSequenceKey = end($highestSequence)->highest;
-    \Kint::dump($highestSequence);
     if (!$highestSequenceKey) {
       $this->sequence = 1;
     }else{
