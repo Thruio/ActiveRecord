@@ -181,22 +181,28 @@ class Sqlite extends Base
         $table = end($tables);
 
         $updates = array();
+        $keys = [];
+        $values = [];
         foreach($thing->getData() as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
                 $value = JsonPrettyPrinter::Json($value);
             }
+            $keys[] = $key;
+
             $value_slashed = addslashes($value);
             if($value === null){
-                $updates[] = "`$key` = NULL";
+                $value = "NULL";
             }else{
-                $updates[] = "`$key` = \"$value_slashed\"";
+                $value = $value_slashed;
             }
+            $values[] = $value;
         }
         $selector = "INSERT INTO {$table->getName()} ";
-        $data = "SET " . implode(", ", $updates);
+        $columns = "(`" . implode("`, `", $keys) . "`)";
+        $values = "('" . implode("', '", $values) . "')";
 
-        $query = "{$selector}\n{$data}";
+        $query = "{$selector}\n{$columns} \nVALUES \n{$values}";
 
         $this->query($query);
 
@@ -243,7 +249,8 @@ class Sqlite extends Base
         if(isset($this->known_indexes[$table])){
           return $this->known_indexes[$table];
         }
-        $query = "SHOW COLUMNS FROM {$table} WHERE `Key` = 'PRI'";
+
+        $query = "PRAGMA table_info('{$table}')";
         $indexes = $this->query($query);
 
         $results = array();
@@ -254,10 +261,12 @@ class Sqlite extends Base
         }
         if($indexes->rowCount() > 0){
             foreach($indexes as $index){
+              if($index->pk==1){
                 $result = new \StdClass();
-                $result->Column_name = $index->Field;
-                $result->Auto_increment = stripos($index->Extra, "auto_increment")!==false?true:false;
+                $result->Column_name = $index->name;
+                $result->Auto_increment = true;
                 $results[] = $result;
+              }
             }
         }
         $this->known_indexes[$table] = $results;
@@ -282,26 +291,18 @@ class Sqlite extends Base
               switch(strtolower($psuedo_type)){
                 case 'int':
                 case 'integer':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
-                  $type = "INT({$length})";
+                  $type = "INTEGER";
                   $auto_increment_possible = true;
-                  break;
-
-                case 'string':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
-                  $type = "VARCHAR({$length})";
                   break;
 
                 case 'date':
                 case 'datetime':
-                  $type = 'DATETIME';
-                  break;
-
                 case 'enum':
-                  $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
-                  break;
-
+                case 'string':
                 case 'text':
+                case 'uuid':
+                case 'md5':
+                case 'sha1':
                   $type = "TEXT";
                   break;
 
@@ -309,59 +310,37 @@ class Sqlite extends Base
                   $type = 'BLOB';
                   break;
 
-                case "decimal":
-                  $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
-                  break;
-
-                case "uuid":
-                  $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
-                  break;
-
-                case "md5":
-                  $type = "VARCHAR(" . strlen(md5("test")) . ")";
-                  break;
-
-                case "sha1":
-                  $type = "VARCHAR(" . strlen(sha1("test")) . ")";
-                  break;
               }
             }
 
+            $is_primary_key = false;
             if($p == 0){
                 // First param always primary key if possible
                 if($auto_increment_possible) {
-                  $primary_key = $parameter;
+                  $is_primary_key = "PRIMARY KEY";
                   if(!$model instanceof VersionedActiveRecord) {
                     $auto_increment = true;
                   }
                 }
             }
+
             if($auto_increment){
-              $auto_increment_sql = 'AUTO_INCREMENT';
+              $auto_increment_sql = 'AUTOINCREMENT';
             }else{
-              $auto_increment_sql = '';
+              $auto_increment_sql = false;
             }
+
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
-            // TODO make nullability settable.
-            $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
+            $nullability = $is_primary_key?'':$nullability;
+
+            $params[] = "  " . trim("`{$parameter}` {$type} {$is_primary_key} {$auto_increment_sql} {$nullability}");
         }
 
-        // Disable auto-increment if this object is versioned.
-        if($model instanceof VersionedActiveRecord){
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
-          }
-        }else{
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`)";
-          }
-        }
-
+        // TODO: Disable auto-increment if this object is versioned
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
         $query.= "(\n";
         $query.= implode(",\n", $params)."\n";
         $query.= ")\n";
-        $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
         // Log it.
         if(DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
