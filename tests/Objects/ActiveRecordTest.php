@@ -344,7 +344,8 @@ class ActiveRecordTest extends BaseTest
      * @expectedException \PHPUnit_Framework_Error_Deprecated
      * @expectedExceptionMessage getTablePrimaryKey() is deprecated. Use getIDField() instead.
      */
-    public function testCheckGetTablePrimaryKeyDeprecated(){
+    public function testCheckGetTablePrimaryKeyDeprecated()
+    {
         $testModel = new TestModel();
         $testModel->getTablePrimaryKey();
     }

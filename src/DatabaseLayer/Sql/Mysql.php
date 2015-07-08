@@ -301,5 +301,4 @@ class Mysql extends GenericSql
 
         $this->query($query);
     }
-
 }

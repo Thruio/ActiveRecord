@@ -77,8 +77,9 @@ abstract class ActiveRecord
      * Get the field that is being used for the id.
      * @return string|false
      */
-    public function getIDField(){
-        if(count($this->getPrimaryKeyIndex()) > 0) {
+    public function getIDField()
+    {
+        if (count($this->getPrimaryKeyIndex()) > 0) {
             return reset($this->getPrimaryKeyIndex());
         }
         return false;
