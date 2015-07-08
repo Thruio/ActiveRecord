@@ -2,7 +2,6 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Monolog\Logger;
-use SebastianBergmann\Version;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
