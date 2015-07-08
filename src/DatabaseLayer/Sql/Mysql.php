@@ -12,9 +12,6 @@ use Thru\UUID;
 
 class Mysql extends GenericSql
 {
-
-    private $known_indexes;
-
     /**
      * @param \Thru\ActiveRecord\DatabaseLayer\Select $thing
      * @return array
