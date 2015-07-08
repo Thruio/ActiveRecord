@@ -52,7 +52,7 @@ class Search
           /* @var $model ActiveRecord */
             $model = $this->model;
 
-            if (end($this->conditions)->get_column() == $model->getTablePrimaryKey() && end($this->conditions)->get_operation() == '=') {
+            if (end($this->conditions)->getColumn() == $model->getTablePrimaryKey() && end($this->conditions)->getOperation() == '=') {
                 $primary_key_search = true;
                 if (SearchIndex::getInstance()->exists($model->getTableName(), end($this->conditions)->get_value())) {
                     return array(
@@ -66,12 +66,12 @@ class Search
 
         $database = DatabaseLayer::getInstance();
 
-        $select = $database->select($this->model->get_table_name(), $this->model->get_table_alias());
-        $select->fields($this->model->get_table_alias());
+        $select = $database->select($this->model->getTableName(), $this->model->getTableAlias());
+        $select->fields($this->model->getTableAlias());
 
         // Add WHERE Conditions
         foreach ((array)$this->conditions as $condition) {
-            $select->condition($condition->get_column(), $condition->get_value(), $condition->get_operation());
+            $select->condition($condition->getColumn(), $condition->getValue(), $condition->getOperation());
         }
 
         if ($this->order) {
@@ -128,7 +128,7 @@ class Search
             $active_record_to_store = end($results);
             if ($active_record_to_store instanceof ActiveRecord) {
                 SearchIndex::getInstance()
-                ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
+                ->put($this->model->getTableName(), end($this->conditions)->getValue(), $active_record_to_store);
             }
         }
         return $results;

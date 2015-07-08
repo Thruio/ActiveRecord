@@ -350,7 +350,7 @@ abstract class ActiveRecord
     {
         $class = get_called_class();
         $object = new $class();
-        return $object->get_table_name();
+        return $object->getTableName();
     }
 
     /**
