@@ -20,7 +20,8 @@
     "johnkary/phpunit-speedtrap": "~1.0@dev",
     "lstrojny/phpunit-clever-and-smart": "0.*",
     "brianium/paratest": "dev-master",
-    "fiunchinho/phpunit-randomizer": "dev-master"
+    "fiunchinho/phpunit-randomizer": "dev-master",
+    "squizlabs/php_codesniffer": "*"
   },
   "autoload"   : {
     "psr-4": {

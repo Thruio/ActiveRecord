@@ -23,7 +23,9 @@ after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
 
-script: phpunit
+script:
+  - ./vendor/bin/phpcs --standard=PSR2 *.php src tests
+  - phpunit
 
 notifications:
   email:
