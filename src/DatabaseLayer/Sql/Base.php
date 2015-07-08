@@ -84,13 +84,12 @@ class Base extends \PDO
                     }
                 }
                 throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
-            break;
             default:
               // Write exception to log.
                 if (DatabaseLayer::get_instance()->getLogger()) {
-                    DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . parent::errorCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
+                    DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
                 }
-                throw new DatabaseLayer\Exception(parent::errorCode() . ": " . $e->getMessage() . ".\n\n" . $query);
+                throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
         }
     }
 
