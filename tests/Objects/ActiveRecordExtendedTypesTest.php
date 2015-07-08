@@ -21,11 +21,11 @@ class ActiveRecordExtendedTypesTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        TestModel::delete_table();
-        TestModelExtendedTypes::delete_table();
-        TestModelWithNameLabel::delete_table();
-        TestModelSortable::delete_table();
-        TestModelSearchOnly::delete_table();
+        TestModel::deleteTable();
+        TestModelExtendedTypes::deleteTable();
+        TestModelWithNameLabel::deleteTable();
+        TestModelSortable::deleteTable();
+        TestModelSearchOnly::deleteTable();
     }
 
     public function testExtendedTypes()

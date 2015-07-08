@@ -53,7 +53,7 @@ class VersionedActiveRecordTest extends BaseTest
     {
         $tvm = new TestVersionedModel();
         $util = new DatabaseLayer\Util();
-        $keys = $util->getIndexes($tvm->get_database_table());
+        $keys = $util->getIndexes($tvm->getDatabaseTable());
         $failed = false;
         foreach ($keys as $key) {
             if ($key->Auto_increment) {

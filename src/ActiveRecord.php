@@ -37,44 +37,51 @@ abstract class ActiveRecord
      */
     public function __construct()
     {
-        $tableBuilder = $this->get_table_builder();
+        $tableBuilder = $this->getTableBuilder();
         $tableBuilder->build($this);
     }
 
     /**
      * Override-able calls
      */
-    public function __post_construct()
+    public function postConstruct()
     {
     }
 
-    public function __pre_save()
+    public function preSave()
     {
     }
 
-    public function __post_save()
+    public function postSave()
     {
     }
-
-    /*public function __requires_recast()
-    {
-        return false;
-    }*/
 
     /**
      * Find an item by the Primary Key ID. This does not use the search() functionality
      * @param integer $id
      * @return ActiveRecord
      */
-    public function get_by_id($id)
+    public function getById($id)
     {
-        $database = DatabaseLayer::get_instance();
-        $select = $database->select($this->get_table_name(), $this->get_table_alias());
-        $select->fields($this->get_table_alias());
-        $select->condition($this->get_table_primary_key(), $id);
+        $database = DatabaseLayer::getInstance();
+        $select = $database->select($this->getTableName(), $this->getTableAlias());
+        $select->fields($this->getTableAlias());
+        $select->condition($this->getIDField(), $id);
         $results = $select->execute(get_called_class());
         $result = end($results);
         return $result;
+    }
+
+    /**
+     * Get the field that is being used for the id.
+     * @return string|false
+     */
+    public function getIDField()
+    {
+        if (count($this->getPrimaryKeyIndex()) > 0) {
+            return $this->getPrimaryKeyIndex()[0];
+        }
+        return false;
     }
 
     /**
@@ -83,10 +90,10 @@ abstract class ActiveRecord
      * @param string $table_name Optional table name
      * @return string Table alias
      */
-    public function get_table_alias($table_name = null)
+    public function getTableAlias($table_name = null)
     {
         if (!$table_name) {
-            $table_name = $this->get_table_name();
+            $table_name = $this->getTableName();
         }
         $bits = explode("_", $table_name);
         $alias = '';
@@ -101,7 +108,7 @@ abstract class ActiveRecord
      *
      * @return string Table Name
      */
-    public function get_table_name()
+    public function getTableName()
     {
         return $this->_table;
     }
@@ -109,31 +116,34 @@ abstract class ActiveRecord
     /**
      * Get table primary key column name
      *
+     * @deprecated
      * @return string|false
      */
-    public function get_table_primary_key()
+    public function getTablePrimaryKey()
     {
-        $keys = $this->get_primary_key_index();
+        trigger_error('getTablePrimaryKey() is deprecated. Use getIDField() instead.', E_USER_DEPRECATED);
+
+        $keys = $this->getPrimaryKeyIndex();
         return isset($keys[0])?$keys[0]:false;
     }
 
     /**
      * Get a unique key to use as an index
      *
-     * @return string
+     * @return string[]
      */
-    public function get_primary_key_index()
+    public function getPrimaryKeyIndex()
     {
-        $database = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::getInstance();
 
         $columns = array();
 
         if ($this instanceof VersionedActiveRecord) {
-            $schema = $this->get_class_schema();
+            $schema = $this->getClassSchema();
             $firstColumn = reset($schema)['name'];
             $columns = [$firstColumn => $firstColumn, "sequence" => "sequence"];
         } else {
-            foreach ($database->get_table_indexes($this->_table) as $key) {
+            foreach ($database->getTableIndexes($this->_table) as $key) {
                 $columns[$key->Column_name] = $key->Column_name;
             }
         }
@@ -145,10 +155,9 @@ abstract class ActiveRecord
      * Get object ID
      * @return integer
      */
-    public function get_id()
+    public function getId()
     {
-
-        $col = $this->get_table_primary_key();
+        $col = $this->getIDField();
 
         if (property_exists($this, $col)) {
             $id = $this->$col;
@@ -163,7 +172,7 @@ abstract class ActiveRecord
      * Get a label for the object. Perhaps a Name or Description field.
      * @return string
      */
-    public function get_label()
+    public function getLabel()
     {
         if (property_exists($this, '_label_column')) {
             if (property_exists($this, $this->_label_column)) {
@@ -177,13 +186,13 @@ abstract class ActiveRecord
         if (property_exists($this, 'description')) {
             return $this->description;
         }
-        return "No label for " . get_called_class() . " ID " . $this->get_id();
+        return "No label for " . get_called_class() . " ID " . $this->getId();
     }
 
     /**
      * Work out which columns should be saved down.
      */
-    public function _calculate_save_down_rows()
+    public function __calculateSaveDownRows()
     {
         if (!$this->_columns) {
             foreach (get_object_vars($this) as $potential_column => $discard) {
@@ -201,7 +210,7 @@ abstract class ActiveRecord
 
         // reorder the columns to match get_class_schema
         //TODO: Write test to verify that this works right.
-        foreach ($this->get_class_schema() as $schemaKey => $dontCare) {
+        foreach ($this->getClassSchema() as $schemaKey => $dontCare) {
             if (in_array($schemaKey, $this->_columns)) {
                 $sortedColumns[$schemaKey] = $schemaKey;
             }
@@ -235,7 +244,7 @@ abstract class ActiveRecord
                 $this->$column = & $value;
             }
         }
-        $this->__post_construct();
+        $this->postConstruct();
         return $this;
     }
 
@@ -250,14 +259,14 @@ abstract class ActiveRecord
     public function save($automatic_reload = true)
     {
         // Run Pre-saver.
-        $this->__pre_save();
+        $this->preSave();
 
         // Run Field Fixer.
-        $this->field_fix();
+        $this->__fieldFix();
 
         // Calculate row to save_down
-        $this->_calculate_save_down_rows();
-        $primary_key_column = $this->get_table_primary_key();
+        $this->__calculateSaveDownRows();
+        $primary_key_column = $this->getIDField();
 
         // Make an array out of the objects columns.
         $data = array();
@@ -269,34 +278,34 @@ abstract class ActiveRecord
         }
 
         // If we already have an ID, this is an update.
-        $database = DatabaseLayer::get_instance();
-        if (!$this->get_id() || property_exists($this, '_is_versioned') && $this->_is_versioned == true) {
-            $operation = $database->insert($this->get_table_name(), $this->get_table_alias());
+        $database = DatabaseLayer::getInstance();
+        if (!$this->getId() || property_exists($this, '_is_versioned') && $this->_is_versioned == true) {
+            $operation = $database->insert($this->getTableName(), $this->getTableAlias());
         } else { // Else, we're an insert.
-            $operation = $database->update($this->get_table_name(), $this->get_table_alias());
+            $operation = $database->update($this->getTableName(), $this->getTableAlias());
         }
 
         $operation->setData($data);
 
-        if ($this->get_id() && $primary_key_column) {
+        if ($this->getId() && $primary_key_column) {
             $operation->condition($primary_key_column, $this->$primary_key_column);
             $operation->execute();
         } else { // Else, we're an insert.
-            $new_id = $operation->execute($this->get_class());
+            $new_id = $operation->execute($this->getClass());
             if ($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
         }
 
         // Expire any existing copy of this object.
-        SearchIndex::get_instance()->expire($this->get_table_name(), $this->get_id());
+        SearchIndex::getInstance()->expire($this->getTableName(), $this->getId());
 
         if ($automatic_reload && $primary_key_column) {
             $this->reload();
         }
 
         // Run Post Save.
-        $this->__post_save();
+        $this->postSave();
 
         // Return object. Should this return true/false based on success instead?
         return $this;
@@ -308,7 +317,7 @@ abstract class ActiveRecord
      */
     public function reload()
     {
-        $item = $this->get_by_id($this->get_id());
+        $item = $this->getById($this->getId());
         if ($item !== false) {
             $this->loadFromRow($item);
             return $this;
@@ -322,15 +331,15 @@ abstract class ActiveRecord
      */
     public function delete()
     {
-        $database = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::getInstance();
 
-        $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
+        $delete = $database->delete($this->getTableName(), $this->getTableAlias());
         $delete->setModel($this);
-        $delete->condition($this->get_table_primary_key(), $this->get_id());
-        $delete->execute($this->get_class());
+        $delete->condition($this->getIDField(), $this->getId());
+        $delete->execute($this->getClass());
 
       // Invalidate cache.
-        SearchIndex::get_instance()->expire($this->get_table_name(), $this->get_id());
+        SearchIndex::getInstance()->expire($this->getTableName(), $this->getId());
 
         return true;
     }
@@ -339,7 +348,7 @@ abstract class ActiveRecord
      * Delete the selected records table.
      * WARNING YO.
      */
-    public static function delete_table()
+    public static function deleteTable()
     {
         $class = get_called_class();
         $object = new $class();
@@ -347,20 +356,29 @@ abstract class ActiveRecord
         $table_builder->destroy();
     }
 
-    public static function get_table()
+    public static function getTable()
     {
         $class = get_called_class();
         $object = new $class();
-        return $object->get_table_name();
+        return $object->getTableName();
     }
 
-    public function set_database_table($table)
+    /**
+     * Set the name of the table to use for this ActiveRecord based object
+     * @param $table
+     * @return $this
+     */
+    public function setDatabaseTable($table)
     {
         $this->_table = $table;
         return $this;
     }
 
-    public function get_database_table()
+    /**
+     * Get the name of the table to use for this ActiveRecord based object
+     * @return string
+     */
+    public function getDatabaseTable()
     {
         return $this->_table;
     }
@@ -372,12 +390,12 @@ abstract class ActiveRecord
      *
      * @return mixed
      */
-    public static function get_by_slug($slug)
+    public static function getBySlug($slug)
     {
         $slug_parts = explode("-", $slug, 2);
         $class = get_called_class();
         $temp_this = new $class();
-        $primary_key = $temp_this->get_table_primary_key();
+        $primary_key = $temp_this->getIDField();
         return self::search()->where($primary_key, $slug_parts[0])->execOne();
     }
 
@@ -386,9 +404,9 @@ abstract class ActiveRecord
      *
      * @return string
      */
-    public function get_slug()
+    public function getSlug()
     {
-        return $this->get_id() . "-" . Util::slugify($this->get_label());
+        return $this->getId() . "-" . Util::slugify($this->getLabel());
     }
 
     public function __toArray($anticipated_rows = null)
@@ -424,7 +442,7 @@ abstract class ActiveRecord
         return JsonPrettyPrinter::Json($array);
     }
 
-    public function get_class($without_namespace = false)
+    public function getClass($without_namespace = false)
     {
         if ($without_namespace) {
             $bits = explode("\\", get_called_class());
@@ -434,7 +452,7 @@ abstract class ActiveRecord
         }
     }
 
-    public function get_table_builder()
+    public function getTableBuilder()
     {
         return new TableBuilder($this);
     }
@@ -442,10 +460,10 @@ abstract class ActiveRecord
     /**
      * Fix types of fields to match definition
      */
-    public function field_fix()
+    public function __fieldFix()
     {
-        $schema = $this->get_class_schema();
-        foreach ($this->_calculate_save_down_rows() as $column) {
+        $schema = $this->getClassSchema();
+        foreach ($this->__calculateSaveDownRows() as $column) {
             if (!isset($schema[$column]['type'])) {
                 throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
             }
@@ -458,7 +476,7 @@ abstract class ActiveRecord
         return true;
     }
 
-    public function get_class_schema()
+    public function getClassSchema()
     {
         $current = get_class($this);
         $parents[] = $current;
@@ -479,13 +497,13 @@ abstract class ActiveRecord
 
         foreach ($rows as $rowGroup) {
             foreach ($rowGroup as $row) {
-                $property = $this->_parse_schema_docblock_row($row);
+                $property = $this->__parseSchemaDocblockRow($row);
                 $variables[][$property['name']] = $property;
             }
         }
         foreach ($abstractRows as $abstractRowGroup) {
             foreach ($abstractRowGroup as $row) {
-                $property = $this->_parse_schema_docblock_row($row);
+                $property = $this->__parseSchemaDocblockRow($row);
                 $variables[][$property['name']] = $property;
             }
         }
@@ -494,16 +512,16 @@ abstract class ActiveRecord
         return array_filter($merged_variables);
     }
 
-    private function _parse_schema_docblock_row($row)
+    private function __parseSchemaDocblockRow($row)
     {
         $row = str_replace("*", "", $row);
         $row = trim($row);
         if (substr($row, 0, 4) == '@var') {
-            return $this->_parse_class_schema_property($row);
+            return $this->__parseClassSchemaProperty($row);
         }
     }
 
-    private function _parse_class_schema_property($row)
+    private function __parseClassSchemaProperty($row)
     {
         $bits = explode(" ", $row);
         $name = trim($bits[1], "$");
@@ -540,6 +558,5 @@ abstract class ActiveRecord
             $definition['nullable'] = false;
         }
         return $definition;
-
     }
 }

@@ -16,7 +16,7 @@ class SearchRecordsTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        TestModelSortable::delete_table();
+        TestModelSortable::deleteTable();
         $this->one = new TestModelSortable();
         $this->two = new TestModelSortable();
         $this->three = new TestModelSortable();
@@ -50,9 +50,9 @@ class SearchRecordsTest extends \PHPUnit_Framework_TestCase
         $slug_original->something_else = "Example";
         $slug_original->save();
 
-        $this->assertStringMatchesFormat("%d-example", $slug_original->get_slug());
+        $this->assertStringMatchesFormat("%d-example", $slug_original->getSlug());
 
-        $slug_searched = TestModelWithNameLabel::get_by_slug($slug_original->get_slug());
+        $slug_searched = TestModelWithNameLabel::getBySlug($slug_original->getSlug());
 
         $this->assertNotFalse($slug_searched);
 

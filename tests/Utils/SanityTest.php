@@ -26,11 +26,11 @@ class SanityTest extends \PHPUnit_Framework_TestCase
 
     public function testWorksWithoutMonolog()
     {
-        $logger = DatabaseLayer::get_instance()->getLogger();
+        $logger = DatabaseLayer::getInstance()->getLogger();
 
-        DatabaseLayer::get_instance()->setLogger(null);
+        DatabaseLayer::getInstance()->setLogger(null);
         TestModel::search()->exec();
 
-        DatabaseLayer::get_instance()->setLogger($logger);
+        DatabaseLayer::getInstance()->setLogger($logger);
     }
 }

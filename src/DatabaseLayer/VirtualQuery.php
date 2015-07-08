@@ -68,7 +68,7 @@ class VirtualQuery
      */
     public function getInterpreter()
     {
-        $sql_interpreter_name = "\\Thru\\ActiveRecord\\DatabaseLayer\\Sql\\" . \Thru\ActiveRecord\DatabaseLayer::get_instance()->get_option('db_type');
+        $sql_interpreter_name = "\\Thru\\ActiveRecord\\DatabaseLayer\\Sql\\" . \Thru\ActiveRecord\DatabaseLayer::getInstance()->getOption('db_type');
         $sql_interpreter = $sql_interpreter_name::factory();
         return $sql_interpreter;
     }
@@ -89,7 +89,7 @@ class VirtualQuery
     {
         if ($model) {
             if ($model instanceof ActiveRecord) {
-                $model = $model->get_class();
+                $model = $model->getClass();
             }
             $this->setModel($model);
         }

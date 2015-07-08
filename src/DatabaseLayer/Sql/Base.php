@@ -24,14 +24,14 @@ class Base extends \PDO
 
     public function __construct()
     {
-        $dsn = DatabaseLayer::get_instance()->get_option('db_dsn');
+        $dsn = DatabaseLayer::getInstance()->getOption('db_dsn');
         $username = null;
         $password = null;
-        if (DatabaseLayer::get_instance()->get_option('db_username')) {
-            $username = DatabaseLayer::get_instance()->get_option('db_username');
+        if (DatabaseLayer::getInstance()->getOption('db_username')) {
+            $username = DatabaseLayer::getInstance()->getOption('db_username');
         }
-        if (DatabaseLayer::get_instance()->get_option('db_password')) {
-            $password = DatabaseLayer::get_instance()->get_option('db_password');
+        if (DatabaseLayer::getInstance()->getOption('db_password')) {
+            $password = DatabaseLayer::getInstance()->getOption('db_password');
         }
         $username = !empty($username)?$username:null;
         $password = !empty($password)?$password:null;
@@ -53,15 +53,15 @@ class Base extends \PDO
 
             $exec_time_end = microtime(true);
             $exec_time = $exec_time_end - $exec_time_start;
-            if (DatabaseLayer::get_instance()->getLogger()) {
-                DatabaseLayer::get_instance()->getLogger()->addDebug("{$exec_time} sec: {$query}");
+            if (DatabaseLayer::getInstance()->getLogger()) {
+                DatabaseLayer::getInstance()->getLogger()->addDebug("{$exec_time} sec: {$query}");
             }
 
             $this->query_log[] = new Log($query, $exec_time);
             return $result;
         } catch (\PDOException $e) {
-            if (DatabaseLayer::get_instance()->getLogger()) {
-                DatabaseLayer::get_instance()->getLogger()->addDebug("Query() Caught Exception: {$e->getMessage()}");
+            if (DatabaseLayer::getInstance()->getLogger()) {
+                DatabaseLayer::getInstance()->getLogger()->addDebug("Query() Caught Exception: {$e->getMessage()}");
             }
             $this->handleError($model, $query, $e);
         }
@@ -86,8 +86,8 @@ class Base extends \PDO
                 throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
             default:
               // Write exception to log.
-                if (DatabaseLayer::get_instance()->getLogger()) {
-                    DatabaseLayer::get_instance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
+                if (DatabaseLayer::getInstance()->getLogger()) {
+                    DatabaseLayer::getInstance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
                 }
                 throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
         }
