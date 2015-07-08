@@ -9,10 +9,11 @@ use Thru\ActiveRecord\VersionedActiveRecord;
  * @var $id INTEGER
  * @var $value TEXT
  */
-class TestVersionedModel extends VersionedActiveRecord{
+class TestVersionedModel extends VersionedActiveRecord
+{
 
-  protected $_table = "test_models_versioned";
+    protected $_table = "test_models_versioned";
 
-  public $id;
-  public $value;
+    public $id;
+    public $value;
 }

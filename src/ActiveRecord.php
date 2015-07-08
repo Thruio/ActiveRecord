@@ -17,7 +17,7 @@ abstract class ActiveRecord
      * Start a Search on this type of active record
      * @return Search
      */
-    static public function search()
+    public static function search()
     {
         $class = get_called_class();
         return new Search(new $class);
@@ -38,8 +38,8 @@ abstract class ActiveRecord
      */
     public function __construct()
     {
-      $tableBuilder = $this->get_table_builder();
-      $tableBuilder->build($this);
+        $tableBuilder = $this->get_table_builder();
+        $tableBuilder->build($this);
     }
 
     /**
@@ -125,21 +125,21 @@ abstract class ActiveRecord
      */
     public function get_primary_key_index()
     {
-      $database = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::get_instance();
 
-      $columns = array();
+        $columns = array();
 
-      if ($this instanceof VersionedActiveRecord) {
-          $schema = $this->get_class_schema();
-          $firstColumn = reset($schema)['name'];
-          $columns = [$firstColumn => $firstColumn, "sequence" => "sequence"];
-      } else {
-          foreach ($database->get_table_indexes($this->_table) as $key) {
-            $columns[$key->Column_name] = $key->Column_name;
-          }
-      }
+        if ($this instanceof VersionedActiveRecord) {
+            $schema = $this->get_class_schema();
+            $firstColumn = reset($schema)['name'];
+            $columns = [$firstColumn => $firstColumn, "sequence" => "sequence"];
+        } else {
+            foreach ($database->get_table_indexes($this->_table) as $key) {
+                $columns[$key->Column_name] = $key->Column_name;
+            }
+        }
 
-      return array_values($columns);
+        return array_values($columns);
     }
 
     /**
@@ -202,16 +202,16 @@ abstract class ActiveRecord
 
         // reorder the columns to match get_class_schema
         //TODO: Write test to verify that this works right.
-        foreach($this->get_class_schema() as $schemaKey => $dontCare){
-          if(in_array($schemaKey, $this->_columns)){
-            $sortedColumns[$schemaKey] = $schemaKey;
-          }
+        foreach ($this->get_class_schema() as $schemaKey => $dontCare) {
+            if (in_array($schemaKey, $this->_columns)) {
+                $sortedColumns[$schemaKey] = $schemaKey;
+            }
         }
         foreach ($this->_columns as $column) {
-          if(!isset($sortedColumns[$column])){
-            $class_name = get_called_class();
-            throw new Exception("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
-          }
+            if (!isset($sortedColumns[$column])) {
+                $class_name = get_called_class();
+                throw new Exception("No type hinting/docblock found for '{$column}' in '{$class_name}'.", E_USER_WARNING);
+            }
         }
 
         $this->_columns = array_values($sortedColumns);
@@ -284,7 +284,7 @@ abstract class ActiveRecord
             $operation->execute();
         } else { // Else, we're an insert.
             $new_id = $operation->execute($this->get_class());
-            if($primary_key_column) {
+            if ($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
         }
@@ -309,13 +309,13 @@ abstract class ActiveRecord
      */
     public function reload()
     {
-      $item = $this->get_by_id($this->get_id());
-      if($item !== false){
-        $this->loadFromRow($item);
-        return $this;
-      }else{
-        return false;
-      }
+        $item = $this->get_by_id($this->get_id());
+        if ($item !== false) {
+            $this->loadFromRow($item);
+            return $this;
+        } else {
+            return false;
+        }
     }
     /**
      * Delete the selected record
@@ -323,43 +323,47 @@ abstract class ActiveRecord
      */
     public function delete()
     {
-      $database = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::get_instance();
 
-      $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
-      $delete->setModel($this);
-      $delete->condition($this->get_table_primary_key(), $this->get_id());
-      $delete->execute($this->get_class());
+        $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
+        $delete->setModel($this);
+        $delete->condition($this->get_table_primary_key(), $this->get_id());
+        $delete->execute($this->get_class());
 
       // Invalidate cache.
-      SearchIndex::get_instance()->expire($this->get_table_name(),$this->get_id());
+        SearchIndex::get_instance()->expire($this->get_table_name(), $this->get_id());
 
-      return true;
+        return true;
     }
 
     /**
      * Delete the selected records table.
      * WARNING YO.
      */
-    public static function delete_table(){
+    public static function delete_table()
+    {
         $class = get_called_class();
         $object = new $class();
         $table_builder = new TableBuilder($object);
         $table_builder->destroy();
     }
 
-    public static function get_table(){
+    public static function get_table()
+    {
         $class = get_called_class();
         $object = new $class();
         return $object->get_table_name();
     }
 
-    public function set_database_table($table){
-      $this->_table = $table;
-      return $this;
+    public function set_database_table($table)
+    {
+        $this->_table = $table;
+        return $this;
     }
 
-    public function get_database_table(){
-      return $this->_table;
+    public function get_database_table()
+    {
+        return $this->_table;
     }
 
     /**
@@ -369,7 +373,7 @@ abstract class ActiveRecord
      *
      * @return mixed
      */
-    static public function get_by_slug($slug)
+    public static function get_by_slug($slug)
     {
         $slug_parts = explode("-", $slug, 2);
         $class = get_called_class();
@@ -399,12 +403,13 @@ abstract class ActiveRecord
         return $array;
     }
 
-    public function __toPublicArray(){
+    public function __toPublicArray()
+    {
         $array = array();
 
         $reflect = new \ReflectionObject($this);
         foreach ($reflect->getProperties(\ReflectionProperty::IS_PUBLIC /* + ReflectionProperty::IS_PROTECTED*/) as $prop) {
-            if($prop->isStatic()){
+            if ($prop->isStatic()) {
                 continue;
             }
             $name = $prop->getName();
@@ -414,69 +419,75 @@ abstract class ActiveRecord
 
     }
 
-    public function __toJson($anticipated_rows = null){
+    public function __toJson($anticipated_rows = null)
+    {
         $array = $this->__toArray($anticipated_rows);
         return JsonPrettyPrinter::Json($array);
     }
 
-    public function get_class($without_namespace = false){
-        if($without_namespace){
-          $bits = explode("\\", get_called_class());
-          return end($bits);
-        }else{
-          return get_called_class();
+    public function get_class($without_namespace = false)
+    {
+        if ($without_namespace) {
+            $bits = explode("\\", get_called_class());
+            return end($bits);
+        } else {
+            return get_called_class();
         }
     }
 
-    public function get_table_builder(){
+    public function get_table_builder()
+    {
         return new TableBuilder($this);
     }
 
     /**
      * Fix types of fields to match definition
      */
-    public function field_fix(){
+    public function field_fix()
+    {
         $schema = $this->get_class_schema();
-        foreach($this->_calculate_save_down_rows() as $column){
-
-            if(!isset($schema[$column]['type'])) throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
+        foreach ($this->_calculate_save_down_rows() as $column) {
+            if (!isset($schema[$column]['type'])) {
+                throw new Exception("No type hinting/docblock found for '{$column}' in '" . get_called_class() . "'.", E_USER_WARNING);
+            }
 
             $type = $schema[$column]['type'];
-            if($type == "integer" && !is_int($this->$column)){
+            if ($type == "integer" && !is_int($this->$column)) {
                 $this->$column = intval($this->$column);
             }
         }
         return true;
     }
 
-    public function get_class_schema(){
+    public function get_class_schema()
+    {
         $current = get_class($this);
         $parents[] = $current;
-        while($current = get_parent_class($current)){
-          $parents[] = $current;
+        while ($current = get_parent_class($current)) {
+            $parents[] = $current;
         }
         $variables = array();
         $rows = [];
         $abstractRows = [];
-        foreach(array_reverse($parents) as $parent) {
-          $reflection_class = new \ReflectionClass($parent);
-          if(!$reflection_class->isAbstract()){
-            $rows[] = explode("\n", $reflection_class->getDocComment());
-          }else{
-            $abstractRows[] = explode("\n", $reflection_class->getDocComment());
-          }
+        foreach (array_reverse($parents) as $parent) {
+            $reflection_class = new \ReflectionClass($parent);
+            if (!$reflection_class->isAbstract()) {
+                $rows[] = explode("\n", $reflection_class->getDocComment());
+            } else {
+                $abstractRows[] = explode("\n", $reflection_class->getDocComment());
+            }
         }
 
         foreach ($rows as $rowGroup) {
-            foreach($rowGroup as $row) {
-              $property = $this->_parse_schema_docblock_row($row);
-              $variables[][$property['name']] = $property;
+            foreach ($rowGroup as $row) {
+                $property = $this->_parse_schema_docblock_row($row);
+                $variables[][$property['name']] = $property;
             }
         }
         foreach ($abstractRows as $abstractRowGroup) {
-            foreach($abstractRowGroup as $row) {
-              $property = $this->_parse_schema_docblock_row($row);
-              $variables[][$property['name']] = $property;
+            foreach ($abstractRowGroup as $row) {
+                $property = $this->_parse_schema_docblock_row($row);
+                $variables[][$property['name']] = $property;
             }
         }
         $merged_variables = call_user_func_array('array_merge', $variables);
@@ -484,47 +495,49 @@ abstract class ActiveRecord
         return array_filter($merged_variables);
     }
 
-  private function _parse_schema_docblock_row($row){
-    $row = str_replace("*", "", $row);
-    $row = trim($row);
-    if (substr($row, 0, 4) == '@var') {
-      return $this->_parse_class_schema_property($row);
+    private function _parse_schema_docblock_row($row)
+    {
+        $row = str_replace("*", "", $row);
+        $row = trim($row);
+        if (substr($row, 0, 4) == '@var') {
+            return $this->_parse_class_schema_property($row);
+        }
     }
-  }
 
-    private function _parse_class_schema_property($row){
+    private function _parse_class_schema_property($row)
+    {
         $bits = explode(" ", $row);
-        $name = trim($bits[1],"$");
+        $name = trim($bits[1], "$");
         $type = $bits[2];
         $type_bits = explode("(", $type, 2);
         $type = strtolower($type_bits[0]);
 
-        $controls = implode(" ", array_slice($bits,3));
+        $controls = implode(" ", array_slice($bits, 3));
         $controls = explode(" ", $controls);
         // TODO: Parse controls for relationships and so on.
 
-        if($type == 'enum' || $type == 'decimal'){
+        if ($type == 'enum' || $type == 'decimal') {
             $options = explode(",", $type_bits[1]);
-            foreach($options as &$option){
+            foreach ($options as &$option) {
                 $option = trim($option);
                 $option = trim($option, "'\")");
             }
-        }else{
-            $length = isset($type_bits[1]) ? trim($type_bits[1],")") : null;
+        } else {
+            $length = isset($type_bits[1]) ? trim($type_bits[1], ")") : null;
         }
 
         $definition = array();
         $definition['name'] = $name;
         $definition['type'] = $type;
-        if(isset($length)) {
+        if (isset($length)) {
             $definition['length'] = $length;
         }
-        if(isset($options)){
+        if (isset($options)) {
             $definition['options'] = $options;
         }
-        if(in_array("nullable", $controls)){
+        if (in_array("nullable", $controls)) {
             $definition['nullable'] = true;
-        }else{
+        } else {
             $definition['nullable'] = false;
         }
         return $definition;

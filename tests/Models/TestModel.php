@@ -11,13 +11,13 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $text_field text
  * @var $date_field date
  */
-class TestModel extends ActiveRecord{
+class TestModel extends ActiveRecord
+{
 
-  protected $_table = "test_models";
+    protected $_table = "test_models";
 
-  public $test_model_id;
-  public $integer_field;
-  public $text_field;
-  public $date_field;
-
+    public $test_model_id;
+    public $integer_field;
+    public $text_field;
+    public $date_field;
 }

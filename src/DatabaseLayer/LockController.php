@@ -9,11 +9,13 @@ class LockController extends VirtualQuery
         $this->tables[$alias] = new Table($table);
     }
 
-    public function lock(){
+    public function lock()
+    {
 
     }
 
-    public function unlock(){
+    public function unlock()
+    {
 
     }
 }

@@ -9,5 +9,4 @@ class Delete extends VirtualQuery
     {
         $this->tables[$alias] = new Table($table);
     }
-
 }

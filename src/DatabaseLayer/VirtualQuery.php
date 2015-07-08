@@ -12,52 +12,62 @@ class VirtualQuery
     protected $orders;      // ORDER BY *
     protected $model = 'StdClass';
 
-    public function getTables(){
+    public function getTables()
+    {
         return $this->tables;
     }
 
-    public function setTables($tables){
+    public function setTables($tables)
+    {
         $this->tables = $tables;
         return $this;
     }
 
-    public function getConditions(){
+    public function getConditions()
+    {
         return $this->conditions;
     }
 
-    public function getLimit(){
+    public function getLimit()
+    {
         return $this->limit;
     }
 
-    public function getOffset(){
+    public function getOffset()
+    {
         return $this->offset;
     }
 
-    public function setModel($model){
-        if(is_object($model)){
-          $model = get_class($model);
+    public function setModel($model)
+    {
+        if (is_object($model)) {
+            $model = get_class($model);
         }
         $this->model = $model;
         return $this;
     }
 
-    public function getModel(){
+    public function getModel()
+    {
         return $this->model;
     }
 
-    public function addOrder(Order $order){
+    public function addOrder(Order $order)
+    {
         $this->orders[] = $order;
         return $this;
     }
 
-    public function getOrders(){
+    public function getOrders()
+    {
         return $this->orders;
     }
 
     /**
      * @return \Thru\ActiveRecord\DatabaseLayer\Sql\Base
      */
-    public function getInterpreter(){
+    public function getInterpreter()
+    {
         $sql_interpreter_name = "\\Thru\\ActiveRecord\\DatabaseLayer\\Sql\\" . \Thru\ActiveRecord\DatabaseLayer::get_instance()->get_option('db_type');
         $sql_interpreter = $sql_interpreter_name::factory();
         return $sql_interpreter;
@@ -77,9 +87,9 @@ class VirtualQuery
 
     public function execute($model = null)
     {
-        if($model){
-            if($model instanceof ActiveRecord){
-              $model = $model->get_class();
+        if ($model) {
+            if ($model instanceof ActiveRecord) {
+                $model = $model->get_class();
             }
             $this->setModel($model);
         }
@@ -88,10 +98,9 @@ class VirtualQuery
         return $result;
     }
 
-    public function getOperation(){
+    public function getOperation()
+    {
         $class_bits = explode("\\", get_called_class());
         return end($class_bits);
     }
-
-
 }

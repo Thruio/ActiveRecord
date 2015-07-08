@@ -11,13 +11,13 @@ use Thru\ActiveRecord\ActiveRecord;
  * // No hint for text_field
  * @var $date_field date
  */
-class TestModelBadHinting extends ActiveRecord{
+class TestModelBadHinting extends ActiveRecord
+{
 
-  protected $_table = "test_models";
+    protected $_table = "test_models";
 
-  public $test_model_id;
-  public $integer_field;
-  public $text_field;
-  public $date_field;
-
+    public $test_model_id;
+    public $integer_field;
+    public $text_field;
+    public $date_field;
 }
