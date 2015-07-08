@@ -80,7 +80,7 @@ abstract class ActiveRecord
     public function getIDField()
     {
         if (count($this->getPrimaryKeyIndex()) > 0) {
-            return reset($this->getPrimaryKeyIndex());
+            return $this->getPrimaryKeyIndex()[0];
         }
         return false;
     }
