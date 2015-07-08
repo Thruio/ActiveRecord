@@ -2,7 +2,6 @@
 
 namespace Thru\ActiveRecord;
 
-use CodeClimate\Bundle\TestReporterBundle\Version;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 
