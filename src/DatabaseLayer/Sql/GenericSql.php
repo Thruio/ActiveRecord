@@ -2,30 +2,21 @@
 
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
-use Monolog\Logger;
-use SebastianBergmann\Version;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
-use Thru\ActiveRecord\ActiveRecord;
-use Thru\ActiveRecord\DatabaseLayer\IndexException;
-use Thru\ActiveRecord\VersionedActiveRecord;
-use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
-use Thru\UUID;
 
-class GenericSql extends Base
+abstract class GenericSql extends Base
 {
-    private $known_indexes;
+    protected $known_indexes;
 
     /**
      * Turn a VirtualQuery into a SQL statement
      * @param \Thru\ActiveRecord\DatabaseLayer\VirtualQuery $thing
-     * @return array of results
+     * @return array|boolean
      * @throws Exception
      */
     public function process(DatabaseLayer\VirtualQuery $thing)
     {
-
-        #echo "*** process() model is " . $thing->getModel()."\n";
         switch ($thing->getOperation()) {
             case 'Insert':
                 //Create
@@ -47,6 +38,12 @@ class GenericSql extends Base
         }
     }
 
+    abstract public function processInsert(DatabaseLayer\Insert $thing);
+
+    abstract public function processSelect(DatabaseLayer\Select $thing);
+
+    abstract public function processUpdate(DatabaseLayer\Update $thing);
+
     public function processDelete(DatabaseLayer\Delete $thing)
     {
         // SELECTORS
@@ -62,9 +59,31 @@ class GenericSql extends Base
 
         $query = "{$selector}\n{$conditions}";
 
-        $result = $this->query($query, $thing->getModel());
+        $this->query($query, $thing->getModel());
 
         return true;
+    }
+
+    /**
+     * @param \Thru\ActiveRecord\DatabaseLayer\Passthru $thing
+     * @return array
+     * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
+     */
+    public function processPassthru(DatabaseLayer\Passthru $thing)
+    {
+        $sql = $thing->get_sql_to_passthru();
+        $result = $this->query($sql, $thing->getModel());
+
+        // TODO: Make this a Collection.
+
+        $results = array();
+        if ($result !== false && $result !== null) {
+            foreach ($result as $result_item) {
+                $results[] = $result_item;
+            }
+        }
+
+        return $results;
     }
 
     protected function processConditions($thing)
@@ -92,25 +111,5 @@ class GenericSql extends Base
         return $conditions;
     }
 
-    /**
-     * @param \Thru\ActiveRecord\DatabaseLayer\Passthru $thing
-     * @return array
-     * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
-     */
-    public function processPassthru(DatabaseLayer\Passthru $thing)
-    {
-        $sql = $thing->get_sql_to_passthru();
-        $result = $this->query($sql, $thing->getModel());
 
-        // TODO: Make this a Collection.
-
-        $results = array();
-        if ($result !== false && $result !== null) {
-            foreach ($result as $result_item) {
-                $results[] = $result_item;
-            }
-        }
-
-        return $results;
-    }
 }

@@ -2,21 +2,15 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Monolog\Logger;
-use SebastianBergmann\Version;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
-use Thru\UUID;
 
 class Sqlite extends GenericSql
 {
-
-
-
-
     /**
      * @param \Thru\ActiveRecord\DatabaseLayer\Select $thing
      * @return array

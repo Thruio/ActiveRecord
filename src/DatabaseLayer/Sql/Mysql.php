@@ -2,7 +2,6 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Monolog\Logger;
-use SebastianBergmann\Version;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 use Thru\ActiveRecord\ActiveRecord;
@@ -13,9 +12,6 @@ use Thru\UUID;
 
 class Mysql extends GenericSql
 {
-
-    private $known_indexes;
-
     /**
      * @param \Thru\ActiveRecord\DatabaseLayer\Select $thing
      * @return array
