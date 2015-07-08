@@ -11,11 +11,12 @@ $monologHandlers = [$fileLoggerHandler];
 $monolog = new Logger("ActiveRecord", $monologHandlers);
 
 if(!getenv('DB')){
-  echo "No DB set in environment\n";
-  exit;
+  $env = "mysql";
+}else{
+  $env = getenv("DB");
 }
 
-switch(getenv('DB')){
+switch($env){
   case 'mysql':
     $database = new \Thru\ActiveRecord\DatabaseLayer(array(
       'db_type' => 'Mysql',
@@ -27,13 +28,14 @@ switch(getenv('DB')){
     ));
     break;
   case 'sqlite':
+    unlink('test.sqlite');
     $database = new \Thru\ActiveRecord\DatabaseLayer(array(
       'db_type' => 'Sqlite',
       'db_file' => 'test.sqlite',
     ));
     break;
   default:
-    die("Unsupported DB: " . getenv('DB') . "\n");
+    die("Unsupported DB: {$env}\n");
 }
 
 $database->setLogger($monolog);

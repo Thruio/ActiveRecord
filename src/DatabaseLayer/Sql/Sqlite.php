@@ -25,6 +25,7 @@ class Sqlite extends Base
     public function process(DatabaseLayer\VirtualQuery $thing)
     {
 
+        #echo "*** process() model is " . $thing->getModel()."\n";
         switch($thing->getOperation()){
             case 'Insert': //Create
                 return $this->processInsert($thing);
@@ -117,7 +118,7 @@ class Sqlite extends Base
                     case 'random()':
                     case 'random':
                         $column = '';
-                        $direction = 'rand()';
+                        $direction = 'RANDOM()';
                         break;
                     default:
                         throw new Exception("Bad ORDER direction: {$order->getDirection()}");
@@ -133,8 +134,6 @@ class Sqlite extends Base
         }
 
         $query = "{$selector}\n{$from}\n{$conditions}\n{$order}\n{$limit} {$offset}";
-
-        #echo " *** " . str_replace("\n", " ", $query) . "\n";
 
         $delay = microtime(true);
         $result = $this->query($query, $thing->getModel());
@@ -180,31 +179,35 @@ class Sqlite extends Base
         $tables = $thing->getTables();
         $table = end($tables);
 
-        $updates = array();
+        $data = $thing->getData();
+
         $keys = [];
         $values = [];
-        foreach($thing->getData() as $key => $value){
+
+        foreach($data as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
                 $value = JsonPrettyPrinter::Json($value);
             }
             $keys[] = $key;
 
-            $value_slashed = addslashes($value);
+            $value_slashed = str_replace("'","''", $value);
             if($value === null){
                 $value = "NULL";
+            }elseif(is_numeric($value)) {
+                // Do nothing
             }else{
-                $value = $value_slashed;
+                $value = "'{$value_slashed}'";
             }
             $values[] = $value;
         }
         $selector = "INSERT INTO {$table->getName()} ";
-        $columns = "(`" . implode("`, `", $keys) . "`)";
-        $values = "('" . implode("', '", $values) . "')";
+        $columns  = "(`" . implode("`, `", $keys) . "`)";
+        $values   = "(" . implode(", ", $values) . ")";
+        $query    = "{$selector}\n{$columns} \nVALUES \n{$values}";
 
-        $query = "{$selector}\n{$columns} \nVALUES \n{$values}";
-
-        $this->query($query);
+        #echo "*** Just before query(): ".$thing->getModel() . "\n";
+        $this->query($query, $thing->getModel());
 
         $insertId = $this->lastInsertId();
 
@@ -225,11 +228,13 @@ class Sqlite extends Base
             if(is_object($value) || is_array($value)){
                 $value = JsonPrettyPrinter::Json($value);
             }
-            $value_slashed = addslashes($value);
+            $value_slashed = str_replace("',","''",$value);
             if($value === null){
-                $updates[] = "`$key` = NULL";
+                $updates[] = "`{$key}` = NULL";
+            }elseif(is_numeric($value)) {
+                $updates[] = "`{$key}` = {$value_slashed}";
             }else{
-                $updates[] = "`$key` = \"$value_slashed\"";
+                $updates[] = "`{$key}` = '{$value_slashed}'";
             }
         }
         $selector = "UPDATE {$table->getName()} ";
@@ -259,15 +264,15 @@ class Sqlite extends Base
           $indexException->remedy = 'table_missing';
           throw $indexException;
         }
-        if($indexes->rowCount() > 0){
-            foreach($indexes as $index){
-              if($index->pk==1){
-                $result = new \StdClass();
-                $result->Column_name = $index->name;
-                $result->Auto_increment = true;
-                $results[] = $result;
-              }
-            }
+        $indexesResult = $indexes->fetchAll();
+
+        foreach($indexesResult as $index){
+          if($index->pk==1){
+            $result = new \StdClass();
+            $result->Column_name = $index->name;
+            $result->Auto_increment = true;
+            $results[] = $result;
+          }
         }
         $this->known_indexes[$table] = $results;
         return $results;
@@ -324,7 +329,7 @@ class Sqlite extends Base
                 }
             }
 
-            if($auto_increment){
+            if($auto_increment && !$model instanceof VersionedActiveRecord){
               $auto_increment_sql = 'AUTOINCREMENT';
             }else{
               $auto_increment_sql = false;
@@ -333,21 +338,22 @@ class Sqlite extends Base
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
             $nullability = $is_primary_key?'':$nullability;
 
+            $is_primary_key = !$model instanceof VersionedActiveRecord ? $is_primary_key : null;
+
             $params[] = "  " . trim("`{$parameter}` {$type} {$is_primary_key} {$auto_increment_sql} {$nullability}");
         }
 
-        // TODO: Disable auto-increment if this object is versioned
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
         $query.= "(\n";
         $query.= implode(",\n", $params)."\n";
         $query.= ")\n";
 
+        $this->query($query);
+
         // Log it.
         if(DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
           DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
         }
-
-        $this->query($query);
     }
 
     private function processConditions($thing){
@@ -368,5 +374,19 @@ class Sqlite extends Base
             $conditions = null;
         }
         return $conditions;
+    }
+
+    public function query($query, $model = 'StdClass'){
+      try {
+        return parent::query($query, $model);
+      }Catch(DatabaseLayer\TableDoesntExistException $tdee){
+        if(stripos($tdee->getMessage(), "HY000") !== false){
+          if(stripos($tdee->getMessage(), "no such table") !== false) {
+            $table = str_replace("HY000: SQLSTATE[HY000]: General error: 1 no such table: ", "", $tdee->getMessage());
+            throw new DatabaseLayer\TableDoesntExistException("42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'", $tdee->getCode(), $tdee);
+          }
+        }
+        throw $tdee;
+      }
     }
 }

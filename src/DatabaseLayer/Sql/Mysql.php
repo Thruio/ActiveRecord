@@ -134,8 +134,6 @@ class Mysql extends Base
 
         $query = "{$selector}\n{$from}\n{$conditions}\n{$order}\n{$limit} {$offset}";
 
-        #echo " *** " . str_replace("\n", " ", $query) . "\n";
-
         $delay = microtime(true);
         $result = $this->query($query, $thing->getModel());
         $delay = microtime(true) - $delay;
