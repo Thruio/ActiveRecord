@@ -84,7 +84,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $passthru = new \Thru\ActiveRecord\DatabaseLayer\Passthru();
         $passthru->query($query);
 
-        $this->assertEquals($query, $passthru->get_sql_to_passthru());
+        $this->assertEquals($query, $passthru->getSqlToPassthru());
 
         $result = $passthru->execute();
 
@@ -102,7 +102,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $passthru = new \Thru\ActiveRecord\DatabaseLayer\Passthru();
         $passthru->query($query);
 
-        $this->assertEquals($query, $passthru->get_sql_to_passthru());
+        $this->assertEquals($query, $passthru->getSqlToPassthru());
 
         $passthru->execute();
     }

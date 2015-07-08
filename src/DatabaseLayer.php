@@ -11,7 +11,7 @@ class DatabaseLayer
 
     const DSN_REGEX = '/^(?P<user>\w+)(:(?P<password>\w+))?@(?P<host>[.\w]+)(:(?P<port>\d+))?\\\\(?P<database>\w+)$/im';
 
-    static $instance;
+    private static $instance;
     private $options;
     private $logger;
 

@@ -11,15 +11,15 @@ class Base extends \PDO
 {
     protected $query_log;
 
-    private static $_instance;
+    private static $instance;
 
     public static function factory()
     {
         $called_class = get_called_class();
-        if (!self::$_instance instanceof $called_class) {
-            self::$_instance = new $called_class();
+        if (!self::$instance instanceof $called_class) {
+            self::$instance = new $called_class();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     public function __construct()
