@@ -26,23 +26,27 @@ class DatabaseLayer
         return DatabaseLayer::$instance;
     }
 
-    public static function set_instance(DatabaseLayer $instance){
+    public static function set_instance(DatabaseLayer $instance)
+    {
         self::$instance = $instance;
     }
 
-    public function setLogger(Logger $logger = null){
-      $this->logger = $logger;
-      return $this;
+    public function setLogger(Logger $logger = null)
+    {
+        $this->logger = $logger;
+        return $this;
     }
 
     /**
      * @returns Logger
      */
-    public function getLogger(){
-      return $this->logger;
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
-    public static function destroy_instance(){
+    public static function destroy_instance()
+    {
         self::$instance = null;
         return true;
     }
@@ -53,8 +57,8 @@ class DatabaseLayer
     public function __construct($options = null)
     {
         $this->options = $options;
-        if(!isset($this->options['db_dsn'])){
-          $this->options['db_dsn'] = $this->_getDsn();
+        if (!isset($this->options['db_dsn'])) {
+            $this->options['db_dsn'] = $this->_getDsn();
         }
         self::$instance = $this;
     }
@@ -63,7 +67,8 @@ class DatabaseLayer
      * @param $table_name
      * @return DatabaseLayer\LockController
      */
-    public function lockController($table_name, $table_alias = null){
+    public function lockController($table_name, $table_alias = null)
+    {
         return new DatabaseLayer\LockController($table_name, $table_alias);
     }
 
@@ -103,7 +108,7 @@ class DatabaseLayer
      */
     public function insert($table_name, $table_alias = null)
     {
-      return new DatabaseLayer\Insert($table_name, $table_alias);
+        return new DatabaseLayer\Insert($table_name, $table_alias);
     }
 
     /**
@@ -112,10 +117,11 @@ class DatabaseLayer
      */
     public function passthru($sql = null)
     {
-      return new DatabaseLayer\Passthru($sql);
+        return new DatabaseLayer\Passthru($sql);
     }
 
-    public function get_table_indexes($table_name){
+    public function get_table_indexes($table_name)
+    {
         $util = new DatabaseLayer\Util();
           $indexes = $util->getIndexes($table_name);
           return $indexes;
@@ -126,8 +132,9 @@ class DatabaseLayer
      *
      * @return string|null
      */
-    public function get_option($name){
-        if(isset($this->options[$name])){
+    public function get_option($name)
+    {
+        if (isset($this->options[$name])) {
             return $this->options[$name];
         }
         return false;
@@ -137,8 +144,9 @@ class DatabaseLayer
      * @return string|false
      * @throws ConfigurationException
      */
-    private function _getDsn(){
-        switch($this->options['db_type']){
+    private function _getDsn()
+    {
+        switch ($this->options['db_type']) {
             case 'Mysql':
                 $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
                 break;

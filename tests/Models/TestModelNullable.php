@@ -11,13 +11,13 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $text_field_nullable text nullable
  * @var $date_field date
  */
-class TestModelNullable extends ActiveRecord{
+class TestModelNullable extends ActiveRecord
+{
 
-  protected $_table = "test_models_nullable";
+    protected $_table = "test_models_nullable";
 
-  public $test_model_id;
-  public $integer_field;
-  public $text_field_nullable;
-  public $date_field;
-
+    public $test_model_id;
+    public $integer_field;
+    public $text_field_nullable;
+    public $date_field;
 }

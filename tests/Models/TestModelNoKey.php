@@ -9,10 +9,11 @@ use Thru\ActiveRecord\ActiveRecord;
  * @var $a text
  * @var $b text
  */
-class TestModelNoKey extends ActiveRecord{
+class TestModelNoKey extends ActiveRecord
+{
 
-  protected $_table = "test_models_no_key";
+    protected $_table = "test_models_no_key";
 
-  public $a;
-  public $b;
+    public $a;
+    public $b;
 }

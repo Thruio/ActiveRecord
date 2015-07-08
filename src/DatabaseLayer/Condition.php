@@ -15,26 +15,31 @@ class Condition
         $this->setOperation($operation);
     }
 
-    public function getColumn(){
+    public function getColumn()
+    {
         return $this->column;
     }
-    public function setColumn($column){
+    public function setColumn($column)
+    {
         $this->column = $column;
         return $this;
     }
-    public function getValue(){
+    public function getValue()
+    {
         return $this->value;
     }
-    public function setValue($value){
+    public function setValue($value)
+    {
         $this->value = $value;
         return $this;
     }
-    public function getOperation(){
+    public function getOperation()
+    {
         return $this->operation;
     }
-    public function setOperation($operation){
+    public function setOperation($operation)
+    {
         $this->operation = $operation;
         return $this;
     }
-
 }

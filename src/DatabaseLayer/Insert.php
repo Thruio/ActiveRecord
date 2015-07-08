@@ -12,12 +12,14 @@ class Insert extends VirtualQuery
         $this->tables[$alias] = $table_object;
     }
 
-    public function setData($data){
+    public function setData($data)
+    {
         $this->data = $data;
         return $this;
     }
 
-    public function getData(){
+    public function getData()
+    {
         return $this->data;
     }
 }

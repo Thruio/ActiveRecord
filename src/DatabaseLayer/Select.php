@@ -1,7 +1,6 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-
 class Select extends VirtualQuery
 {
 
@@ -18,7 +17,7 @@ class Select extends VirtualQuery
      */
     public function fields($alias, $fields = '*')
     {
-        if(!is_array($fields)){
+        if (!is_array($fields)) {
             $fields = array($fields);
         }
         if (isset($this->tables[$alias])) {
@@ -42,7 +41,8 @@ class Select extends VirtualQuery
     /**
      * @param string $direction
      */
-    public function orderBy($column, $direction){
+    public function orderBy($column, $direction)
+    {
         $this->addOrder(new Order($column, $direction));
         return $this;
     }

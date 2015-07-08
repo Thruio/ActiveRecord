@@ -25,16 +25,21 @@ class Mysql extends Base
     public function process(DatabaseLayer\VirtualQuery $thing)
     {
 
-        switch($thing->getOperation()){
-            case 'Insert': //Create
+        switch ($thing->getOperation()) {
+            case 'Insert':
+                //Create
                 return $this->processInsert($thing);
-            case 'Select': //Read
+            case 'Select':
+                //Read
                 return $this->processSelect($thing);
-            case 'Update': //Update
+            case 'Update':
+                //Update
                 return $this->processUpdate($thing);
-            case 'Delete': //Delete
+            case 'Delete':
+                //Delete
                 return $this->processDelete($thing);
-            case 'Passthru': //Delete
+            case 'Passthru':
+                //Delete
                 return $this->processPassthru($thing);
             default:
                 throw new Exception("Operation {$thing->getOperation()} not supported");
@@ -46,23 +51,24 @@ class Mysql extends Base
      * @return array
      * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
      */
-    public function processPassthru(DatabaseLayer\Passthru $thing){
-      $sql = $thing->get_sql_to_passthru();
-      $result = $this->query(
-        $sql,
-        $thing->getModel()
-      );
+    public function processPassthru(DatabaseLayer\Passthru $thing)
+    {
+        $sql = $thing->get_sql_to_passthru();
+        $result = $this->query(
+            $sql,
+            $thing->getModel()
+        );
 
       // TODO: Make this a Collection.
 
-      $results = array();
-      if($result !== false && $result !== null){
-        foreach($result as $result_item){
-          $results[] = $result_item;
+        $results = array();
+        if ($result !== false && $result !== null) {
+            foreach ($result as $result_item) {
+                $results[] = $result_item;
+            }
         }
-      }
 
-      return $results;
+        return $results;
     }
 
     /**
@@ -70,7 +76,8 @@ class Mysql extends Base
      * @return array
      * @throws \Thru\ActiveRecord\DatabaseLayer\Exception
      */
-    public function processSelect(DatabaseLayer\Select $thing){
+    public function processSelect(DatabaseLayer\Select $thing)
+    {
         $fields = array();
         $tables = array();
         $orders = array();
@@ -86,24 +93,24 @@ class Mysql extends Base
         $selector = "SELECT " . implode(" ", $fields);
         $from = "FROM " . implode(" ", $tables);
 
-      $conditions = $this->processConditions($thing);
+        $conditions = $this->processConditions($thing);
 
       // Handle LIMIT & OFFSET
         $limit = '';
         $offset = '';
-        if($thing->getLimit()){
+        if ($thing->getLimit()) {
             $limit = "LIMIT {$thing->getLimit()}";
-            if($thing->getOffset()){
+            if ($thing->getOffset()) {
                 $offset = "OFFSET {$thing->getOffset()}";
             }
         }
 
         // Handle ORDERs
-        if(count($thing->getOrders()) > 0){
-            foreach($thing->getOrders() as $order){
+        if (count($thing->getOrders()) > 0) {
+            foreach ($thing->getOrders() as $order) {
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
-                switch(strtolower($order->getDirection())){
+                switch (strtolower($order->getDirection())) {
                     case 'asc':
                     case 'ascending':
                         $direction = 'ASC';
@@ -126,9 +133,9 @@ class Mysql extends Base
                 $orders[] = $column . " " . $direction;
             }
         }
-        if(count($orders) > 0){
+        if (count($orders) > 0) {
             $order = "ORDER BY " . implode(", ", $orders);
-        }else{
+        } else {
             $order = null;
         }
 
@@ -141,8 +148,8 @@ class Mysql extends Base
         // TODO: Make this a Collection.
 
         $results = array();
-        if($result !== false){
-            foreach($result as $result_item){
+        if ($result !== false) {
+            foreach ($result as $result_item) {
                 $results[] = $result_item;
             }
         }
@@ -150,10 +157,11 @@ class Mysql extends Base
         return $results;
     }
 
-    public function processDelete(DatabaseLayer\Delete $thing){
+    public function processDelete(DatabaseLayer\Delete $thing)
+    {
         // SELECTORS
-        if(count($thing->getTables()) > 1){
-          throw new Exception("Active Record Cannot delete from more than one table at a time!");
+        if (count($thing->getTables()) > 1) {
+            throw new Exception("Active Record Cannot delete from more than one table at a time!");
         }
         $tables = $thing->getTables();
         $table = end($tables);
@@ -170,24 +178,25 @@ class Mysql extends Base
     }
 
     // TODO: For the love of god, rewrite this to use PDO prepared statements
-    public function processInsert(DatabaseLayer\Insert $thing){
+    public function processInsert(DatabaseLayer\Insert $thing)
+    {
         // SELECTORS
-        if(count($thing->getTables()) > 1){
+        if (count($thing->getTables()) > 1) {
             throw new Exception("Active Record Cannot insert into more than one table at a time!");
         }
         $tables = $thing->getTables();
         $table = end($tables);
 
         $updates = array();
-        foreach($thing->getData() as $key => $value){
-            $key = trim($key,"`");
-            if(is_object($value) || is_array($value)){
+        foreach ($thing->getData() as $key => $value) {
+            $key = trim($key, "`");
+            if (is_object($value) || is_array($value)) {
                 $value = JsonPrettyPrinter::Json($value);
             }
             $value_slashed = addslashes($value);
-            if($value === null){
+            if ($value === null) {
                 $updates[] = "`$key` = NULL";
-            }else{
+            } else {
                 $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
@@ -203,24 +212,25 @@ class Mysql extends Base
         return $insertId;
     }
 
-    public function processUpdate(DatabaseLayer\Update $thing){
+    public function processUpdate(DatabaseLayer\Update $thing)
+    {
         // SELECTORS
-        if(count($thing->getTables()) > 1){
+        if (count($thing->getTables()) > 1) {
             throw new Exception("Active Record Cannot update into more than one table at a time!");
         }
         $tables = $thing->getTables();
         $table = end($tables);
 
         $updates = array();
-        foreach($thing->getData() as $key => $value){
-            $key = trim($key,"`");
-            if(is_object($value) || is_array($value)){
+        foreach ($thing->getData() as $key => $value) {
+            $key = trim($key, "`");
+            if (is_object($value) || is_array($value)) {
                 $value = JsonPrettyPrinter::Json($value);
             }
             $value_slashed = addslashes($value);
-            if($value === null){
+            if ($value === null) {
                 $updates[] = "`$key` = NULL";
-            }else{
+            } else {
                 $updates[] = "`$key` = \"$value_slashed\"";
             }
         }
@@ -234,24 +244,25 @@ class Mysql extends Base
 
         $result = $this->query($query);
 
-        return $result->errorCode() == "00000" ? TRUE : FALSE;
+        return $result->errorCode() == "00000" ? true : false;
     }
 
-    public function getIndexes($table){
-        if(isset($this->known_indexes[$table])){
-          return $this->known_indexes[$table];
+    public function getIndexes($table)
+    {
+        if (isset($this->known_indexes[$table])) {
+            return $this->known_indexes[$table];
         }
         $query = "SHOW COLUMNS FROM {$table} WHERE `Key` = 'PRI'";
         $indexes = $this->query($query);
 
         $results = array();
-        if(!$indexes instanceof \PDOStatement){
-          $indexException = new IndexException("Error running query: {$query}");
-          $indexException->remedy = 'table_missing';
-          throw $indexException;
+        if (!$indexes instanceof \PDOStatement) {
+            $indexException = new IndexException("Error running query: {$query}");
+            $indexException->remedy = 'table_missing';
+            throw $indexException;
         }
-        if($indexes->rowCount() > 0){
-            foreach($indexes as $index){
+        if ($indexes->rowCount() > 0) {
+            foreach ($indexes as $index) {
                 $result = new \StdClass();
                 $result->Column_name = $index->Field;
                 $result->Auto_increment = stripos($index->Extra, "auto_increment")!==false?true:false;
@@ -262,96 +273,98 @@ class Mysql extends Base
         return $results;
     }
 
-    public function destroyTable(ActiveRecord $model){
-      $query = "DROP TABLE {$model->get_table_name()};";
-      $this->query($query);
+    public function destroyTable(ActiveRecord $model)
+    {
+        $query = "DROP TABLE {$model->get_table_name()};";
+        $this->query($query);
     }
 
-    public function buildTable(ActiveRecord $model){
+    public function buildTable(ActiveRecord $model)
+    {
         $schema = $model->get_class_schema();
         $params = array();
-        foreach($model->_calculate_save_down_rows() as $p => $parameter){
+        foreach ($model->_calculate_save_down_rows() as $p => $parameter) {
             $auto_increment = false;
             $type = "varchar(200)";
             $auto_increment_possible = false;
 
-            if(isset($schema[$parameter])){
-              $psuedo_type = $schema[$parameter]['type'];
-              switch(strtolower($psuedo_type)){
-                case 'int':
-                case 'integer':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
-                  $type = "INT({$length})";
-                  $auto_increment_possible = true;
-                  break;
+            if (isset($schema[$parameter])) {
+                $psuedo_type = $schema[$parameter]['type'];
+                switch (strtolower($psuedo_type)) {
+                    case 'int':
+                    case 'integer':
+                        $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
+                        $type = "INT({$length})";
+                        $auto_increment_possible = true;
+                        break;
 
-                case 'string':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
-                  $type = "VARCHAR({$length})";
-                  break;
+                    case 'string':
+                        $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
+                        $type = "VARCHAR({$length})";
+                        break;
 
-                case 'date':
-                case 'datetime':
-                  $type = 'DATETIME';
-                  break;
+                    case 'date':
+                    case 'datetime':
+                        $type = 'DATETIME';
+                        break;
 
-                case 'enum':
-                  $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
-                  break;
+                    case 'enum':
+                        $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
+                        break;
 
-                case 'text':
-                  $type = "TEXT";
-                  break;
+                    case 'text':
+                        $type = "TEXT";
+                        break;
 
-                case 'blob':
-                  $type = 'BLOB';
-                  break;
+                    case 'blob':
+                        $type = 'BLOB';
+                        break;
 
-                case "decimal":
-                  $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
-                  break;
+                    case "decimal":
+                        $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
+                        break;
 
-                case "uuid":
-                  $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
-                  break;
+                    case "uuid":
+                        $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
+                        break;
 
-                case "md5":
-                  $type = "VARCHAR(" . strlen(md5("test")) . ")";
-                  break;
+                    case "md5":
+                        $type = "VARCHAR(" . strlen(md5("test")) . ")";
+                        break;
 
-                case "sha1":
-                  $type = "VARCHAR(" . strlen(sha1("test")) . ")";
-                  break;
-              }
-            }
-
-            if($p == 0){
-                // First param always primary key if possible
-                if($auto_increment_possible) {
-                  $primary_key = $parameter;
-                  if(!$model instanceof VersionedActiveRecord) {
-                    $auto_increment = true;
-                  }
+                    case "sha1":
+                        $type = "VARCHAR(" . strlen(sha1("test")) . ")";
+                        break;
                 }
             }
-            if($auto_increment){
-              $auto_increment_sql = 'AUTO_INCREMENT';
-            }else{
-              $auto_increment_sql = '';
+
+            if ($p == 0) {
+                // First param always primary key if possible
+                if ($auto_increment_possible) {
+                    $primary_key = $parameter;
+                    if (!$model instanceof VersionedActiveRecord) {
+                        $auto_increment = true;
+                    }
+                }
+            }
+            if ($auto_increment) {
+                $auto_increment_sql = 'AUTO_INCREMENT';
+            } else {
+                $auto_increment_sql = '';
             }
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
         }
 
         // Disable auto-increment if this object is versioned.
-        if($model instanceof VersionedActiveRecord){
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
-          }
-        }else{
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`)";
-          }
+        if ($model instanceof VersionedActiveRecord) {
+            if (isset($primary_key)) {
+                $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
+            }
+        } else {
+            if (isset($primary_key)) {
+                $params[] = "  PRIMARY KEY (`$primary_key`)";
+            }
         }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
@@ -361,28 +374,29 @@ class Mysql extends Base
         $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
 
         // Log it.
-        if(DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
-          DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
+        if (DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
+            DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
         }
 
         $this->query($query);
     }
 
-    private function processConditions($thing){
+    private function processConditions($thing)
+    {
         // CONDITIONS
-        if(count($thing->getConditions()) > 0){
-            foreach($thing->getConditions() as $condition){
+        if (count($thing->getConditions()) > 0) {
+            foreach ($thing->getConditions() as $condition) {
                 /* @var $condition DatabaseLayer\Condition */
-                if($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '='){
+                if ($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '=') {
                     $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }elseif($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!='){
+                } elseif ($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!=') {
                     $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "', $condition->getValue()) . "\")";
-                }else{
+                } else {
                     $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
                 }
             }
             $conditions = "WHERE " . implode("\n  AND ", $conditions);
-        }else{
+        } else {
             $conditions = null;
         }
         return $conditions;
