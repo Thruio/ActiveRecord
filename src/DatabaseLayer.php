@@ -3,8 +3,6 @@ namespace Thru\ActiveRecord;
 
 use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
-use Thru\ActiveRecord\DatabaseLayer\IndexException;
-use Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException;
 
 class DatabaseLayer
 {
@@ -16,6 +14,7 @@ class DatabaseLayer
     private $logger;
 
     /**
+     * @throws ConfigurationException
      * @return DatabaseLayer
      */
     public static function getInstance()
