@@ -158,10 +158,13 @@ class ActiveRecordTest extends BaseTest {
     $this->assertNotFalse(strtotime($result->date_field));
   }
 
-  /**
-   * @depends testUpdate
-   */
-  public function testDelete(TestModel $deletable){
+  public function testDelete(){
+    $deletable = new TestModel();
+    $deletable->text_field = "Before";
+    $deletable->integer_field = 0;
+    $deletable->date_field = date("Y-m-d H:i:s");
+    $deletable->save();
+
     $this->assertTrue($deletable->delete(), "Delete function returned true");
 
     return $deletable->test_model_id;
@@ -259,6 +262,10 @@ class ActiveRecordTest extends BaseTest {
     $this->assertEquals(JsonPrettyPrinter::Json($different_object), $reload_again->text_field);
   }
 
+  /**
+   * @expectedExceptionMessage 42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table 'test_models'
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
+   */
   public function testDestroyTableThatDoesntExist(){
     $model = new TestModel();
     $model->delete_table();

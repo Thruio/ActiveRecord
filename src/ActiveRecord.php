@@ -138,6 +138,7 @@ abstract class ActiveRecord
             $columns[$key->Column_name] = $key->Column_name;
           }
       }
+
       return array_values($columns);
     }
 
@@ -147,7 +148,9 @@ abstract class ActiveRecord
      */
     public function get_id()
     {
+
         $col = $this->get_table_primary_key();
+
         if (property_exists($this, $col)) {
             $id = $this->$col;
             if ($id > 0) {
@@ -280,7 +283,7 @@ abstract class ActiveRecord
             $operation->condition($primary_key_column, $this->$primary_key_column);
             $operation->execute();
         } else { // Else, we're an insert.
-            $new_id = $operation->execute();
+            $new_id = $operation->execute($this->get_class());
             if($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
@@ -325,7 +328,7 @@ abstract class ActiveRecord
       $delete = $database->delete($this->get_table_name(), $this->get_table_alias());
       $delete->setModel($this);
       $delete->condition($this->get_table_primary_key(), $this->get_id());
-      $delete->execute();
+      $delete->execute($this->get_class());
 
       // Invalidate cache.
       SearchIndex::get_instance()->expire($this->get_table_name(),$this->get_id());

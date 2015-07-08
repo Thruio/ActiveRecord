@@ -1,6 +1,8 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
+use Thru\ActiveRecord\ActiveRecord;
+
 class VirtualQuery
 {
     protected $tables;      // SELECT/UPDATE/DELETE
@@ -76,9 +78,13 @@ class VirtualQuery
     public function execute($model = null)
     {
         if($model){
+            if($model instanceof ActiveRecord){
+              $model = $model->get_class();
+            }
             $this->setModel($model);
         }
-        $result = $this->getInterpreter()->process($this);
+        $interpreter = $this->getInterpreter();
+        $result = $interpreter->process($this);
         return $result;
     }
 

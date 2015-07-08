@@ -1,5 +1,7 @@
 <?php
 namespace Thru\ActiveRecord\Test;
+use Thru\ActiveRecord\DatabaseLayer;
+use Thru\ActiveRecord\DatabaseLayer\Passthru;
 use \Thru\ActiveRecord\Test\Models\TestModel;
 use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
 use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
@@ -53,16 +55,18 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase {
     $model->date_field = date("Y-m-d H:i:s");
     $model->save();
 
-    $mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();
-    $indexes = $mysql->getIndexes("test_models_sortable");
+    $indexes = DatabaseLayer::get_instance()->get_table_indexes("test_models_sortable");
     $this->assertTrue(is_array($indexes));
     $this->assertTrue($indexes[0]->Column_name == "test_model_id");
   }
 
   /**
-   * @expectedException \Thru\ActiveRecord\DatabaseLayer\IndexException
+   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
    */
   public function testIndexFailOnNonExistant(){
+    if(DatabaseLayer::get_instance()->get_option('db_type') !== "mysql"){
+      $this->markTestSkipped("MySQL Dependent");
+    }
     $mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();
     $mysql->getIndexes("test_models_sortable");
   }

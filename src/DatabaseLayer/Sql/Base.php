@@ -43,6 +43,7 @@ class Base extends \PDO
 
   public function query($query, $model = 'StdClass'){
     /* @var $result \PDOStatement */
+    #echo "*** Model in Query: " . $model . "\n";
     try {
       $exec_time_start = microtime(true);
       $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
@@ -56,23 +57,29 @@ class Base extends \PDO
       $this->query_log[] = new Log($query, $exec_time);
       return $result;
     }catch(\PDOException $e){
+      if(DatabaseLayer::get_instance()->getLogger()) {
+        DatabaseLayer::get_instance()->getLogger()->addDebug("Query() Caught Exception: {$e->getMessage()}");
+      }
       $this->handleError($model, $query, $e);
     }
   }
 
   public function handleError($model, $query, \PDOException $e){
-
+    #echo "*** Model in handleError: " . $model . "\n";
     switch($e->getCode()){
+      // MySQL table missing
       case '42S02':
+      // SQLite table missing
+      case 'HY000' && (stripos($e->getMessage(), "no such table") !== false):
         if($model != 'StdClass'){
           $instance = new $model();
           if($instance instanceof ActiveRecord) {
             $table_builder = new TableBuilder($instance);
             $table_builder->build();
-            return $this->query($query); // Re-run the query
+            return $this->query($query, $model); // Re-run the query
           }
-          throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
         }
+        throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
         break;
       default:
         // Write exception to log.

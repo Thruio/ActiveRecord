@@ -11,7 +11,7 @@ use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 use Thru\UUID;
 
-class Mysql extends Base
+class Sqlite extends Base
 {
 
     private $known_indexes;
@@ -25,6 +25,7 @@ class Mysql extends Base
     public function process(DatabaseLayer\VirtualQuery $thing)
     {
 
+        #echo "*** process() model is " . $thing->getModel()."\n";
         switch($thing->getOperation()){
             case 'Insert': //Create
                 return $this->processInsert($thing);
@@ -117,7 +118,7 @@ class Mysql extends Base
                     case 'random()':
                     case 'random':
                         $column = '';
-                        $direction = 'rand()';
+                        $direction = 'RANDOM()';
                         break;
                     default:
                         throw new Exception("Bad ORDER direction: {$order->getDirection()}");
@@ -178,25 +179,35 @@ class Mysql extends Base
         $tables = $thing->getTables();
         $table = end($tables);
 
-        $updates = array();
-        foreach($thing->getData() as $key => $value){
+        $data = $thing->getData();
+
+        $keys = [];
+        $values = [];
+
+        foreach($data as $key => $value){
             $key = trim($key,"`");
             if(is_object($value) || is_array($value)){
                 $value = JsonPrettyPrinter::Json($value);
             }
-            $value_slashed = addslashes($value);
+            $keys[] = $key;
+
+            $value_slashed = str_replace("'","''", $value);
             if($value === null){
-                $updates[] = "`$key` = NULL";
+                $value = "NULL";
+            }elseif(is_numeric($value)) {
+                // Do nothing
             }else{
-                $updates[] = "`$key` = \"$value_slashed\"";
+                $value = "'{$value_slashed}'";
             }
+            $values[] = $value;
         }
         $selector = "INSERT INTO {$table->getName()} ";
-        $data = "SET " . implode(", ", $updates);
+        $columns  = "(`" . implode("`, `", $keys) . "`)";
+        $values   = "(" . implode(", ", $values) . ")";
+        $query    = "{$selector}\n{$columns} \nVALUES \n{$values}";
 
-        $query = "{$selector}\n{$data}";
-
-        $this->query($query);
+        #echo "*** Just before query(): ".$thing->getModel() . "\n";
+        $this->query($query, $thing->getModel());
 
         $insertId = $this->lastInsertId();
 
@@ -217,11 +228,13 @@ class Mysql extends Base
             if(is_object($value) || is_array($value)){
                 $value = JsonPrettyPrinter::Json($value);
             }
-            $value_slashed = addslashes($value);
+            $value_slashed = str_replace("',","''",$value);
             if($value === null){
-                $updates[] = "`$key` = NULL";
+                $updates[] = "`{$key}` = NULL";
+            }elseif(is_numeric($value)) {
+                $updates[] = "`{$key}` = {$value_slashed}";
             }else{
-                $updates[] = "`$key` = \"$value_slashed\"";
+                $updates[] = "`{$key}` = '{$value_slashed}'";
             }
         }
         $selector = "UPDATE {$table->getName()} ";
@@ -241,7 +254,8 @@ class Mysql extends Base
         if(isset($this->known_indexes[$table])){
           return $this->known_indexes[$table];
         }
-        $query = "SHOW COLUMNS FROM {$table} WHERE `Key` = 'PRI'";
+
+        $query = "PRAGMA table_info('{$table}')";
         $indexes = $this->query($query);
 
         $results = array();
@@ -250,13 +264,15 @@ class Mysql extends Base
           $indexException->remedy = 'table_missing';
           throw $indexException;
         }
-        if($indexes->rowCount() > 0){
-            foreach($indexes as $index){
-                $result = new \StdClass();
-                $result->Column_name = $index->Field;
-                $result->Auto_increment = stripos($index->Extra, "auto_increment")!==false?true:false;
-                $results[] = $result;
-            }
+        $indexesResult = $indexes->fetchAll();
+
+        foreach($indexesResult as $index){
+          if($index->pk==1){
+            $result = new \StdClass();
+            $result->Column_name = $index->name;
+            $result->Auto_increment = true;
+            $results[] = $result;
+          }
         }
         $this->known_indexes[$table] = $results;
         return $results;
@@ -280,26 +296,18 @@ class Mysql extends Base
               switch(strtolower($psuedo_type)){
                 case 'int':
                 case 'integer':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
-                  $type = "INT({$length})";
+                  $type = "INTEGER";
                   $auto_increment_possible = true;
-                  break;
-
-                case 'string':
-                  $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
-                  $type = "VARCHAR({$length})";
                   break;
 
                 case 'date':
                 case 'datetime':
-                  $type = 'DATETIME';
-                  break;
-
                 case 'enum':
-                  $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
-                  break;
-
+                case 'string':
                 case 'text':
+                case 'uuid':
+                case 'md5':
+                case 'sha1':
                   $type = "TEXT";
                   break;
 
@@ -307,65 +315,45 @@ class Mysql extends Base
                   $type = 'BLOB';
                   break;
 
-                case "decimal":
-                  $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
-                  break;
-
-                case "uuid":
-                  $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
-                  break;
-
-                case "md5":
-                  $type = "VARCHAR(" . strlen(md5("test")) . ")";
-                  break;
-
-                case "sha1":
-                  $type = "VARCHAR(" . strlen(sha1("test")) . ")";
-                  break;
               }
             }
 
+            $is_primary_key = false;
             if($p == 0){
                 // First param always primary key if possible
                 if($auto_increment_possible) {
-                  $primary_key = $parameter;
+                  $is_primary_key = "PRIMARY KEY";
                   if(!$model instanceof VersionedActiveRecord) {
                     $auto_increment = true;
                   }
                 }
             }
-            if($auto_increment){
-              $auto_increment_sql = 'AUTO_INCREMENT';
-            }else{
-              $auto_increment_sql = '';
-            }
-            $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
-            $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
-        }
 
-        // Disable auto-increment if this object is versioned.
-        if($model instanceof VersionedActiveRecord){
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`, `sequence`)";
-          }
-        }else{
-          if(isset($primary_key)) {
-            $params[] = "  PRIMARY KEY (`$primary_key`)";
-          }
+            if($auto_increment && !$model instanceof VersionedActiveRecord){
+              $auto_increment_sql = 'AUTOINCREMENT';
+            }else{
+              $auto_increment_sql = false;
+            }
+
+            $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
+            $nullability = $is_primary_key?'':$nullability;
+
+            $is_primary_key = !$model instanceof VersionedActiveRecord ? $is_primary_key : null;
+
+            $params[] = "  " . trim("`{$parameter}` {$type} {$is_primary_key} {$auto_increment_sql} {$nullability}");
         }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
         $query.= "(\n";
         $query.= implode(",\n", $params)."\n";
         $query.= ")\n";
-        $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
+
+        $this->query($query);
 
         // Log it.
         if(DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
           DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
         }
-
-        $this->query($query);
     }
 
     private function processConditions($thing){
@@ -386,5 +374,19 @@ class Mysql extends Base
             $conditions = null;
         }
         return $conditions;
+    }
+
+    public function query($query, $model = 'StdClass'){
+      try {
+        return parent::query($query, $model);
+      }Catch(DatabaseLayer\TableDoesntExistException $tdee){
+        if(stripos($tdee->getMessage(), "HY000") !== false){
+          if(stripos($tdee->getMessage(), "no such table") !== false) {
+            $table = str_replace("HY000: SQLSTATE[HY000]: General error: 1 no such table: ", "", $tdee->getMessage());
+            throw new DatabaseLayer\TableDoesntExistException("42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'", $tdee->getCode(), $tdee);
+          }
+        }
+        throw $tdee;
+      }
     }
 }

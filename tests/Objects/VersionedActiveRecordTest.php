@@ -24,7 +24,6 @@ class VersionedActiveRecordTest extends BaseTest {
     $versionedRecord = new TestVersionedModel();
     $versionedRecord->value = "blue";
     $versionedRecord->save();
-    echo "Sequence ID is {$versionedRecord->sequence}\n";
     $this->assertGreaterThan(0, $versionedRecord->id);
     $this->assertEquals(1, $versionedRecord->sequence);
     return $versionedRecord;
@@ -39,7 +38,6 @@ class VersionedActiveRecordTest extends BaseTest {
 
     $versionedRecord->value = "red";
     $versionedRecord->save();
-    echo "Sequence ID is {$versionedRecord->sequence}\n";
 
     $this->assertEquals($originalId, $versionedRecord->id, "ID did not change");
     $this->assertNotEquals($originalSequence, $versionedRecord->sequence, "But the sequence did");

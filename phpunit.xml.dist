@@ -3,9 +3,7 @@
          colors="true"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="utils">
-            <directory>tests/Utils</directory>
-        </testsuite>
+
         <testsuite name="dblayer">
             <directory>tests/DatabaseLayer</directory>
         </testsuite>
@@ -20,6 +18,9 @@
         </testsuite>
         <testsuite name="config">
             <directory>tests/Configuration</directory>
+        </testsuite>
+        <testsuite name="utils">
+          <directory>tests/Utils</directory>
         </testsuite>
     </testsuites>
     <logging>
@@ -46,5 +47,15 @@
                 </array>
             </arguments>
         </listener>
+
+        <!--<listener class="PHPUnit\Runner\CleverAndSmart\TestListener">
+          <arguments>
+            <object class="PHPUnit\Runner\CleverAndSmart\Storage\Sqlite3Storage">
+              <arguments>
+                <string>build/logs/phpunit-cas.db</string>
+              </arguments>
+            </object>
+          </arguments>
+        </listener>-->
     </listeners>
 </phpunit>
