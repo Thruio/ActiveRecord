@@ -263,7 +263,7 @@ class ActiveRecordTest extends BaseTest {
   }
 
   /**
-   * @expectedExceptionMessage 42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table 'test_models'
+   * @expectedExceptionMessage Unknown table 'test_models'
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
    */
   public function testDestroyTableThatDoesntExist(){
