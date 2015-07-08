@@ -1,0 +1,65 @@
+<?php
+$env = "sqlite";
+$loops = isset($argv[1]) ? $argv[1] : 100;
+
+require_once("vendor/autoload.php");
+require_once("test_configs.php");
+$totalStart = microtime(true);
+
+foreach ($testDatabases as $name => $config) {
+    $database = new \Thru\ActiveRecord\DatabaseLayer($config);
+
+    $date = date("Y-m-d H:i:s");
+    $text = "Test text";
+
+    echo "Benchmarking for {$loops} loops with {$name} backend...\n";
+
+    echo "Construct:\n";
+    $start = microtime(true);
+    for ($i = 1; $i <= $loops; $i++) {
+        $object = new \Thru\ActiveRecord\Test\Models\TestModel();
+        $object->date_field = $date;
+        $object->text_field = $text;
+        $object->integer_field = $i;
+        $object->save();
+        echo "\r > Construct {$i}";
+    }
+    $end = microtime(true);
+    $delay = $end - $start;
+    echo "\nConstruct Done in " . number_format($delay, 2) . " sec\n";
+    $metrics[$name]['Construct'] = $delay / $loops;
+
+    echo "Search:\n";
+    $start = microtime(true);
+    for ($i = 1; $i <= $loops; $i++) {
+        $object = \Thru\ActiveRecord\Test\Models\TestModel::search()->where('integer_field', rand(0, $loops))->execOne();
+        echo "\r > Search {$i}";
+    }
+    $end = microtime(true);
+    $delay = $end - $start;
+    echo "\nSearch Done in " . number_format($delay, 2) . " sec\n";
+    $metrics[$name]['Search'] = $delay / $loops;
+
+    echo "Destroy:\n";
+    $start = microtime(true);
+    for ($i = 1; $i <= $loops; $i++) {
+        $object = \Thru\ActiveRecord\Test\Models\TestModel::search()->where('integer_field', $i)->execOne();
+        $object->delete();
+        echo "\r > Search {$i}";
+    }
+    $end = microtime(true);
+    $delay = $end - $start;
+    echo "\nDestroy Done in " . number_format($delay, 2) . " sec\n";
+    $metrics[$name]['Destroy'] = $delay / $loops;
+}
+
+echo "\n\n*************************************************************************\n";
+echo "TOTAL TIME: " . number_format(microtime(true) - $totalStart, 2) . " sec\n\n";
+foreach ($metrics as $db => $data) {
+    foreach ($data as $function => $timeEach) {
+        $perSecond = 1 / $timeEach;
+        echo str_pad($db . ":" . $function . ":", 20, ' ');
+        echo number_format($timeEach, 4) . "/ea, ";
+        echo str_pad(number_format($perSecond, 2), 10, ' ', STR_PAD_LEFT) . "/s\n";
+    }
+}
