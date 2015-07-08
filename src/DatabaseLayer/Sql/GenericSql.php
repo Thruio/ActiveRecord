@@ -94,11 +94,15 @@ abstract class GenericSql extends Base
             foreach ($thing->getConditions() as $condition) {
                 /* @var $condition DatabaseLayer\Condition */
                 if ($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '=') {
-                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode('", "',
-                        $condition->getValue()) . "\")";
+                    $conditions[] = "`{$condition->getColumn()}` IN(\"" . implode(
+                        '", "',
+                        $condition->getValue()
+                    ) . "\")";
                 } elseif ($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!=') {
-                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode('", "',
-                        $condition->getValue()) . "\")";
+                    $conditions[] = "`{$condition->getColumn()}` NOT IN(\"" . implode(
+                        '", "',
+                        $condition->getValue()
+                    ) . "\")";
                 } else {
                     $conditions[] = "`{$condition->getColumn()}` {$condition->getOperation()} \"{$condition->getValue()}\"";
                 }
@@ -110,6 +114,4 @@ abstract class GenericSql extends Base
 
         return $conditions;
     }
-
-
 }
