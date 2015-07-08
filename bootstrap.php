@@ -28,7 +28,9 @@ switch($env){
     ));
     break;
   case 'sqlite':
-    unlink('test.sqlite');
+    if(file_exists('test.sqlite')) {
+      unlink('test.sqlite');
+    }
     $database = new \Thru\ActiveRecord\DatabaseLayer(array(
       'db_type' => 'Sqlite',
       'db_file' => 'test.sqlite',
