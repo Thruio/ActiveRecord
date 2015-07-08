@@ -7,8 +7,7 @@ use Monolog\Formatter as LogFormatter;
 use Monolog\Handler as LogHandler;
 use Monolog\Logger;
 
-$fileLoggerHandler = new LogHandler\StreamHandler(__DIR__ . "/build/logs/active-record." . date('Y-m-d') . '.log', null,
-  null, 0664);
+$fileLoggerHandler = new LogHandler\StreamHandler(__DIR__ . "/build/logs/active-record." . date('Y-m-d') . '.log', null, null, 0664);
 $monologHandlers = [$fileLoggerHandler];
 $monolog = new Logger("ActiveRecord", $monologHandlers);
 
@@ -21,7 +20,7 @@ if (!isset($env)) {
 }
 
 
-if(!isset($testDatabases[$env])){
+if (!isset($testDatabases[$env])) {
     die("Invalid environment [$env]\n");
 }
 $database = new \Thru\ActiveRecord\DatabaseLayer($testDatabases[$env]);
