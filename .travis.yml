@@ -24,7 +24,7 @@ after_script:
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
 
 script:
-  - ./vendor/bin/phpcs --standard=PSR2 *.php src tests
+  - ./vendor/bin/phpcs --warning-severity=6 --standard=PSR2 *.php src tests
   - phpunit
 
 notifications:
