@@ -52,12 +52,12 @@ class Search
           /* @var $model ActiveRecord */
             $model = $this->model;
 
-            if (end($this->conditions)->getColumn() == $model->getTablePrimaryKey() && end($this->conditions)->getOperation() == '=') {
+            if (end($this->conditions)->getColumn() == $model->getIDField() && end($this->conditions)->getOperation() == '=') {
                 $primary_key_search = true;
-                if (SearchIndex::getInstance()->exists($model->getTableName(), end($this->conditions)->get_value())) {
+                if (SearchIndex::getInstance()->exists($model->getTableName(), end($this->conditions)->getValue())) {
                     return array(
                     SearchIndex::getInstance()
-                    ->get($model->getTableName(), end($this->conditions)->get_value())
+                    ->get($model->getTableName(), end($this->conditions)->getValue())
                     );
                 }
             }
@@ -99,7 +99,7 @@ class Search
         foreach ($response as $result) {
           /* @var $result ActiveRecord */
             if ($result->getPrimaryKeyIndex()) {
-                $primary_key_column = $result->getPrimaryKeyIndex()[0];
+                $primary_key_column = $result->getIDField();
                 $results[$result->$primary_key_column] = $result;
             } else {
                 $results[] = $result;

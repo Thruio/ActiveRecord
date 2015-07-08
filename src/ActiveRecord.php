@@ -67,10 +67,21 @@ abstract class ActiveRecord
         $database = DatabaseLayer::getInstance();
         $select = $database->select($this->getTableName(), $this->getTableAlias());
         $select->fields($this->getTableAlias());
-        $select->condition($this->getTablePrimaryKey(), $id);
+        $select->condition($this->getIDField(), $id);
         $results = $select->execute(get_called_class());
         $result = end($results);
         return $result;
+    }
+
+    /**
+     * Get the field that is being used for the id.
+     * @return string|false
+     */
+    public function getIDField(){
+        if(count($this->getPrimaryKeyIndex()) > 0) {
+            return reset($this->getPrimaryKeyIndex());
+        }
+        return false;
     }
 
     /**
@@ -110,7 +121,7 @@ abstract class ActiveRecord
      */
     public function getTablePrimaryKey()
     {
-        trigger_error('Use getPrimaryKeyIndex instead', E_USER_DEPRECATED);
+        trigger_error('getTablePrimaryKey() is deprecated. Use getIDField() instead.', E_USER_DEPRECATED);
 
         $keys = $this->getPrimaryKeyIndex();
         return isset($keys[0])?$keys[0]:false;
@@ -146,8 +157,7 @@ abstract class ActiveRecord
      */
     public function getId()
     {
-
-        $col = $this->getTablePrimaryKey();
+        $col = $this->getIDField();
 
         if (property_exists($this, $col)) {
             $id = $this->$col;
@@ -256,7 +266,7 @@ abstract class ActiveRecord
 
         // Calculate row to save_down
         $this->__calculateSaveDownRows();
-        $primary_key_column = $this->getTablePrimaryKey();
+        $primary_key_column = $this->getIDField();
 
         // Make an array out of the objects columns.
         $data = array();
@@ -325,7 +335,7 @@ abstract class ActiveRecord
 
         $delete = $database->delete($this->getTableName(), $this->getTableAlias());
         $delete->setModel($this);
-        $delete->condition($this->getTablePrimaryKey(), $this->getId());
+        $delete->condition($this->getIDField(), $this->getId());
         $delete->execute($this->getClass());
 
       // Invalidate cache.
@@ -385,7 +395,7 @@ abstract class ActiveRecord
         $slug_parts = explode("-", $slug, 2);
         $class = get_called_class();
         $temp_this = new $class();
-        $primary_key = $temp_this->get_table_primary_key();
+        $primary_key = $temp_this->getIDField();
         return self::search()->where($primary_key, $slug_parts[0])->execOne();
     }
 

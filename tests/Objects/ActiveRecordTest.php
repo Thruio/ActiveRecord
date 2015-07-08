@@ -339,4 +339,13 @@ class ActiveRecordTest extends BaseTest
         $testModelNullable->reload();
         $this->assertNull($testModelNullable->text_field_nullable);
     }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Deprecated
+     * @expectedExceptionMessage getTablePrimaryKey() is deprecated. Use getIDField() instead.
+     */
+    public function testCheckGetTablePrimaryKeyDeprecated(){
+        $testModel = new TestModel();
+        $testModel->getTablePrimaryKey();
+    }
 }

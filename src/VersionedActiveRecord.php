@@ -34,7 +34,7 @@ abstract class VersionedActiveRecord extends ActiveRecord
         $lockController->lock();
 
       // Get our primary key
-        $primaryColumn = $this->getPrimaryKeyIndex()[0];
+        $primaryColumn = $this->getIDField();
 
       // Get the highest primary key
         if (!$this->$primaryColumn) {
