@@ -4,7 +4,7 @@ php:
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
+#  - hhvm
   - 7.0
 
 env:
@@ -23,7 +23,9 @@ after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
 
-script: phpunit
+script:
+  - ./vendor/bin/phpcs --warning-severity=6 --standard=PSR2 *.php src tests
+  - phpunit
 
 notifications:
   email:

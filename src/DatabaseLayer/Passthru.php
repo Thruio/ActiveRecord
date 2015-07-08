@@ -18,7 +18,7 @@ class Passthru extends VirtualQuery
         return $this;
     }
 
-    public function get_sql_to_passthru()
+    public function getSqlToPassthru()
     {
         return $this->sql_to_passthru;
     }

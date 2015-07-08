@@ -11,13 +11,13 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->originalInstance = DatabaseLayer::get_instance();
-        DatabaseLayer::destroy_instance();
+        $this->originalInstance = DatabaseLayer::getInstance();
+        DatabaseLayer::destroyInstance();
     }
 
     public function tearDown()
     {
-        DatabaseLayer::set_instance($this->originalInstance);
+        DatabaseLayer::setInstance($this->originalInstance);
     }
 
     public function testConstructMySQL()
@@ -30,9 +30,9 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase
         'db_password' => 'travis',
         'db_database' => 'active_record_test'
         ));
-        $this->assertEquals("travis", $database->get_option("db_username"));
-        $this->assertEquals("travis", $database->get_option("db_password"));
-        $this->assertEquals("active_record_test", $database->get_option("db_database"));
+        $this->assertEquals("travis", $database->getOption("db_username"));
+        $this->assertEquals("travis", $database->getOption("db_password"));
+        $this->assertEquals("active_record_test", $database->getOption("db_database"));
         return $database;
     }
 
@@ -55,7 +55,7 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase
    */
     public function testConstructBogusSetting(DatabaseLayer $databaseLayer)
     {
-        $this->assertFalse($databaseLayer->get_option("not_an_option_really"));
+        $this->assertFalse($databaseLayer->getOption("not_an_option_really"));
     }
 
   /**
@@ -64,6 +64,6 @@ class DatabaseLayerTest extends \PHPUnit_Framework_TestCase
    */
     public function testBlankDatabaseLayer()
     {
-        DatabaseLayer::get_instance();
+        DatabaseLayer::getInstance();
     }
 }

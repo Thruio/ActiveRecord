@@ -71,7 +71,7 @@ abstract class GenericSql extends Base
      */
     public function processPassthru(DatabaseLayer\Passthru $thing)
     {
-        $sql = $thing->get_sql_to_passthru();
+        $sql = $thing->getSqlToPassthru();
         $result = $this->query($sql, $thing->getModel());
 
         // TODO: Make this a Collection.

@@ -5,20 +5,20 @@ use Thru\ActiveRecord\ActiveRecord;
 
 class TableBuilder extends VirtualQuery
 {
-    private $_context;
+    private $context;
 
     public function __construct(ActiveRecord $context)
     {
-        $this->_context = $context;
+        $this->context = $context;
     }
 
     public function build()
     {
-        $this->getInterpreter()->buildTable($this->_context);
+        $this->getInterpreter()->buildTable($this->context);
     }
 
     public function destroy()
     {
-        $this->getInterpreter()->destroyTable($this->_context);
+        $this->getInterpreter()->destroyTable($this->context);
     }
 }

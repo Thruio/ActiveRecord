@@ -7,7 +7,7 @@ class SearchIndex
 
     private $index;
 
-    public static function get_instance()
+    public static function getInstance()
     {
         if (!self::$instance instanceof SearchIndex) {
             self::$instance = new SearchIndex();

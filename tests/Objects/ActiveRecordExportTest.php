@@ -34,7 +34,7 @@ class ActiveRecordExportTest extends BaseTest
         $this->assertEquals("text_field", $model_array['_columns'][2]);
         $this->assertEquals("date_field", $model_array['_columns'][3]);
 
-        $model_array_filtered = $test_model->__toArray($test_model->_calculate_save_down_rows());
+        $model_array_filtered = $test_model->__toArray($test_model->__calculateSaveDownRows());
 
         $this->assertArrayNotHasKey("_table", $model_array_filtered);
         $this->assertArrayHasKey("test_model_id", $model_array_filtered);

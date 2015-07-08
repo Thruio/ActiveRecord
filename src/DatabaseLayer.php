@@ -3,22 +3,21 @@ namespace Thru\ActiveRecord;
 
 use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
-use Thru\ActiveRecord\DatabaseLayer\IndexException;
-use Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException;
 
 class DatabaseLayer
 {
 
     const DSN_REGEX = '/^(?P<user>\w+)(:(?P<password>\w+))?@(?P<host>[.\w]+)(:(?P<port>\d+))?\\\\(?P<database>\w+)$/im';
 
-    static $instance;
+    private static $instance;
     private $options;
     private $logger;
 
     /**
+     * @throws ConfigurationException
      * @return DatabaseLayer
      */
-    public static function get_instance()
+    public static function getInstance()
     {
         if (!DatabaseLayer::$instance) {
             throw new ConfigurationException("DatabaseLayer has not been configured");
@@ -26,7 +25,7 @@ class DatabaseLayer
         return DatabaseLayer::$instance;
     }
 
-    public static function set_instance(DatabaseLayer $instance)
+    public static function setInstance(DatabaseLayer $instance)
     {
         self::$instance = $instance;
     }
@@ -45,7 +44,7 @@ class DatabaseLayer
         return $this->logger;
     }
 
-    public static function destroy_instance()
+    public static function destroyInstance()
     {
         self::$instance = null;
         return true;
@@ -58,7 +57,7 @@ class DatabaseLayer
     {
         $this->options = $options;
         if (!isset($this->options['db_dsn'])) {
-            $this->options['db_dsn'] = $this->_getDsn();
+            $this->options['db_dsn'] = $this->__getDsn();
         }
         self::$instance = $this;
     }
@@ -120,7 +119,7 @@ class DatabaseLayer
         return new DatabaseLayer\Passthru($sql);
     }
 
-    public function get_table_indexes($table_name)
+    public function getTableIndexes($table_name)
     {
         $util = new DatabaseLayer\Util();
           $indexes = $util->getIndexes($table_name);
@@ -132,7 +131,7 @@ class DatabaseLayer
      *
      * @return string|null
      */
-    public function get_option($name)
+    public function getOption($name)
     {
         if (isset($this->options[$name])) {
             return $this->options[$name];
@@ -144,7 +143,7 @@ class DatabaseLayer
      * @return string|false
      * @throws ConfigurationException
      */
-    private function _getDsn()
+    private function __getDsn()
     {
         switch ($this->options['db_type']) {
             case 'Mysql':

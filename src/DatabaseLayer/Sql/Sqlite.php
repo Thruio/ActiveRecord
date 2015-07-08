@@ -212,15 +212,15 @@ class Sqlite extends GenericSql
 
     public function destroyTable(ActiveRecord $model)
     {
-        $query = "DROP TABLE {$model->get_table_name()};";
+        $query = "DROP TABLE {$model->getTableName()};";
         $this->query($query);
     }
 
     public function buildTable(ActiveRecord $model)
     {
-        $schema = $model->get_class_schema();
+        $schema = $model->getClassSchema();
         $params = array();
-        foreach ($model->_calculate_save_down_rows() as $p => $parameter) {
+        foreach ($model->__calculateSaveDownRows() as $p => $parameter) {
             $auto_increment = false;
             $type = "varchar(200)";
             $auto_increment_possible = false;
@@ -277,7 +277,7 @@ class Sqlite extends GenericSql
             $params[] = "  " . trim("`{$parameter}` {$type} {$is_primary_key} {$auto_increment_sql} {$nullability}");
         }
 
-        $query = "CREATE TABLE IF NOT EXISTS `{$model->get_table_name()}`\n";
+        $query = "CREATE TABLE IF NOT EXISTS `{$model->getTableName()}`\n";
         $query.= "(\n";
         $query.= implode(",\n", $params)."\n";
         $query.= ")\n";
@@ -285,8 +285,8 @@ class Sqlite extends GenericSql
         $this->query($query);
 
         // Log it.
-        if (DatabaseLayer::get_instance()->getLogger() instanceof Logger) {
-            DatabaseLayer::get_instance()->getLogger()->addInfo("Creating table {$model->get_table_name()}\n\n{$query}");
+        if (DatabaseLayer::getInstance()->getLogger() instanceof Logger) {
+            DatabaseLayer::getInstance()->getLogger()->addInfo("Creating table {$model->getTableName()}\n\n{$query}");
         }
     }
 

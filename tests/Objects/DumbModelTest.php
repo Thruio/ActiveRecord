@@ -28,19 +28,19 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        TestModel::factory()->get_table_builder()->destroy();
+        TestModel::factory()->getTableBuilder()->destroy();
     }
 
     public function testDumbModelFetch()
     {
-        $result = DumbModel::query("SELECT * FROM " . TestModel::factory()->get_table_name());
+        $result = DumbModel::query("SELECT * FROM " . TestModel::factory()->getTableName());
         $this->assertTrue(is_array($result));
         $this->assertEquals("stdClass", get_class(end($result)));
     }
 
     public function testDumbModelFetchOne()
     {
-        $result = DumbModel::queryOne("SELECT * FROM " . TestModel::factory()->get_table_name());
+        $result = DumbModel::queryOne("SELECT * FROM " . TestModel::factory()->getTableName());
         $this->assertEquals("stdClass", get_class($result));
         return $result;
     }
