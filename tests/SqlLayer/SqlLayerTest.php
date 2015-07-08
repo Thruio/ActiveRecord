@@ -26,11 +26,11 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
     {
         $this->base = new \Thru\ActiveRecord\DatabaseLayer\Sql\Base();
         $this->mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();
-        TestModel::delete_table();
-        TestModelExtendedTypes::delete_table();
-        TestModelWithNameLabel::delete_table();
-        TestModelSortable::delete_table();
-        TestModelSearchOnly::delete_table();
+        TestModel::deleteTable();
+        TestModelExtendedTypes::deleteTable();
+        TestModelWithNameLabel::deleteTable();
+        TestModelSortable::deleteTable();
+        TestModelSearchOnly::deleteTable();
     }
 
   /**
@@ -61,7 +61,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $model->date_field = date("Y-m-d H:i:s");
         $model->save();
 
-        $indexes = DatabaseLayer::get_instance()->get_table_indexes("test_models_sortable");
+        $indexes = DatabaseLayer::getInstance()->getTableIndexes("test_models_sortable");
         $this->assertTrue(is_array($indexes));
         $this->assertTrue($indexes[0]->Column_name == "test_model_id");
     }
@@ -71,7 +71,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
    */
     public function testIndexFailOnNonExistant()
     {
-        if (DatabaseLayer::get_instance()->get_option('db_type') !== "mysql") {
+        if (DatabaseLayer::getInstance()->getOption('db_type') !== "mysql") {
             $this->markTestSkipped("MySQL Dependent");
         }
         $mysql = new \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql();

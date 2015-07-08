@@ -19,17 +19,17 @@ class ActiveRecordTest extends BaseTest
 
     public function tearDown()
     {
-        TestModel::delete_table();
-        TestModelExtendedTypes::delete_table();
-        TestModelWithNameLabel::delete_table();
-        TestModelSortable::delete_table();
-        TestModelSearchOnly::delete_table();
-        TestModelNoKey::delete_table();
+        TestModel::deleteTable();
+        TestModelExtendedTypes::deleteTable();
+        TestModelWithNameLabel::deleteTable();
+        TestModelSortable::deleteTable();
+        TestModelSearchOnly::deleteTable();
+        TestModelNoKey::deleteTable();
     }
 
     public function testTableName()
     {
-        $this->assertEquals("test_models", TestModel::get_table());
+        $this->assertEquals("test_models", TestModel::getTable());
     }
 
     public function testConstruct()
@@ -103,21 +103,21 @@ class ActiveRecordTest extends BaseTest
    */
     public function testLabels(TestModel $test_model)
     {
-        $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID 1", $test_model->get_label());
+        $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID 1", $test_model->getLabel());
 
         $with_name_label = new \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel();
         $with_name_label->name = "Wrong name here";
         $with_name_label->something_else = "Right name here";
         $with_name_label->save();
 
-        $this->assertEquals($with_name_label->something_else, $with_name_label->get_label(), "Name label works");
+        $this->assertEquals($with_name_label->something_else, $with_name_label->getLabel(), "Name label works");
     }
 
     public function testLabelAutoName()
     {
         $model = new TestModel();
         $model->name = 'bar';
-        $this->assertEquals("bar", $model->get_label());
+        $this->assertEquals("bar", $model->getLabel());
     }
 
     public function testLabelAutoDescription()
@@ -125,21 +125,21 @@ class ActiveRecordTest extends BaseTest
         $model = new TestModel();
         $model->test_model_id = $this->faker->numberBetween(1, 100000);
         $model->description = 'foo';
-        $this->assertEquals("foo", $model->get_label());
+        $this->assertEquals("foo", $model->getLabel());
     }
 
     public function testLabelManual()
     {
         $model = new TestModelWithNameLabel();
         $model->something_else = 'foo';
-        $this->assertEquals("foo", $model->get_label());
+        $this->assertEquals("foo", $model->getLabel());
     }
 
     public function testLabelFailure()
     {
         $model = new TestModel();
         $model->test_model_id = $this->faker->numberBetween(1, 100000);
-        $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID {$model->test_model_id}", $model->get_label());
+        $this->assertEquals("No label for Thru\\ActiveRecord\\Test\\Models\\TestModel ID {$model->test_model_id}", $model->getLabel());
     }
 
     public function testUpdate()
@@ -202,15 +202,15 @@ class ActiveRecordTest extends BaseTest
    */
     public function testGetClass(TestModel $testModel)
     {
-        $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", $testModel->get_class(false));
-        $this->assertEquals("TestModel", $testModel->get_class(true));
+        $this->assertEquals("Thru\\ActiveRecord\\Test\\Models\\TestModel", $testModel->getClass(false));
+        $this->assertEquals("TestModel", $testModel->getClass(true));
     }
 
     public function testCreateTableOnSearch()
     {
         $this->assertEquals(0, TestModelSearchOnly::search()->count());
 
-        TestModelSearchOnly::delete_table();
+        TestModelSearchOnly::deleteTable();
     }
 
     public function testQueryCache()
@@ -295,7 +295,7 @@ class ActiveRecordTest extends BaseTest
     public function testDestroyTableThatDoesntExist()
     {
         $model = new TestModel();
-        $model->delete_table();
+        $model->deleteTable();
         $vq = new VirtualQuery();
         $interpreter = $vq->getInterpreter();
         $interpreter->destroyTable($model);
@@ -304,13 +304,13 @@ class ActiveRecordTest extends BaseTest
     public function testSetTable()
     {
         $testModel = new TestModel();
-        $this->assertEquals("test_models", $testModel->get_database_table());
+        $this->assertEquals("test_models", $testModel->getDatabaseTable());
 
-        $testModel->set_database_table("something_else");
-        $this->assertEquals("something_else", $testModel->get_database_table());
+        $testModel->setDatabaseTable("something_else");
+        $this->assertEquals("something_else", $testModel->getDatabaseTable());
 
         $testModel = new TestModel();
-        $this->assertEquals("test_models", $testModel->get_database_table());
+        $this->assertEquals("test_models", $testModel->getDatabaseTable());
     }
 
     public function testValueIsNull()

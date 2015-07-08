@@ -14,17 +14,17 @@ class SearchCondition
         $this->operation = $operation;
     }
 
-    public function get_column()
+    public function getColumn()
     {
         return $this->column;
     }
 
-    public function get_operation()
+    public function getOperation()
     {
         return $this->operation;
     }
 
-    public function get_value()
+    public function getValue()
     {
         return $this->value;
     }

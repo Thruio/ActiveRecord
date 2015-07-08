@@ -52,19 +52,19 @@ class Search
           /* @var $model ActiveRecord */
             $model = $this->model;
 
-            if (end($this->conditions)->get_column() == $model->get_table_primary_key() && end($this->conditions)->get_operation() == '=') {
+            if (end($this->conditions)->get_column() == $model->getTablePrimaryKey() && end($this->conditions)->get_operation() == '=') {
                 $primary_key_search = true;
-                if (SearchIndex::get_instance()->exists($model->get_table_name(), end($this->conditions)->get_value())) {
+                if (SearchIndex::getInstance()->exists($model->getTableName(), end($this->conditions)->get_value())) {
                     return array(
-                    SearchIndex::get_instance()
-                    ->get($model->get_table_name(), end($this->conditions)->get_value())
+                    SearchIndex::getInstance()
+                    ->get($model->getTableName(), end($this->conditions)->get_value())
                     );
                 }
             }
             unset($model);
         }
 
-        $database = DatabaseLayer::get_instance();
+        $database = DatabaseLayer::getInstance();
 
         $select = $database->select($this->model->get_table_name(), $this->model->get_table_alias());
         $select->fields($this->model->get_table_alias());
@@ -98,8 +98,8 @@ class Search
 
         foreach ($response as $result) {
           /* @var $result ActiveRecord */
-            if ($result->get_primary_key_index()) {
-                $primary_key_column = $result->get_primary_key_index()[0];
+            if ($result->getPrimaryKeyIndex()) {
+                $primary_key_column = $result->getPrimaryKeyIndex()[0];
                 $results[$result->$primary_key_column] = $result;
             } else {
                 $results[] = $result;
@@ -107,7 +107,7 @@ class Search
         }
 
         foreach ($results as $result) {
-            $result->field_fix();
+            $result->__fieldFix();
         }
 
       // Check for ActiveRecord_class and recast as needed
@@ -118,7 +118,7 @@ class Search
       // Call __post_construct on each of the newly constructed objects.
         foreach ($results as &$result) {
           /* @var $result ActiveRecord */
-            $result->__post_construct();
+            $result->postConstruct();
           /*if ($result->__requires_recast()) {
             $result = $result->__recast();
           }*/
@@ -127,7 +127,7 @@ class Search
         if ($primary_key_search) {
             $active_record_to_store = end($results);
             if ($active_record_to_store instanceof ActiveRecord) {
-                SearchIndex::get_instance()
+                SearchIndex::getInstance()
                 ->put($this->model->get_table_name(), end($this->conditions)->get_value(), $active_record_to_store);
             }
         }

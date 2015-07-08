@@ -16,29 +16,29 @@ abstract class VersionedActiveRecord extends ActiveRecord
 
     public $_is_versioned = true;
 
-    public function __post_construct()
+    public function postConstruct()
     {
-        parent::__post_construct();
+        parent::postConstruct();
         $this->sequence = intval($this->sequence);
     }
 
     public function save($automatic_reload = true)
     {
-        $databaseLayer = DatabaseLayer::get_instance();
-        $lockController = $databaseLayer->lockController($this->get_table(), $this->get_table_alias());
+        $databaseLayer = DatabaseLayer::getInstance();
+        $lockController = $databaseLayer->lockController($this->getTable(), $this->getTableAlias());
 
       // Check the table exists.
-        $this->get_table_builder()->build();
+        $this->getTableBuilder()->build();
 
       // Lock the table.
         $lockController->lock();
 
       // Get our primary key
-        $primaryColumn = $this->get_primary_key_index()[0];
+        $primaryColumn = $this->getPrimaryKeyIndex()[0];
 
       // Get the highest primary key
         if (!$this->$primaryColumn) {
-            $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->get_table()}");
+            $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->getTable()}");
             $highestKey = end($highest)->highest;
 
           // Set our primary key to this +1
@@ -48,7 +48,7 @@ abstract class VersionedActiveRecord extends ActiveRecord
         }
 
       // Set sequence to sequence + 1
-        $highestSequence = DumbModel::query("SELECT max(sequence) as highest FROM {$this->get_table()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
+        $highestSequence = DumbModel::query("SELECT max(sequence) as highest FROM {$this->getTable()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
         $highestSequenceKey = end($highestSequence)->highest;
         if (!$highestSequenceKey) {
             $this->sequence = 1;

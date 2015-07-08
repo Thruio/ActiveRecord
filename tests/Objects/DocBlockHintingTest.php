@@ -37,7 +37,7 @@ class DocBlockHintingTest extends BaseTest
         $tmp->date_field = $this->faker->datetime()->format(self::TIME_STORAGE_FORMAT);
         $tmp->save();
 
-        SearchIndex::get_instance()->wipe();
+        SearchIndex::getInstance()->wipe();
         $j = TestModelBadHinting::search()->where('test_model_id', $tmp->test_model_id)->execOne();
     }
 }
