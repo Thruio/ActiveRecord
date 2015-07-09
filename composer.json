@@ -36,5 +36,8 @@
     "psr-4": {
       "Thru\\ActiveRecord\\Test\\": "tests/"
     }
-  }
+  },
+  "bin": [
+    "ar_benchmark"
+  ]
 }
