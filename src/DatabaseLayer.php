@@ -3,6 +3,7 @@ namespace Thru\ActiveRecord;
 
 use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
+use Predis\Client as RedisCache;
 
 class DatabaseLayer
 {
@@ -11,6 +12,7 @@ class DatabaseLayer
 
     private static $instance;
     private $options;
+    private $cache;
     private $logger;
 
     /**
@@ -25,11 +27,60 @@ class DatabaseLayer
         return DatabaseLayer::$instance;
     }
 
+    /**
+     * @param DatabaseLayer $instance
+     */
     public static function setInstance(DatabaseLayer $instance)
     {
         self::$instance = $instance;
     }
 
+    /**
+     * Destroy current instance
+     * @return bool
+     */
+    public static function destroyInstance()
+    {
+        self::$instance = null;
+        return true;
+    }
+
+    /**
+     * @param $cache
+     * @return $this
+     * @throws CacheException
+     */
+    public function setCache($cache)
+    {
+        if ($cache instanceof RedisCache) {
+            $this->cache = $cache;
+        } else {
+            throw new CacheException("Unsupported caching mechanism: " . get_class($cache));
+        }
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
+     * Decide if we're going to use a cache or not.
+     * @return bool
+     */
+    public function useCache()
+    {
+        return $this->cache!=null?true:false;
+    }
+
+    /**
+     * @param Logger $logger
+     * @return $this
+     */
     public function setLogger(Logger $logger = null)
     {
         $this->logger = $logger;
@@ -42,12 +93,6 @@ class DatabaseLayer
     public function getLogger()
     {
         return $this->logger;
-    }
-
-    public static function destroyInstance()
-    {
-        self::$instance = null;
-        return true;
     }
 
     /**

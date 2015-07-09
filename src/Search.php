@@ -110,12 +110,12 @@ class Search
             $result->__fieldFix();
         }
 
-      // Check for ActiveRecord_class and recast as needed
-      /*foreach ($results as $key => $result) {
-        $results[$key] = $result->__recast();
-      }*/
+        // Check for ActiveRecord_class and recast as needed
+        /*foreach ($results as $key => $result) {
+            $results[$key] = $result->__recast();
+        }*/
 
-      // Call __post_construct on each of the newly constructed objects.
+        // Call __post_construct on each of the newly constructed objects.
         foreach ($results as &$result) {
           /* @var $result ActiveRecord */
             $result->postConstruct();

@@ -21,7 +21,11 @@
     "lstrojny/phpunit-clever-and-smart": "0.*",
     "brianium/paratest": "dev-master",
     "fiunchinho/phpunit-randomizer": "dev-master",
-    "squizlabs/php_codesniffer": "*"
+    "squizlabs/php_codesniffer": "*",
+    "doctrine/cache": "~1.4"
+  },
+  "suggest": {
+    "doctrine/cache": "For caching, we need Doctrine/Cache"
   },
   "autoload"   : {
     "psr-4": {
