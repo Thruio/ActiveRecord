@@ -14,15 +14,15 @@ $cacheRedis = new Doctrine\Common\Cache\RedisCache();
 $cacheRedis->setRedis($redis);
 
 $caches = [
-    'none' => false,
-    'redis' => $cacheRedis
+  'none' => false,
+  'redis' => $cacheRedis
 ];
 
 foreach ($testDatabases as $name => $config) {
-    foreach($caches as $cacheName => $cache) {
+    foreach ($caches as $cacheName => $cache) {
         $database = new \Thru\ActiveRecord\DatabaseLayer($config);
 
-        if($cache){
+        if ($cache) {
             $database->setCache($cache);
             $name = "{$name} w/{$cacheName}";
         }
@@ -50,8 +50,9 @@ foreach ($testDatabases as $name => $config) {
         echo "Search:\n";
         $start = microtime(true);
         for ($i = 1; $i <= $loops; $i++) {
-            $object = \Thru\ActiveRecord\Test\Models\TestModel::search()->where('integer_field',
-              rand(0, $loops))->execOne();
+            $object = \Thru\ActiveRecord\Test\Models\TestModel::search()
+              ->where('integer_field', rand(0, $loops))
+              ->execOne();
             echo "\r > Search {$i}";
         }
         $end = microtime(true);
@@ -62,7 +63,9 @@ foreach ($testDatabases as $name => $config) {
         echo "Destroy:\n";
         $start = microtime(true);
         for ($i = 1; $i <= $loops; $i++) {
-            $object = \Thru\ActiveRecord\Test\Models\TestModel::search()->where('integer_field', $i)->execOne();
+            $object = \Thru\ActiveRecord\Test\Models\TestModel::search()
+              ->where('integer_field', $i)
+              ->execOne();
             $object->delete();
             echo "\r > Search {$i}";
         }
