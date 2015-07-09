@@ -2,6 +2,7 @@
 
 namespace Thru\ActiveRecord;
 
+use Guzzle\Common\Version;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 
@@ -228,6 +229,16 @@ abstract class ActiveRecord
         return $this->_columns;
     }
 
+    protected function getCacheIdentifier()
+    {
+        $elements = [
+            $this->getClass(),
+            $this instanceof VersionedActiveRecord ? $this->getId() . "-" . $this->sequence : $this->getId(),
+        ];
+
+        return md5(implode("::", $elements));
+    }
+
     /**
      * Load an object from data fed to us as an array (or similar.)
      *
@@ -245,6 +256,10 @@ abstract class ActiveRecord
             }
         }
         $this->postConstruct();
+        if (DatabaseLayer::getInstance()->useCache()) {
+            $cache = DatabaseLayer::getInstance()->getCache();
+            $cache->save($this->getCacheIdentifier(), serialize($this));
+        }
         return $this;
     }
 
@@ -295,6 +310,12 @@ abstract class ActiveRecord
             if ($primary_key_column) {
                 $this->$primary_key_column = $new_id;
             }
+        }
+
+        // Expire cache.
+        if (DatabaseLayer::getInstance()->useCache()) {
+            $cache = DatabaseLayer::getInstance()->getCache();
+            $cache->delete($this->getCacheIdentifier());
         }
 
         // Expire any existing copy of this object.

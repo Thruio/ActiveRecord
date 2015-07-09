@@ -1,6 +1,7 @@
 <?php
 namespace Thru\ActiveRecord;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Logger;
 use Thru\ActiveRecord\DatabaseLayer\ConfigurationException;
 use Predis\Client as RedisCache;
@@ -46,22 +47,17 @@ class DatabaseLayer
     }
 
     /**
-     * @param $cache
+     * @param CacheProvider $cache
      * @return $this
-     * @throws CacheException
      */
-    public function setCache($cache)
+    public function setCache(CacheProvider $cache)
     {
-        if ($cache instanceof RedisCache) {
-            $this->cache = $cache;
-        } else {
-            throw new CacheException("Unsupported caching mechanism: " . get_class($cache));
-        }
+        $this->cache = $cache;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return CacheProvider
      */
     public function getCache()
     {
@@ -74,7 +70,7 @@ class DatabaseLayer
      */
     public function useCache()
     {
-        return $this->cache!=null?true:false;
+        return $this->cache instanceof CacheProvider ? true : false;
     }
 
     /**
