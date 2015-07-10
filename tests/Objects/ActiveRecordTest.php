@@ -340,6 +340,14 @@ class ActiveRecordTest extends BaseTest
         $this->assertNull($testModelNullable->text_field_nullable);
     }
 
+    public function testCheckGetTablePrimaryKey()
+    {
+        \PHPUnit_Framework_Error_Deprecated::$enabled = false;
+        $testModel = new TestModel();
+        $this->assertEquals("test_model_id", @$testModel->getTablePrimaryKey());
+        \PHPUnit_Framework_Error_Deprecated::$enabled = true;
+    }
+
     /**
      * @expectedException \PHPUnit_Framework_Error_Deprecated
      * @expectedExceptionMessage getTablePrimaryKey() is deprecated. Use getIDField() instead.
@@ -348,5 +356,8 @@ class ActiveRecordTest extends BaseTest
     {
         $testModel = new TestModel();
         $testModel->getTablePrimaryKey();
+
     }
+
+
 }
