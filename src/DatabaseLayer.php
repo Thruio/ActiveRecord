@@ -114,7 +114,7 @@ class DatabaseLayer
 
     /**
      * @param $table_name
-     * @param null $table_alias
+     * @param null       $table_alias
      * @return DatabaseLayer\Select
      */
     public function select($table_name, $table_alias = null)
@@ -187,14 +187,14 @@ class DatabaseLayer
     private function __getDsn()
     {
         switch ($this->options['db_type']) {
-            case 'Mysql':
-                $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
-                break;
-            case 'Sqlite':
-                $dsn = "sqlite:{$this->options['db_file']}";
-                break;
-            default:
-                throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
+        case 'Mysql':
+            $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
+            break;
+        case 'Sqlite':
+            $dsn = "sqlite:{$this->options['db_file']}";
+            break;
+        default:
+            throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");
         }
         return $dsn;
     }

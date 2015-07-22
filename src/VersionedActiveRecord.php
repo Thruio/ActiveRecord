@@ -27,27 +27,27 @@ abstract class VersionedActiveRecord extends ActiveRecord
         $databaseLayer = DatabaseLayer::getInstance();
         $lockController = $databaseLayer->lockController($this->getTable(), $this->getTableAlias());
 
-      // Check the table exists.
+        // Check the table exists.
         $this->getTableBuilder()->build();
 
-      // Lock the table.
+        // Lock the table.
         $lockController->lock();
 
-      // Get our primary key
+        // Get our primary key
         $primaryColumn = $this->getIDField();
 
-      // Get the highest primary key
+        // Get the highest primary key
         if (!$this->$primaryColumn) {
             $highest = DumbModel::query("SELECT max({$primaryColumn}) as highest FROM {$this->getTable()}");
             $highestKey = end($highest)->highest;
 
-          // Set our primary key to this +1
+            // Set our primary key to this +1
             $newKey = isset($highestKey)?$highestKey + 1 : 1;
             $this->$primaryColumn = $newKey;
-          #echo "{$this->get_table()}: {$primaryColumn} = {$newKey}\n";
+            // echo "{$this->get_table()}: {$primaryColumn} = {$newKey}\n";
         }
 
-      // Set sequence to sequence + 1
+        // Set sequence to sequence + 1
         $highestSequence = DumbModel::query("SELECT max(sequence) as highest FROM {$this->getTable()} WHERE `{$primaryColumn}` = '{$this->$primaryColumn}'");
         $highestSequenceKey = end($highestSequence)->highest;
         if (!$highestSequenceKey) {
@@ -56,13 +56,13 @@ abstract class VersionedActiveRecord extends ActiveRecord
             $this->sequence = intval($highestSequenceKey) + 1;
         }
 
-      // Save the object
+        // Save the object
         parent::save($automatic_reload);
 
-      // Unlock the table.
+        // Unlock the table.
         $lockController->unlock();
 
-      // return the object.
+        // return the object.
         return $this;
     }
 }

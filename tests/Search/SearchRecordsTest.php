@@ -7,11 +7,11 @@ use \Thru\ActiveRecord\Test\Models\TestModelSortable;
 class SearchRecordsTest extends \PHPUnit_Framework_TestCase
 {
 
-  /* @var $one TestModelSortable */
+    /* @var $one TestModelSortable */
     private $one;
-  /* @var $two TestModelSortable */
+    /* @var $two TestModelSortable */
     private $two;
-  /* @var $three TestModelSortable */
+    /* @var $three TestModelSortable */
     private $three;
 
     public function setUp()
@@ -40,7 +40,7 @@ class SearchRecordsTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-      //TestModelSortable::delete_table();
+        //TestModelSortable::delete_table();
     }
 
     public function testSearchBySlug()
@@ -137,7 +137,7 @@ class SearchRecordsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("Parakeet", end($array)->text_field);
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
    * @expectedExceptionMessage Bad ORDER direction: invalid
    */

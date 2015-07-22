@@ -46,8 +46,8 @@ class ActiveRecordTest extends BaseTest
 
     public function testCreate()
     {
-      /* @var $test_model TestModel */
-      /* @var $result_object TestModel */
+        /* @var $test_model TestModel */
+        /* @var $result_object TestModel */
         $test_model = TestModel::factory();
         $test_model->integer_field = $this->faker->numberBetween(0, 9999999);
         $test_model->text_field = $this->faker->paragraph(5);
@@ -66,8 +66,8 @@ class ActiveRecordTest extends BaseTest
 
     public function testSearchOneResult()
     {
-      /* @var $test_model TestModel */
-      /* @var $result_object TestModel */
+        /* @var $test_model TestModel */
+        /* @var $result_object TestModel */
         $test_model = TestModel::factory();
         $test_model->integer_field = $this->faker->numberBetween(0, 9999999);
         $test_model->text_field = $this->faker->paragraph(5);
@@ -97,7 +97,7 @@ class ActiveRecordTest extends BaseTest
         $this->assertFalse(TestModel::search()->where('test_model_id', -1)->execOne());
     }
 
-  /**
+    /**
    * @depends testSearchOneResult
    * @param \Thru\ActiveRecord\Test\Models\TestModel $test_model
    */
@@ -164,7 +164,7 @@ class ActiveRecordTest extends BaseTest
         return $reload_again;
     }
 
-  /**
+    /**
    * @depends testUpdate
    */
     public function testReturnedTypes(TestModel $result)
@@ -188,7 +188,7 @@ class ActiveRecordTest extends BaseTest
         return $deletable->test_model_id;
     }
 
-  /**
+    /**
    * @depends testDelete
    */
     public function testDeleteVerify($test_model_id)
@@ -197,7 +197,7 @@ class ActiveRecordTest extends BaseTest
         $this->assertFalse($reload, "Delete verified");
     }
 
-  /**
+    /**
    * @depends testUpdate
    */
     public function testGetClass(TestModel $testModel)
@@ -221,12 +221,12 @@ class ActiveRecordTest extends BaseTest
         $insert->date_field = date("Y-m-d H:i:s");
         $insert->save();
 
-      // Run once
+        // Run once
         $first_time = microtime(true);
         $first = TestModel::search()->where('test_model_id', 1)->execOne();
         $first_time = microtime(true) - $first_time;
 
-      // Run twice
+        // Run twice
         $second_time = microtime(true);
         $second = TestModel::search()->where('test_model_id', 1)->execOne();
         $second_time = microtime(true) - $second_time;
@@ -255,7 +255,7 @@ class ActiveRecordTest extends BaseTest
 
 
 
-  /**
+    /**
    * TODO: flesh this out
    */
     public function testTableBad()
@@ -279,7 +279,7 @@ class ActiveRecordTest extends BaseTest
 
         $reload = TestModel::search()->where('test_model_id', $model->test_model_id)->execOne();
         $this->assertEquals(JsonPrettyPrinter::Json($object), $reload->text_field);
-      // TODO: This should really be returning a deserialised blob.
+        // TODO: This should really be returning a deserialised blob.
 
         $reload->text_field = $different_object;
         $reload->save();
@@ -288,7 +288,7 @@ class ActiveRecordTest extends BaseTest
         $this->assertEquals(JsonPrettyPrinter::Json($different_object), $reload_again->text_field);
     }
 
-  /**
+    /**
    * @expectedExceptionMessage Unknown table 'test_models'
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
    */
@@ -326,7 +326,7 @@ class ActiveRecordTest extends BaseTest
         return $testModelNullable;
     }
 
-  /**
+    /**
    * @depends testValueIsNull
    */
     public function testValueIsNullUpdatable(TestModelNullable $testModelNullable)

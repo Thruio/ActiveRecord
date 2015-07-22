@@ -9,7 +9,9 @@ use Faker;
 class DumbModelTest extends \PHPUnit_Framework_TestCase
 {
 
-  /** @var $faker \Faker\Generator */
+    /**
+ * @var $faker \Faker\Generator 
+*/
     private $faker;
 
     public function setUp()
@@ -45,7 +47,7 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
-  /**
+    /**
    * @depends testDumbModelFetchOne
    */
     public function testDumbModelResponse($result)
@@ -56,7 +58,7 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(property_exists($result, 'date_field'));
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
    */
     public function testTableExistsGotcha()

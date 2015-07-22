@@ -9,7 +9,7 @@ use Thru\ActiveRecord\Test\Models\TestModelBadHinting;
 class DocBlockHintingTest extends BaseTest
 {
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage No type hinting/docblock found for 'text_field' in 'Thru\ActiveRecord\Test\Models\TestModelBadHinting'.
    */
@@ -25,7 +25,7 @@ class DocBlockHintingTest extends BaseTest
         return $o->test_model_id;
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage No type hinting/docblock found for 'text_field' in 'Thru\ActiveRecord\Test\Models\TestModelBadHinting'.
    */

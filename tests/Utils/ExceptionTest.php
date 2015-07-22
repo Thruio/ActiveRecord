@@ -4,7 +4,7 @@ namespace Thru\ActiveRecord\Test;
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
 
-  /**
+    /**
    * @expectedException         \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage  Message Here
    */

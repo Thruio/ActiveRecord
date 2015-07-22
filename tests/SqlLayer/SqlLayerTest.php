@@ -15,7 +15,7 @@ use Thru\ActiveRecord\Test\Models\BogusVirtualQuery;
 class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
 {
 
-  /**
+    /**
    * @var $base \Thru\ActiveRecord\DatabaseLayer\Sql\Base
    * @var $mysql \Thru\ActiveRecord\DatabaseLayer\Sql\Mysql
    */
@@ -33,7 +33,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         TestModelSearchOnly::deleteTable();
     }
 
-  /**
+    /**
    * @expectedException         \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage  Operation BogusVirtualQuery not supported
    */
@@ -43,7 +43,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $this->mysql->process($bogus_virtual_query);
     }
 
-  /**
+    /**
    * @expectedException         \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage  Base::process should have been overridden
    */
@@ -66,7 +66,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($indexes[0]->Column_name == "test_model_id");
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
    */
     public function testIndexFailOnNonExistant()
@@ -93,7 +93,7 @@ class SqlLayerMysqlTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, reset($result));
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\Exception
     */
     public function testPassthruInvalidSQL()

@@ -20,7 +20,7 @@ class VersionedActiveRecordTest extends BaseTest
 
     public function tearDown()
     {
-      #TestVersionedModel::delete_table();
+        // TestVersionedModel::delete_table();
     }
 
     public function testCreateVersionedRecord()
@@ -33,7 +33,7 @@ class VersionedActiveRecordTest extends BaseTest
         return $versionedRecord;
     }
 
-  /**
+    /**
    * @depends testCreateVersionedRecord
    */
     public function testUpdateVersionedRecord(TestVersionedModel $versionedRecord)
@@ -68,7 +68,7 @@ class VersionedActiveRecordTest extends BaseTest
         $barry = new TestVersionedModel();
         $oliver = new TestVersionedModel();
 
-      // Round 1.
+        // Round 1.
         $barry->value = "cat";
         $barry->save();
         $oliver->value = "ford";
@@ -78,12 +78,12 @@ class VersionedActiveRecordTest extends BaseTest
         $this->assertEquals("cat", $barry->value);
         $this->assertEquals("ford", $oliver->value);
 
-      // Round 2.
+        // Round 2.
         $barry->value = "dog";
         $barry->save();
         $this->assertEquals("dog", $barry->value);
 
-      // Round 3.
+        // Round 3.
         $barry->value = "mouse";
         $barry->save();
         $this->assertEquals("mouse", $barry->value);
@@ -91,7 +91,7 @@ class VersionedActiveRecordTest extends BaseTest
         $oliver->save();
         $this->assertEquals("chevrolet", $oliver->value);
 
-      // Verify.
+        // Verify.
         $this->assertEquals($barry_original_id, $barry->id);
         $this->assertEquals($oliver_original_id, $oliver->id);
     }

@@ -35,13 +35,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("a_d_d", $table->getAlias());
     }
 
-  /**
+    /**
    * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDestroyFailureException
    */
-  /*public function testDoubleDestroyTable(){
+    /*public function testDoubleDestroyTable(){
     $test_model = new TestModel();
     $table_builder = new TableBuilder($test_model);
     $table_builder->destroy();
     $table_builder->destroy();
-  }*/
+    }*/
 }

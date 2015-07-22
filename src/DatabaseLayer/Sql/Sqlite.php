@@ -35,7 +35,7 @@ class Sqlite extends GenericSql
 
         $conditions = $this->processConditions($thing);
 
-      // Handle LIMIT & OFFSET
+        // Handle LIMIT & OFFSET
         $limit = '';
         $offset = '';
         if ($thing->getLimit()) {
@@ -51,23 +51,23 @@ class Sqlite extends GenericSql
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
                 switch (strtolower($order->getDirection())) {
-                    case 'asc':
-                    case 'ascending':
-                        $direction = 'ASC';
-                        break;
-                    case 'desc':
-                    case 'descending':
-                        $direction = 'DESC';
-                        break;
-                    case 'rand()':
-                    case 'rand':
-                    case 'random()':
-                    case 'random':
-                        $column = '';
-                        $direction = 'RANDOM()';
-                        break;
-                    default:
-                        throw new Exception("Bad ORDER direction: {$order->getDirection()}");
+                case 'asc':
+                case 'ascending':
+                    $direction = 'ASC';
+                    break;
+                case 'desc':
+                case 'descending':
+                    $direction = 'DESC';
+                    break;
+                case 'rand()':
+                case 'rand':
+                case 'random()':
+                case 'random':
+                    $column = '';
+                    $direction = 'RANDOM()';
+                    break;
+                default:
+                    throw new Exception("Bad ORDER direction: {$order->getDirection()}");
                 }
 
                 $orders[] = $column . " " . $direction;
@@ -136,7 +136,7 @@ class Sqlite extends GenericSql
         $values   = "(" . implode(", ", $values) . ")";
         $query    = "{$selector}\n{$columns} \nVALUES \n{$values}";
 
-        #echo "*** Just before query(): ".$thing->getModel() . "\n";
+        // echo "*** Just before query(): ".$thing->getModel() . "\n";
         $this->query($query, $thing->getModel());
 
         $insertId = $this->lastInsertId();
@@ -228,26 +228,26 @@ class Sqlite extends GenericSql
             if (isset($schema[$parameter])) {
                 $psuedo_type = $schema[$parameter]['type'];
                 switch (strtolower($psuedo_type)) {
-                    case 'int':
-                    case 'integer':
-                        $type = "INTEGER";
-                        $auto_increment_possible = true;
-                        break;
+                case 'int':
+                case 'integer':
+                    $type = "INTEGER";
+                    $auto_increment_possible = true;
+                    break;
 
-                    case 'date':
-                    case 'datetime':
-                    case 'enum':
-                    case 'string':
-                    case 'text':
-                    case 'uuid':
-                    case 'md5':
-                    case 'sha1':
-                        $type = "TEXT";
-                        break;
+                case 'date':
+                case 'datetime':
+                case 'enum':
+                case 'string':
+                case 'text':
+                case 'uuid':
+                case 'md5':
+                case 'sha1':
+                    $type = "TEXT";
+                    break;
 
-                    case 'blob':
-                        $type = 'BLOB';
-                        break;
+                case 'blob':
+                    $type = 'BLOB';
+                    break;
 
                 }
             }

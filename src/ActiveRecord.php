@@ -88,7 +88,7 @@ abstract class ActiveRecord
     /**
      * Get the short alias name of a table.
      *
-     * @param string $table_name Optional table name
+     * @param  string $table_name Optional table name
      * @return string Table alias
      */
     public function getTableAlias($table_name = null)
@@ -118,7 +118,7 @@ abstract class ActiveRecord
      * Get table primary key column name
      *
      * @deprecated
-     * @return string|false
+     * @return     string|false
      */
     public function getTablePrimaryKey()
     {
@@ -198,13 +198,13 @@ abstract class ActiveRecord
         if (!$this->_columns) {
             foreach (get_object_vars($this) as $potential_column => $discard) {
                 switch ($potential_column) {
-                    case 'table':
-                    case substr($potential_column, 0, 1) == "_":
-                        // Not a valid column
-                        break;
-                    default:
-                        $this->_columns[] = $potential_column;
-                        break;
+                case 'table':
+                case substr($potential_column, 0, 1) == "_":
+                    // Not a valid column
+                    break;
+                default:
+                    $this->_columns[] = $potential_column;
+                    break;
                 }
             }
         }
@@ -359,7 +359,7 @@ abstract class ActiveRecord
         $delete->condition($this->getIDField(), $this->getId());
         $delete->execute($this->getClass());
 
-      // Invalidate cache.
+        // Invalidate cache.
         SearchIndex::getInstance()->expire($this->getTableName(), $this->getId());
 
         return true;

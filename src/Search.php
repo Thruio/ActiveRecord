@@ -49,7 +49,7 @@ class Search
     {
         $primary_key_search = false;
         if (count($this->conditions) == 1) {
-          /* @var $model ActiveRecord */
+            /* @var $model ActiveRecord */
             $model = $this->model;
 
             if (end($this->conditions)->getColumn() == $model->getIDField() && end($this->conditions)->getOperation() == '=') {
@@ -97,7 +97,7 @@ class Search
         $results = array();
 
         foreach ($response as $result) {
-          /* @var $result ActiveRecord */
+            /* @var $result ActiveRecord */
             if ($result->getPrimaryKeyIndex()) {
                 $primary_key_column = $result->getIDField();
                 $results[$result->$primary_key_column] = $result;
@@ -117,11 +117,11 @@ class Search
 
         // Call __post_construct on each of the newly constructed objects.
         foreach ($results as &$result) {
-          /* @var $result ActiveRecord */
+            /* @var $result ActiveRecord */
             $result->postConstruct();
-          /*if ($result->__requires_recast()) {
+            /*if ($result->__requires_recast()) {
             $result = $result->__recast();
-          }*/
+            }*/
         }
 
         if ($primary_key_search) {

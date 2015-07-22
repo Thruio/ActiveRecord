@@ -36,7 +36,7 @@ class Base extends \PDO
         $username = !empty($username)?$username:null;
         $password = !empty($password)?$password:null;
 
-      //$options = array(self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION);
+        //$options = array(self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION);
 
         parent::__construct($dsn, $username, $password); //, $options);
 
@@ -45,8 +45,8 @@ class Base extends \PDO
 
     public function query($query, $model = 'StdClass')
     {
-      /* @var $result \PDOStatement */
-      #echo "*** Model in Query: " . $model . "\n";
+        /* @var $result \PDOStatement */
+        // echo "*** Model in Query: " . $model . "\n";
         try {
             $exec_time_start = microtime(true);
             $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
@@ -69,31 +69,31 @@ class Base extends \PDO
 
     public function handleError($model, $query, \PDOException $e)
     {
-      #echo "*** Model in handleError: " . $model . "\n";
+        // echo "*** Model in handleError: " . $model . "\n";
         switch ($e->getCode()) {
           // MySQL table missing
-            case '42S02':
+        case '42S02':
             // SQLite table missing
-            case 'HY000' && (stripos($e->getMessage(), "no such table") !== false):
-                if ($model != 'StdClass') {
-                    $instance = new $model();
-                    if ($instance instanceof ActiveRecord) {
-                        $table_builder = new TableBuilder($instance);
-                        $table_builder->build();
-                        return $this->query($query, $model); // Re-run the query
-                    }
+        case 'HY000' && (stripos($e->getMessage(), "no such table") !== false):
+            if ($model != 'StdClass') {
+                $instance = new $model();
+                if ($instance instanceof ActiveRecord) {
+                    $table_builder = new TableBuilder($instance);
+                    $table_builder->build();
+                    return $this->query($query, $model); // Re-run the query
                 }
-                throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
-            default:
-              // Write exception to log.
-                if (DatabaseLayer::getInstance()->getLogger()) {
-                    DatabaseLayer::getInstance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
-                }
-                throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
+            }
+            throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
+        default:
+            // Write exception to log.
+            if (DatabaseLayer::getInstance()->getLogger()) {
+                DatabaseLayer::getInstance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
+            }
+            throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
         }
     }
 
-  /**
+    /**
    * Turn a VirtualQuery into a SQL statement
    * @param VirtualQuery $thing
    * @throws Exception

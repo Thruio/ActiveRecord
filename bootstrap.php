@@ -1,7 +1,7 @@
 <?php
 
-require_once("vendor/autoload.php");
-require_once("test_configs.php");
+require_once "vendor/autoload.php";
+require_once "test_configs.php";
 
 use Monolog\Formatter as LogFormatter;
 use Monolog\Handler as LogHandler;

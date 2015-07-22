@@ -9,7 +9,7 @@ use Thru\ActiveRecord\Test\Models\TestModel;
 class DatabaseLayerSelectTest extends \PHPUnit_Framework_TestCase
 {
 
-  /**
+    /**
    * @expectedException         \Thru\ActiveRecord\Exception
    * @expectedExceptionMessage  No table matching alias 'doesntexist' selectable
    */
