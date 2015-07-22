@@ -2,9 +2,9 @@
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
 use Monolog\Logger;
+use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
-use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
@@ -50,24 +50,29 @@ class Sqlite extends GenericSql
             foreach ($thing->getOrders() as $order) {
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
-                switch (strtolower($order->getDirection())) {
-                case 'asc':
-                case 'ascending':
-                    $direction = 'ASC';
-                    break;
-                case 'desc':
-                case 'descending':
-                    $direction = 'DESC';
-                    break;
-                case 'rand()':
-                case 'rand':
-                case 'random()':
-                case 'random':
-                    $column = '';
-                    $direction = 'RANDOM()';
-                    break;
-                default:
-                    throw new Exception("Bad ORDER direction: {$order->getDirection()}");
+                if (in_array($order->getColumn(), ['rand', 'rand()', 'random()', 'random'])) {
+                    $column = 'RANDOM()';
+                    $direction = '';
+                } else {
+                    switch (strtolower($order->getDirection())) {
+                        case 'asc':
+                        case 'ascending':
+                            $direction = 'ASC';
+                            break;
+                        case 'desc':
+                        case 'descending':
+                            $direction = 'DESC';
+                            break;
+                        case 'rand()':
+                        case 'rand':
+                        case 'random()':
+                        case 'random':
+                            $column = '';
+                            $direction = '';
+                            break;
+                        default:
+                            throw new Exception("Bad ORDER direction: {$order->getDirection()}");
+                    }
                 }
 
                 $orders[] = $column . " " . $direction;
@@ -81,9 +86,11 @@ class Sqlite extends GenericSql
 
         $query = "{$selector}\n{$from}\n{$conditions}\n{$order}\n{$limit} {$offset}";
 
+
         $delay = microtime(true);
         $result = $this->query($query, $thing->getModel());
         $delay = microtime(true) - $delay;
+
 
         // TODO: Make this a Collection.
 
@@ -93,10 +100,10 @@ class Sqlite extends GenericSql
                 $results[] = $result_item;
             }
         }
+        #\Kint::dump(DatabaseLayer::getInstance()->getOption('db_file'), $query, $results);
 
         return $results;
     }
-
 
 
     // TODO: For the love of god, rewrite this to use PDO prepared statements
@@ -132,9 +139,9 @@ class Sqlite extends GenericSql
             $values[] = $value;
         }
         $selector = "INSERT INTO {$table->getName()} ";
-        $columns  = "(`" . implode("`, `", $keys) . "`)";
-        $values   = "(" . implode(", ", $values) . ")";
-        $query    = "{$selector}\n{$columns} \nVALUES \n{$values}";
+        $columns = "(`" . implode("`, `", $keys) . "`)";
+        $values = "(" . implode(", ", $values) . ")";
+        $query = "{$selector}\n{$columns} \nVALUES \n{$values}";
 
         // echo "*** Just before query(): ".$thing->getModel() . "\n";
         $this->query($query, $thing->getModel());
@@ -199,7 +206,7 @@ class Sqlite extends GenericSql
         $indexesResult = $indexes->fetchAll();
 
         foreach ($indexesResult as $index) {
-            if ($index->pk==1) {
+            if ($index->pk == 1) {
                 $result = new \StdClass();
                 $result->Column_name = $index->name;
                 $result->Auto_increment = true;
@@ -207,6 +214,7 @@ class Sqlite extends GenericSql
             }
         }
         $this->known_indexes[$table] = $results;
+
         return $results;
     }
 
@@ -228,26 +236,26 @@ class Sqlite extends GenericSql
             if (isset($schema[$parameter])) {
                 $psuedo_type = $schema[$parameter]['type'];
                 switch (strtolower($psuedo_type)) {
-                case 'int':
-                case 'integer':
-                    $type = "INTEGER";
-                    $auto_increment_possible = true;
-                    break;
+                    case 'int':
+                    case 'integer':
+                        $type = "INTEGER";
+                        $auto_increment_possible = true;
+                        break;
 
-                case 'date':
-                case 'datetime':
-                case 'enum':
-                case 'string':
-                case 'text':
-                case 'uuid':
-                case 'md5':
-                case 'sha1':
-                    $type = "TEXT";
-                    break;
+                    case 'date':
+                    case 'datetime':
+                    case 'enum':
+                    case 'string':
+                    case 'text':
+                    case 'uuid':
+                    case 'md5':
+                    case 'sha1':
+                        $type = "TEXT";
+                        break;
 
-                case 'blob':
-                    $type = 'BLOB';
-                    break;
+                    case 'blob':
+                        $type = 'BLOB';
+                        break;
 
                 }
             }
@@ -270,7 +278,7 @@ class Sqlite extends GenericSql
             }
 
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
-            $nullability = $is_primary_key?'':$nullability;
+            $nullability = $is_primary_key ? '' : $nullability;
 
             $is_primary_key = !$model instanceof VersionedActiveRecord ? $is_primary_key : null;
 
@@ -278,9 +286,9 @@ class Sqlite extends GenericSql
         }
 
         $query = "CREATE TABLE IF NOT EXISTS `{$model->getTableName()}`\n";
-        $query.= "(\n";
-        $query.= implode(",\n", $params)."\n";
-        $query.= ")\n";
+        $query .= "(\n";
+        $query .= implode(",\n", $params) . "\n";
+        $query .= ")\n";
 
         $this->query($query);
 
@@ -293,12 +301,20 @@ class Sqlite extends GenericSql
     public function query($query, $model = 'StdClass')
     {
         try {
-            return parent::query($query, $model);
+            $result = parent::query($query, $model);
+            $error = parent::errorInfo();
+            if($error['2'] == 'database_is_locked'){
+                throw new DatabaseLayer\LockingException("Database is locked.");
+            }
+            return $result;
         } catch (DatabaseLayer\TableDoesntExistException $tdee) {
+            echo "Caught";
             if (stripos($tdee->getMessage(), "HY000") !== false) {
                 if (stripos($tdee->getMessage(), "no such table") !== false) {
-                    $table = str_replace("HY000: SQLSTATE[HY000]: General error: 1 no such table: ", "", $tdee->getMessage());
-                    throw new DatabaseLayer\TableDoesntExistException("42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'", $tdee->getCode(), $tdee);
+                    $table = str_replace("HY000: SQLSTATE[HY000]: General error: 1 no such table: ", "",
+                      $tdee->getMessage());
+                    throw new DatabaseLayer\TableDoesntExistException("42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'",
+                      $tdee->getCode(), $tdee);
                 }
             }
             throw $tdee;

@@ -48,8 +48,11 @@ class Base extends \PDO
         /* @var $result \PDOStatement */
         // echo "*** Model in Query: " . $model . "\n";
         try {
+
             $exec_time_start = microtime(true);
             $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
+
+            #\Kint::dump($query, $model, $result, "There are {$result->rowCount()} elements.", parent::errorInfo());
 
             $exec_time_end = microtime(true);
             $exec_time = $exec_time_end - $exec_time_start;
@@ -60,6 +63,7 @@ class Base extends \PDO
             $this->query_log[] = new Log($query, $exec_time);
             return $result;
         } catch (\PDOException $e) {
+            #\Kint::dump($e->getMessage(), $query, $result);
             if (DatabaseLayer::getInstance()->getLogger()) {
                 DatabaseLayer::getInstance()->getLogger()->addDebug("Query() Caught Exception: {$e->getMessage()}");
             }
