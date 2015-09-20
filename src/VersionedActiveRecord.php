@@ -65,4 +65,17 @@ abstract class VersionedActiveRecord extends ActiveRecord
         // return the object.
         return $this;
     }
+
+    public function delete(){
+        $update = new DatabaseLayer\Update($this->_table);
+        $update->setData(['deleted' => 'Yes']);
+        $update->condition($this->getIDField(), $this->getId());
+        $update->condition('sequence', $this->sequence);
+        $update->execute();
+        #echo "Deleting {$this->_table} with id = {$this->getId()}, sequence = {$this->sequence}\n";
+
+        $this->reload();
+        return $this;
+    }
+
 }
