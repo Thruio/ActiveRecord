@@ -198,13 +198,13 @@ abstract class ActiveRecord
         if (!$this->_columns) {
             foreach (get_object_vars($this) as $potential_column => $discard) {
                 switch ($potential_column) {
-                case 'table':
-                case substr($potential_column, 0, 1) == "_":
-                    // Not a valid column
-                    break;
-                default:
-                    $this->_columns[] = $potential_column;
-                    break;
+                    case 'table':
+                    case substr($potential_column, 0, 1) == "_":
+                        // Not a valid column
+                        break;
+                    default:
+                        $this->_columns[] = $potential_column;
+                        break;
                 }
             }
         }

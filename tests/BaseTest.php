@@ -8,7 +8,7 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
- * @var $faker Generator 
+ * @var $faker Generator
 */
     protected $faker;
     const TIME_TEST_FORMAT = "%d-%d-%d %d:%d:%d";

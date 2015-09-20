@@ -10,7 +10,7 @@ class DumbModelTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
- * @var $faker \Faker\Generator 
+ * @var $faker \Faker\Generator
 */
     private $faker;
 

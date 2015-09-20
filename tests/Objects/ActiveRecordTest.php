@@ -358,6 +358,4 @@ class ActiveRecordTest extends BaseTest
         $testModel->getTablePrimaryKey();
 
     }
-
-
 }

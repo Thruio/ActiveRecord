@@ -303,7 +303,7 @@ class Sqlite extends GenericSql
         try {
             $result = parent::query($query, $model);
             $error = parent::errorInfo();
-            if($error['2'] == 'database_is_locked'){
+            if ($error['2'] == 'database_is_locked') {
                 throw new DatabaseLayer\LockingException("Database is locked.");
             }
             return $result;
@@ -311,10 +311,16 @@ class Sqlite extends GenericSql
             echo "Caught";
             if (stripos($tdee->getMessage(), "HY000") !== false) {
                 if (stripos($tdee->getMessage(), "no such table") !== false) {
-                    $table = str_replace("HY000: SQLSTATE[HY000]: General error: 1 no such table: ", "",
-                      $tdee->getMessage());
-                    throw new DatabaseLayer\TableDoesntExistException("42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'",
-                      $tdee->getCode(), $tdee);
+                    $table = str_replace(
+                        "HY000: SQLSTATE[HY000]: General error: 1 no such table: ",
+                        "",
+                        $tdee->getMessage()
+                    );
+                    throw new DatabaseLayer\TableDoesntExistException(
+                        "42S02: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table '{$table}'",
+                        $tdee->getCode(),
+                        $tdee
+                    );
                 }
             }
             throw $tdee;

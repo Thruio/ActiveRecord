@@ -66,7 +66,8 @@ abstract class VersionedActiveRecord extends ActiveRecord
         return $this;
     }
 
-    public function delete(){
+    public function delete()
+    {
         $update = new DatabaseLayer\Update($this->_table);
         $update->setData(['deleted' => 'Yes']);
         $update->condition($this->getIDField(), $this->getId());
@@ -77,5 +78,4 @@ abstract class VersionedActiveRecord extends ActiveRecord
         $this->reload();
         return $this;
     }
-
 }

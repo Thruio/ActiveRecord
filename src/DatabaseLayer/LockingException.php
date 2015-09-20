@@ -1,6 +1,7 @@
 <?php
 namespace Thru\ActiveRecord\DatabaseLayer;
 
-class LockingException extends \PDOException{
+class LockingException extends \PDOException
+{
 
 }

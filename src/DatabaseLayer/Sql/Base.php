@@ -48,7 +48,6 @@ class Base extends \PDO
         /* @var $result \PDOStatement */
         // echo "*** Model in Query: " . $model . "\n";
         try {
-
             $exec_time_start = microtime(true);
             $result = parent::Query($query, \PDO::FETCH_CLASS, $model);
 
@@ -76,24 +75,24 @@ class Base extends \PDO
         // echo "*** Model in handleError: " . $model . "\n";
         switch ($e->getCode()) {
           // MySQL table missing
-        case '42S02':
-            // SQLite table missing
-        case 'HY000' && (stripos($e->getMessage(), "no such table") !== false):
-            if ($model != 'StdClass') {
-                $instance = new $model();
-                if ($instance instanceof ActiveRecord) {
-                    $table_builder = new TableBuilder($instance);
-                    $table_builder->build();
-                    return $this->query($query, $model); // Re-run the query
+            case '42S02':
+                // SQLite table missing
+            case 'HY000' && (stripos($e->getMessage(), "no such table") !== false):
+                if ($model != 'StdClass') {
+                    $instance = new $model();
+                    if ($instance instanceof ActiveRecord) {
+                        $table_builder = new TableBuilder($instance);
+                        $table_builder->build();
+                        return $this->query($query, $model); // Re-run the query
+                    }
                 }
-            }
-            throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
-        default:
-            // Write exception to log.
-            if (DatabaseLayer::getInstance()->getLogger()) {
-                DatabaseLayer::getInstance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
-            }
-            throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
+                throw new DatabaseLayer\TableDoesntExistException($e->getCode() . ": " . $e->getMessage());
+            default:
+                // Write exception to log.
+                if (DatabaseLayer::getInstance()->getLogger()) {
+                    DatabaseLayer::getInstance()->getLogger()->addError("Active Record Exception in " . $model . "\n\n" . $e->getCode() . ": " . $e->getMessage() . "\n\nrunning:\n\n{$query}");
+                }
+                throw new DatabaseLayer\Exception($e->getCode() . ": " . $e->getMessage() . ".\n\n" . $query);
         }
     }
 

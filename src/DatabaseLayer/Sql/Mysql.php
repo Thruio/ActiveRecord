@@ -52,23 +52,23 @@ class Mysql extends GenericSql
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
                 switch (strtolower($order->getDirection())) {
-                case 'asc':
-                case 'ascending':
-                    $direction = 'ASC';
-                    break;
-                case 'desc':
-                case 'descending':
-                    $direction = 'DESC';
-                    break;
-                case 'rand()':
-                case 'rand':
-                case 'random()':
-                case 'random':
-                    $column = '';
-                    $direction = 'rand()';
-                    break;
-                default:
-                    throw new Exception("Bad ORDER direction: {$order->getDirection()}");
+                    case 'asc':
+                    case 'ascending':
+                        $direction = 'ASC';
+                        break;
+                    case 'desc':
+                    case 'descending':
+                        $direction = 'DESC';
+                        break;
+                    case 'rand()':
+                    case 'rand':
+                    case 'random()':
+                    case 'random':
+                        $column = '';
+                        $direction = 'rand()';
+                        break;
+                    default:
+                        throw new Exception("Bad ORDER direction: {$order->getDirection()}");
                 }
 
                 $orders[] = $column . " " . $direction;
@@ -212,50 +212,50 @@ class Mysql extends GenericSql
             if (isset($schema[$parameter])) {
                 $psuedo_type = $schema[$parameter]['type'];
                 switch (strtolower($psuedo_type)) {
-                case 'int':
-                case 'integer':
-                    $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
-                    $type = "INT({$length})";
-                    $auto_increment_possible = true;
-                    break;
+                    case 'int':
+                    case 'integer':
+                        $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 10;
+                        $type = "INT({$length})";
+                        $auto_increment_possible = true;
+                        break;
 
-                case 'string':
-                    $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
-                    $type = "VARCHAR({$length})";
-                    break;
+                    case 'string':
+                        $length = isset($schema[$parameter]['length']) ? $schema[$parameter]['length'] : 200;
+                        $type = "VARCHAR({$length})";
+                        break;
 
-                case 'date':
-                case 'datetime':
-                    $type = 'DATETIME';
-                    break;
+                    case 'date':
+                    case 'datetime':
+                        $type = 'DATETIME';
+                        break;
 
-                case 'enum':
-                    $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
-                    break;
+                    case 'enum':
+                        $type = "ENUM('" . implode("', '", $schema[$parameter]['options']) . "')";
+                        break;
 
-                case 'text':
-                    $type = "TEXT";
-                    break;
+                    case 'text':
+                        $type = "TEXT";
+                        break;
 
-                case 'blob':
-                    $type = 'BLOB';
-                    break;
+                    case 'blob':
+                        $type = 'BLOB';
+                        break;
 
-                case "decimal":
-                    $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
-                    break;
+                    case "decimal":
+                        $type = "DECIMAL(" . implode(",", $schema[$parameter]['options']) . ")";
+                        break;
 
-                case "uuid":
-                    $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
-                    break;
+                    case "uuid":
+                        $type = "VARCHAR(" . strlen(UUID::v4()) . ")";
+                        break;
 
-                case "md5":
-                    $type = "VARCHAR(" . strlen(md5("test")) . ")";
-                    break;
+                    case "md5":
+                        $type = "VARCHAR(" . strlen(md5("test")) . ")";
+                        break;
 
-                case "sha1":
-                    $type = "VARCHAR(" . strlen(sha1("test")) . ")";
-                    break;
+                    case "sha1":
+                        $type = "VARCHAR(" . strlen(sha1("test")) . ")";
+                        break;
                 }
             }
 

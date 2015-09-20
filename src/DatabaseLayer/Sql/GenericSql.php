@@ -18,23 +18,23 @@ abstract class GenericSql extends Base
     public function process(DatabaseLayer\VirtualQuery $thing)
     {
         switch ($thing->getOperation()) {
-        case 'Insert':
-            //Create
-            return $this->processInsert($thing);
-        case 'Select':
-            //Read
-            return $this->processSelect($thing);
-        case 'Update':
-            //Update
-            return $this->processUpdate($thing);
-        case 'Delete':
-            //Delete
-            return $this->processDelete($thing);
-        case 'Passthru':
-            //Delete
-            return $this->processPassthru($thing);
-        default:
-            throw new Exception("Operation {$thing->getOperation()} not supported");
+            case 'Insert':
+                //Create
+                return $this->processInsert($thing);
+            case 'Select':
+                //Read
+                return $this->processSelect($thing);
+            case 'Update':
+                //Update
+                return $this->processUpdate($thing);
+            case 'Delete':
+                //Delete
+                return $this->processDelete($thing);
+            case 'Passthru':
+                //Delete
+                return $this->processPassthru($thing);
+            default:
+                throw new Exception("Operation {$thing->getOperation()} not supported");
         }
     }
 
