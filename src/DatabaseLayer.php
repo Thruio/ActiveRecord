@@ -188,10 +188,13 @@ class DatabaseLayer
     {
         switch ($this->options['db_type']) {
             case 'Mysql':
-                $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
+                $dsn = "mysql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']};user={$this->options['db_username']};pass={$this->options['db_password']}";
                 break;
             case 'Sqlite':
                 $dsn = "sqlite:{$this->options['db_file']}";
+                break;
+            case 'Postgres':
+                $dsn = "pgsql:host={$this->options['db_hostname']};port={$this->options['db_port']};dbname={$this->options['db_database']}";
                 break;
             default:
                 throw new ConfigurationException("DB TYPE not supported: {$this->options['db_type']}");

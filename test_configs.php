@@ -10,9 +10,9 @@ $testDatabases['mysql'] = array(
 );
 
 $testDatabases['postgres'] = array(
-  'db_type' => 'pgsql',
+  'db_type' => 'Postgres',
   'db_hostname' => 'localhost',
-  'db_port' => '3306',
+  'db_port' => '5432',
   'db_username' => 'travis',
   'db_password' => 'travis',
   'db_database' => 'active_record_test',
