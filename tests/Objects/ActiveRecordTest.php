@@ -289,9 +289,9 @@ class ActiveRecordTest extends BaseTest
     }
 
     /**
-   * @expectedExceptionMessage Unknown table 'test_models'
-   * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
-   */
+     * @expectedExceptionMessageRegExp /Unknown table '(test_models|active_record_test.test_models)'/
+     * @expectedException \Thru\ActiveRecord\DatabaseLayer\TableDoesntExistException
+     */
     public function testDestroyTableThatDoesntExist()
     {
         $model = new TestModel();
