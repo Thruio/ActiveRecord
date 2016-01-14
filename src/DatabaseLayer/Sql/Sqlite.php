@@ -68,7 +68,7 @@ class Sqlite extends GenericSql
                         case 'random()':
                         case 'random':
                             $column = '';
-                            $direction = '';
+                            $direction = 'RANDOM()';
                             break;
                         default:
                             throw new Exception("Bad ORDER direction: {$order->getDirection()}");
@@ -308,7 +308,6 @@ class Sqlite extends GenericSql
             }
             return $result;
         } catch (DatabaseLayer\TableDoesntExistException $tdee) {
-            echo "Caught";
             if (stripos($tdee->getMessage(), "HY000") !== false) {
                 if (stripos($tdee->getMessage(), "no such table") !== false) {
                     $table = str_replace(

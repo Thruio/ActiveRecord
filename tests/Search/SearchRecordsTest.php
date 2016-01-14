@@ -111,7 +111,7 @@ class SearchRecordsTest extends \PHPUnit_Framework_TestCase
     {
         $random_result = TestModelSortable::search()
         ->order("test_model_id", "rand")
-        ->limit(1, 0)  //Not strictly neccisary but helps coverage
+        ->limit(1, 0)  //Not strictly necessary but helps coverage
         ->execOne();
         $this->assertTrue($random_result instanceof TestModelSortable);
     }
