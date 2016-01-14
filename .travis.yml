@@ -12,6 +12,10 @@ env:
   - DB=mysql
   - DB=postgres
 
+matrix:
+  allow_failures:
+    - env: DB=postgres
+
 before_script :
   - composer install
   - mysql -e 'create database active_record_test;'
