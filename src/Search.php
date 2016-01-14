@@ -22,7 +22,7 @@ class Search
         if (!$operation) {
             $operation = '=';
         }
-        if (!property_exists($this->model, $column)){
+        if (!property_exists($this->model, $column)) {
             throw new Exception("Column {$column} does not exist on " . get_class($this->model));
         }
         $this->conditions[] = new SearchCondition($column, $value, $operation);
