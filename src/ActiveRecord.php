@@ -9,9 +9,12 @@ use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 abstract class ActiveRecord
 {
     static public $MYSQL_FORMAT = "Y-m-d H:i:s";
+    static public $showSql;
     protected $_label_column = null;
     protected $_columns;
     protected $_table;
+    protected $_force_insert = false;
+    protected $_caching_enabled = true;
 
     /**
      * Start a Search on this type of active record
@@ -256,10 +259,16 @@ abstract class ActiveRecord
             }
         }
         $this->postConstruct();
-        if (DatabaseLayer::getInstance()->useCache()) {
+        if (DatabaseLayer::getInstance()->useCache() && $this->_caching_enabled) {
             $cache = DatabaseLayer::getInstance()->getCache();
             $cache->save($this->getCacheIdentifier(), serialize($this));
         }
+        return $this;
+    }
+
+    public function setForceInsert($force_insert = true)
+    {
+        $this->_force_insert = $force_insert;
         return $this;
     }
 
@@ -287,15 +296,23 @@ abstract class ActiveRecord
         $data = array();
         foreach ($this->_columns as $column) {
             // Never update the primary key. Bad bad bad. Except if we're versioned.
-            if ($column != $primary_key_column || $this instanceof VersionedActiveRecord) {
+            if ($column != $primary_key_column ||
+              $this instanceof VersionedActiveRecord ||
+              $this->_force_insert
+            ) {
                 $data["`{$column}`"] = $this->$column;
             }
         }
 
         // If we already have an ID, this is an update.
         $database = DatabaseLayer::getInstance();
-        if (!$this->getId() || property_exists($this, '_is_versioned') && $this->_is_versioned == true) {
+        if (
+          !$this->getId() ||
+          (property_exists($this, '_is_versioned') && $this->_is_versioned == true) ||
+          $this->_force_insert
+        ) {
             $operation = $database->insert($this->getTableName(), $this->getTableAlias());
+            $this->_force_insert = false;
         } else { // Else, we're an insert.
             $operation = $database->update($this->getTableName(), $this->getTableAlias());
         }
@@ -319,7 +336,7 @@ abstract class ActiveRecord
         }
 
         // Expire any existing copy of this object.
-        SearchIndex::getInstance()->expire($this->getTableName(), $this->getId());
+        SearchIndex::getInstance()->expire(get_called_class() . "/" . $this->getTableName(), $this->getId());
 
         if ($automatic_reload && $primary_key_column) {
             $this->reload();
@@ -579,5 +596,25 @@ abstract class ActiveRecord
             $definition['nullable'] = false;
         }
         return $definition;
+    }
+
+    static public function enableSqlDisplay()
+    {
+        self::$showSql = true;
+    }
+
+    static public function disableSqlDisplay()
+    {
+        self::$showSql = false;
+    }
+
+    public function disableCache()
+    {
+      $this->_caching_enabled = false;
+    }
+
+    public function enableCache()
+    {
+      $this->_caching_enabled = true;
     }
 }

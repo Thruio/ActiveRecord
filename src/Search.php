@@ -17,6 +17,22 @@ class Search
         $this->model = $model;
     }
 
+    public function enableCache()
+    {
+        if($this->model instanceof ActiveRecord) {
+            $this->model->enableCache();
+        }
+        return $this;
+    }
+
+    public function disableCache()
+    {
+        if($this->model instanceof ActiveRecord) {
+            $this->model->disableCache();
+        }
+        return $this;
+    }
+
     public function where($column, $value, $operation = null)
     {
         if (!$operation) {
@@ -57,11 +73,19 @@ class Search
 
             if (end($this->conditions)->getColumn() == $model->getIDField() && end($this->conditions)->getOperation() == '=') {
                 $primary_key_search = true;
-                if (SearchIndex::getInstance()->exists($model->getTableName(), end($this->conditions)->getValue())) {
-                    return array(
-                    SearchIndex::getInstance()
-                    ->get($model->getTableName(), end($this->conditions)->getValue())
-                    );
+                // TODO: write a test to verify that the additional class ahead of the table name fixes this bug.
+                if (SearchIndex::getInstance()
+                  ->exists(
+                    get_class($model) . "/" . $model->getTableName(),
+                    end($this->conditions)->getValue())
+                ) {
+                    return [
+                        SearchIndex::getInstance()
+                          ->get(
+                            get_class($model) . "/" . $model->getTableName(),
+                            end($this->conditions)->getValue()
+                          )
+                    ];
                 }
             }
             unset($model);
@@ -131,16 +155,24 @@ class Search
             $active_record_to_store = end($results);
             if ($active_record_to_store instanceof ActiveRecord) {
                 SearchIndex::getInstance()
-                ->put($this->model->getTableName(), end($this->conditions)->getValue(), $active_record_to_store);
+                ->put(
+                  get_class($this->model) . "/" . $this->model->getTableName(),
+                  end($this->conditions)->getValue(),
+                  $active_record_to_store
+                );
             }
         }
         return $results;
     }
 
 
+    /**
+     * @return false|ActiveRecord
+     */
     public function execOne()
     {
         // Get all the corresponding items
+
         $results = $this->exec();
 
         // Return the first result. Yes, that is what reset() does. :|

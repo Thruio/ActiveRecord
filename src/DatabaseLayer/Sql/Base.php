@@ -59,6 +59,10 @@ class Base extends \PDO
                 DatabaseLayer::getInstance()->getLogger()->addDebug("{$exec_time} sec: {$query}");
             }
 
+            if (ActiveRecord::$showSql) {
+                echo "{$exec_time} sec: {$query}\n";
+            }
+
             $this->query_log[] = new Log($query, $exec_time);
             return $result;
         } catch (\PDOException $e) {
