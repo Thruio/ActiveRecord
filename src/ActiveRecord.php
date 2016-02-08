@@ -3,6 +3,7 @@
 namespace Thru\ActiveRecord;
 
 use Guzzle\Common\Version;
+use Symfony\Component\Console\Helper\Table;
 use Thru\ActiveRecord\DatabaseLayer\TableBuilder;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
 
@@ -40,6 +41,7 @@ abstract class ActiveRecord
     {
         $tableBuilder = $this->getTableBuilder();
         $tableBuilder->build($this);
+        $this->table_schema_verify($tableBuilder);
     }
 
     /**
@@ -579,5 +581,12 @@ abstract class ActiveRecord
             $definition['nullable'] = false;
         }
         return $definition;
+    }
+
+    public function table_schema_verify(TableBuilder $tableBuilder){
+        $expectedSchema = $tableBuilder->getGeneratedSchema();
+        $actualSchema   = $tableBuilder->getActualSchema();
+
+        \Kint::dump($expectedSchema, $actualSchema);
     }
 }

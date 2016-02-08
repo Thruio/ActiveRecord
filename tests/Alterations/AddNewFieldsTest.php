@@ -9,8 +9,8 @@ class AddNewFieldsTest extends BaseTest
 {
     public function testAddATextField(){
 
-        $text = $this->faker->sentence(rand(5,10);
-        $extraText = $this->faker->sentence(rand(5,10);
+        $text = $this->faker->sentence(rand(5,10));
+        $extraText = $this->faker->sentence(rand(5,10));
 
         $testModel = new TestModel();
         $testModel->date_field = date("Y-m-d H:i:s");

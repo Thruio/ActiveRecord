@@ -14,11 +14,21 @@ class TableBuilder extends VirtualQuery
 
     public function build()
     {
-        $this->getInterpreter()->buildTable($this->context);
+        return $this->getInterpreter()->buildTable($this->context);
     }
 
     public function destroy()
     {
-        $this->getInterpreter()->destroyTable($this->context);
+        return $this->getInterpreter()->destroyTable($this->context);
+    }
+
+    public function getGeneratedSchema()
+    {
+        return $this->getInterpreter()->getGeneratedSchema($this->context);
+    }
+
+    public function getActualSchema()
+    {
+        return $this->getInterpreter()->getActualSchema($this->context);
     }
 }

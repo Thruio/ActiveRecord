@@ -2,6 +2,7 @@
 
 namespace Thru\ActiveRecord\DatabaseLayer\Sql;
 
+use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer;
 use Thru\ActiveRecord\DatabaseLayer\Exception;
 
@@ -113,5 +114,15 @@ abstract class GenericSql extends Base
         }
 
         return $conditions;
+    }
+
+    public function getGeneratedSchema(ActiveRecord $activeRecord)
+    {
+        $this->getClassSchema();
+    }
+
+    public function getActualSchema(ActiveRecord $activeRecord)
+    {
+
     }
 }

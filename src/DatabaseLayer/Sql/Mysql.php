@@ -202,7 +202,26 @@ class Mysql extends GenericSql
 
     public function buildTable(ActiveRecord $model)
     {
+        list($params) = $this->getGeneratedSchema($model);
+
+        $query = "CREATE TABLE IF NOT EXISTS `{$model->getTableName()}`\n";
+        $query.= "(\n";
+        $query.= implode(",\n", $params)."\n";
+        $query.= ")\n";
+        $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
+
+        // Log it.
+        if (DatabaseLayer::getInstance()->getLogger() instanceof Logger) {
+            DatabaseLayer::getInstance()->getLogger()->addInfo("Creating table {$model->getTableName()}\n\n{$query}");
+        }
+
+        $this->query($query);
+    }
+
+    public function getGeneratedSchema(ActiveRecord $model)
+    {
         $schema = $model->getClassSchema();
+        $schemaArray = [];
         $params = array();
         foreach ($model->__calculateSaveDownRows() as $p => $parameter) {
             $auto_increment = false;
@@ -275,6 +294,13 @@ class Mysql extends GenericSql
             }
             $nullability = $schema[$parameter]['nullable'] ? "NULL" : "NOT NULL";
             $params[] = "  " . trim("`{$parameter}` {$type} {$nullability} {$auto_increment_sql}");
+            $schemaArray[] = [
+                'parameter' => $parameter,
+                'type' => $type,
+                'nullable' => $schema[$parameter]['nullable'] ? TRUE : FALSE,
+                'auto_increment' => $auto_increment ? TRUE : FALSE,
+                'primary_key' => ($auto_increment_possible || ($model instanceof VersionedActiveRecord && $parameter == 'sequence')) ? TRUE : FALSE
+            ];
         }
 
         // Disable auto-increment if this object is versioned.
@@ -288,17 +314,6 @@ class Mysql extends GenericSql
             }
         }
 
-        $query = "CREATE TABLE IF NOT EXISTS `{$model->getTableName()}`\n";
-        $query.= "(\n";
-        $query.= implode(",\n", $params)."\n";
-        $query.= ")\n";
-        $query.= "ENGINE=InnoDB DEFAULT CHARSET=UTF8\n";
-
-        // Log it.
-        if (DatabaseLayer::getInstance()->getLogger() instanceof Logger) {
-            DatabaseLayer::getInstance()->getLogger()->addInfo("Creating table {$model->getTableName()}\n\n{$query}");
-        }
-
-        $this->query($query);
+        return [$params, $schemaArray];
     }
 }
