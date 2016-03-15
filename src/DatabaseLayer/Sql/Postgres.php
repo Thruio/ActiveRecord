@@ -8,7 +8,7 @@ use Thru\ActiveRecord\ActiveRecord;
 use Thru\ActiveRecord\DatabaseLayer\IndexException;
 use Thru\ActiveRecord\VersionedActiveRecord;
 use Thru\JsonPrettyPrinter\JsonPrettyPrinter;
-use Thru\UUID;
+use Thru\UUID\UUID;
 
 class Postgres extends GenericSql
 {
