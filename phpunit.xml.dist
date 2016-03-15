@@ -20,7 +20,10 @@
             <directory>tests/Configuration</directory>
         </testsuite>
         <testsuite name="utils">
-          <directory>tests/Utils</directory>
+            <directory>tests/Utils</directory>
+        </testsuite>
+        <testsuite name="dependencies">
+            <directory>vendor/thru.io/uuid/tests</directory>
         </testsuite>
     </testsuites>
     <logging>
