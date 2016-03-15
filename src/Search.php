@@ -19,7 +19,7 @@ class Search
 
     public function enableCache()
     {
-        if($this->model instanceof ActiveRecord) {
+        if ($this->model instanceof ActiveRecord) {
             $this->model->enableCache();
         }
         return $this;
@@ -27,7 +27,7 @@ class Search
 
     public function disableCache()
     {
-        if($this->model instanceof ActiveRecord) {
+        if ($this->model instanceof ActiveRecord) {
             $this->model->disableCache();
         }
         return $this;
@@ -76,14 +76,15 @@ class Search
                 // TODO: write a test to verify that the additional class ahead of the table name fixes this bug.
                 if (SearchIndex::getInstance()
                   ->exists(
-                    get_class($model) . "/" . $model->getTableName(),
-                    end($this->conditions)->getValue())
+                      get_class($model) . "/" . $model->getTableName(),
+                      end($this->conditions)->getValue()
+                  )
                 ) {
                     return [
                         SearchIndex::getInstance()
                           ->get(
-                            get_class($model) . "/" . $model->getTableName(),
-                            end($this->conditions)->getValue()
+                              get_class($model) . "/" . $model->getTableName(),
+                              end($this->conditions)->getValue()
                           )
                     ];
                 }
@@ -156,9 +157,9 @@ class Search
             if ($active_record_to_store instanceof ActiveRecord) {
                 SearchIndex::getInstance()
                 ->put(
-                  get_class($this->model) . "/" . $this->model->getTableName(),
-                  end($this->conditions)->getValue(),
-                  $active_record_to_store
+                    get_class($this->model) . "/" . $this->model->getTableName(),
+                    end($this->conditions)->getValue(),
+                    $active_record_to_store
                 );
             }
         }

@@ -8,7 +8,7 @@
     }
   ],
   "require"    : {
-    "thru.io/uuid": "1.0",
+    "thru.io/uuid": ">=2.0",
     "thru.io/json-pretty-printer": "1.0.*"
   },
   "require-dev": {
