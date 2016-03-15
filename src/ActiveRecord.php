@@ -306,8 +306,7 @@ abstract class ActiveRecord
 
         // If we already have an ID, this is an update.
         $database = DatabaseLayer::getInstance();
-        if (
-          !$this->getId() ||
+        if (!$this->getId() ||
           (property_exists($this, '_is_versioned') && $this->_is_versioned == true) ||
           $this->_force_insert
         ) {
@@ -598,23 +597,23 @@ abstract class ActiveRecord
         return $definition;
     }
 
-    static public function enableSqlDisplay()
+    public static function enableSqlDisplay()
     {
         self::$showSql = true;
     }
 
-    static public function disableSqlDisplay()
+    public static function disableSqlDisplay()
     {
         self::$showSql = false;
     }
 
     public function disableCache()
     {
-      $this->_caching_enabled = false;
+        $this->_caching_enabled = false;
     }
 
     public function enableCache()
     {
-      $this->_caching_enabled = true;
+        $this->_caching_enabled = true;
     }
 }
