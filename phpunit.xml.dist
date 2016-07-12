@@ -13,6 +13,9 @@
         <testsuite name="search">
             <directory>tests/Search</directory>
         </testsuite>
+        <testsuite name="caching">
+            <directory>tests/Caching</directory>
+        </testsuite>
         <testsuite name="sqllayer">
             <directory>tests/SqlLayer</directory>
         </testsuite>
