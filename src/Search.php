@@ -172,8 +172,10 @@ class Search
      */
     public function execOne()
     {
-        // Get all the corresponding items
+        // When requesting one, only bring back one...
+        $this->limit(1);
 
+        // Get the corresponding item
         $results = $this->exec();
 
         // Return the first result. Yes, that is what reset() does. :|
