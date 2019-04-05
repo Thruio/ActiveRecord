@@ -47,7 +47,7 @@ class Mysql extends GenericSql
         }
 
         // Handle ORDERs
-        if (count($thing->getOrders()) > 0) {
+        if (is_countable($thing->getOrders()) && count($thing->getOrders()) > 0) {
             foreach ($thing->getOrders() as $order) {
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
