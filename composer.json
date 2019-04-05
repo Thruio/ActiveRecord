@@ -8,7 +8,7 @@
     }
   ],
   "require"    : {
-    "thru.io/uuid": ">=2.0",
+    "gone.io/uuid": ">=2.0",
     "thru.io/json-pretty-printer": "1.0.*"
   },
   "require-dev": {
@@ -19,7 +19,6 @@
     "monolog/monolog": ">=1.6.0",
     "johnkary/phpunit-speedtrap": "~1.0@dev",
     "lstrojny/phpunit-clever-and-smart": "0.*",
-    "brianium/paratest": "dev-master",
     "fiunchinho/phpunit-randomizer": "dev-master",
     "squizlabs/php_codesniffer": "*",
     "doctrine/cache": "~1.4"

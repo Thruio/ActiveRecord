@@ -6,7 +6,7 @@ use \Thru\ActiveRecord\Test\Models\TestModelExtendedTypes;
 use \Thru\ActiveRecord\Test\Models\TestModelWithNameLabel;
 use \Thru\ActiveRecord\Test\Models\TestModelSortable;
 use \Thru\ActiveRecord\Test\Models\TestModelSearchOnly;
-use \Thru\UUID;
+use \Gone\UUID;
 
 class ActiveRecordExtendedTypesTest extends \PHPUnit_Framework_TestCase
 {

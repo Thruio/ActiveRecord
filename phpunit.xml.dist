@@ -23,7 +23,7 @@
             <directory>tests/Utils</directory>
         </testsuite>
         <testsuite name="dependencies">
-            <directory>vendor/thru.io/uuid/tests</directory>
+            <directory>vendor/gone.io/uuid/tests</directory>
         </testsuite>
     </testsuites>
     <logging>
