@@ -26,7 +26,7 @@ class Postgres extends GenericSql
         // SELECTORS
         foreach ($thing->getTables() as $table) {
             /* @var $table DatabaseLayer\Table */
-            $tables[] = "public." . $table->getName() . " " . $table->getAlias();
+            $tables[] = $table->getName() . " " . $table->getAlias();
             foreach ($table->getFields() as $field) {
                 $fields[] = $table->getAlias() . "." . $field;
             }
