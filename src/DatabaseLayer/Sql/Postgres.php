@@ -47,10 +47,19 @@ class Postgres extends GenericSql
         }
 
         // Handle ORDERs
-        if (count($thing->getOrders()) > 0) {
+        if ($thing->getOrders() !== null && count($thing->getOrders()) > 0) {
             foreach ($thing->getOrders() as $order) {
                 /* @var $order DatabaseLayer\Order */
                 $column = $order->getColumn();
+                switch(strtolower($order->getColumn())){
+                    case 'rand()':
+                    case 'rand':
+                    case 'random()':
+                    case 'random':
+                        $column = 'RANDOM()';
+                        $direction = '';
+                        break;
+                }
                 switch (strtolower($order->getDirection())) {
                     case 'asc':
                     case 'ascending':
@@ -60,13 +69,7 @@ class Postgres extends GenericSql
                     case 'descending':
                         $direction = 'DESC';
                         break;
-                    case 'rand()':
-                    case 'rand':
-                    case 'random()':
-                    case 'random':
-                        $column = '';
-                        $direction = 'rand()';
-                        break;
+
                     default:
                         throw new Exception("Bad ORDER direction: {$order->getDirection()}");
                 }
@@ -98,6 +101,40 @@ class Postgres extends GenericSql
         return $results;
     }
 
+    protected function processConditions($thing)
+    {
+        $conditions = [];
+        // CONDITIONS
+        if (count($thing->getConditions()) > 0) {
+            foreach ($thing->getConditions() as $condition) {
+                $value = $condition->getValue();
+
+                $value = str_replace("\\'","'", $value);
+                $value = str_replace("'","''", $value);
+
+                /* @var $condition DatabaseLayer\Condition */
+                if ($condition->getOperation() == "IN" || is_array($condition->getValue()) && $condition->getOperation() == '=') {
+                    $conditions[] = "{$condition->getColumn()} IN(\"" . implode(
+                            "', '",
+                            $value
+                        ) . "\")";
+                } elseif ($condition->getOperation() == "NOT IN" || is_array($condition->getValue()) && $condition->getOperation() == '!=') {
+                    $conditions[] = "{$condition->getColumn()} NOT IN(\"" . implode(
+                            "', '",
+                            $value
+                        ) . "\")";
+                } else {
+                    $conditions[] = "{$condition->getColumn()} {$condition->getOperation()} '{$value}'";
+                }
+            }
+            $conditions = "WHERE " . implode("\n  AND ", $conditions);
+        } else {
+            $conditions = null;
+        }
+
+        return $conditions;
+    }
+
     // TODO: For the love of god, rewrite this to use PDO prepared statements
     public function processInsert(DatabaseLayer\Insert $thing)
     {
@@ -116,6 +153,7 @@ class Postgres extends GenericSql
                 $value = JsonPrettyPrinter::Json($value);
             }
             $value_slashed = addslashes($value);
+            $value_slashed = str_replace("\\'","''", $value_slashed);
             if ($value === null) {
                 $updates['columns'][] = $key;
                 $updates['values'][] = 'NULL';
@@ -147,15 +185,19 @@ class Postgres extends GenericSql
 
         $updates = array();
         foreach ($thing->getData() as $key => $value) {
-            $key = trim($key, "\"");
+
+            $key = trim($key, "\"`");
             if (is_object($value) || is_array($value)) {
                 $value = JsonPrettyPrinter::Json($value);
             }
             $value_slashed = addslashes($value);
+            $value_slashed = str_replace("\'","''", $value_slashed);
             if ($value === null) {
-                $updates[] = "\"$key\" = NULL";
+                $updates[] = "$key = NULL";
+            } else if (is_numeric($value_slashed)){
+                $updates[] = "$key = $value_slashed";
             } else {
-                $updates[] = "\"$key\" = \"$value_slashed\"";
+                $updates[] = "$key = '$value_slashed'";
             }
         }
         $selector = "UPDATE {$table->getName()} ";
